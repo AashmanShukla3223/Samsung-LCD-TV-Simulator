@@ -1,0 +1,8 @@
+{
+  "label": "CORRUPTED_USB",
+  "description": "A USB drive with a corrupted/malformed version.json file",
+  "files": {
+    "version.json": "this is not valid json {{{{ version: broken }}}",
+    "Samsung_TV.html": "Corrupted firmware package\n=======================\nThis file should not be parsed."
+  }
+}

@@ -1,0 +1,5 @@
+{
+  "label": "EMPTY_USB",
+  "description": "A freshly formatted USB drive with no firmware files",
+  "files": {}
+}
