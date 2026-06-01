@@ -31,7 +31,7 @@ export const config = {
 };
 
 // ── Models ──────────────────────────────────────────────────────────────────
-const GEMINI_MODEL     = process.env.GEMINI_MODEL || 'gemini-2.0-flash-lite';
+const GEMINI_MODEL     = process.env.GEMINI_MODEL || 'gemini-3.1-flash-lite';
 const GROQ_MODEL       = 'llama-3.3-70b-versatile';
 const OPENROUTER_MODEL = 'deepseek/deepseek-r1:free';
 // Other free OpenRouter options:
