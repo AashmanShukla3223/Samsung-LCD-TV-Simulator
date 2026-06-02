@@ -1220,7 +1220,7 @@
         let demoModeTimer = null;
         const DEMO_INPUTS = [0, 1, 2, 3, 4];
         let demoInputIdx = 0;
-        let subtitleMode = 'off';
+        let subtitleMode = localStorage.getItem('samsung_subtitle_mode') || 'off';
 
         // Dynamic audio volume synchronization
         function updateAudioVolumes() {
@@ -1470,12 +1470,6 @@
         // USB media/photo state
         let usbMediaPlayerOpen = false;
         let usbPhotoViewerOpen = false;
-        // Retail Demo Mode
-        let demoModeTimer = null;
-        let demoInputIdx = 0;
-        const DEMO_INPUTS = [0, 1, 2, 3, 4];
-        // Subtitle mode
-        let subtitleMode = localStorage.getItem('samsung_subtitle_mode') || 'off';
         let usbPhotoList = [];
         let usbPhotoIndex = 0;
 
