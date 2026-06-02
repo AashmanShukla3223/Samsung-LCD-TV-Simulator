@@ -573,6 +573,7 @@ Reply with STRICT JSON ONLY, no markdown:
         }
         #ai-modal-backdrop.open { display: flex; }
         #ai-modal {
+          position: relative;
           width: 1280px; max-width: 92vw; height: 720px; max-height: 90vh;
           overflow-y: auto;
           background: linear-gradient(145deg, rgba(11,27,58,.96), rgba(5,12,31,.98));
