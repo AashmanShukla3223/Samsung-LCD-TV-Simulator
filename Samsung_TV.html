@@ -4491,11 +4491,22 @@
                 showToast('Retail Demo Mode: OFF', '<i class="fa-solid fa-tv"></i>', 'info');
             }
         }
+        function switchInputSource(idx) {
+            if (idx === activeInputSource) return;
+            var oldSource = activeInputSource;
+            activeInputSource = idx;
+            renderActiveScreen();
+            if (typeof handleCEC === 'function') handleCEC(oldSource, activeInputSource);
+            if (typeof showToast === 'function') showToast('Input switched to: ' + (['TV/RF','AV/Component','HDMI 1 (Apple TV)','HDMI 2 (PS3)','HDMI 3 (DishTV)'][idx] || 'Source ' + idx), '<i class="fa-solid fa-circle-nodes"></i>', 'success');
+            if (typeof saveSettings === 'function') saveSettings();
+            if (idx === 4 && typeof startBroadcastScanner === 'function') startBroadcastScanner();
+            else if (typeof stopBroadcastScanner === 'function') stopBroadcastScanner();
+        }
         function startDemoMode() {
             stopDemoMode();
             demoModeTimer = setInterval(function() {
                 demoInputIdx = (demoInputIdx + 1) % DEMO_INPUTS.length;
-                switchInput(DEMO_INPUTS[demoInputIdx]);
+                switchInputSource(DEMO_INPUTS[demoInputIdx]);
                 showFloatingDemoBanner();
             }, 30000);
         }
