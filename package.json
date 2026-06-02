@@ -1,0 +1,19 @@
+{
+  "name": "samsung-lcd-tv-simulator",
+  "version": "1.0.0",
+  "description": "Samsung LCD TV Simulator with Vercel Web Analytics",
+  "scripts": {
+    "dev": "npx serve .",
+    "build": "echo 'No build step required for static site'",
+    "lint": "echo 'No linter configured'"
+  },
+  "keywords": [
+    "samsung",
+    "tv",
+    "simulator"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "@vercel/analytics": "^2.0.1"
+  }
+}
