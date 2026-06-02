@@ -1,14 +1,19 @@
 {
-  "name": "samsung-lcd-tv",
+  "name": "samsung-lcd-tv-simulator",
   "version": "1.0.0",
   "description": "Samsung LCD TV Simulator",
   "type": "module",
   "scripts": {
-    "build": "echo 'No build step required for static site'",
-    "lint": "echo 'No linter configured'",
-    "test": "echo 'No tests configured'"
+    "dev": "npx serve ."
   },
+  "keywords": [
+    "samsung",
+    "tv",
+    "simulator"
+  ],
+  "license": "MIT",
   "dependencies": {
+    "@vercel/analytics": "^2.0.1",
     "@vercel/speed-insights": "^2.0.0"
   },
   "devDependencies": {},

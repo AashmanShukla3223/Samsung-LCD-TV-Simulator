@@ -1,4 +1,5 @@
 {
+  "outputDirectory": ".",
   "functions": {
     "api/ai-pick.js": {
       "regions": ["bom1"]
