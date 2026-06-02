@@ -1,4 +1,7 @@
 {
+  "buildCommand": null,
+  "outputDirectory": ".",
+  "framework": null,
   "functions": {
     "api/ai-pick.js": {
       "regions": ["bom1"]

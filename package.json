@@ -1,0 +1,20 @@
+{
+  "name": "samsung-lcd-tv-simulator",
+  "version": "1.0.0",
+  "description": "Samsung LCD TV Simulator",
+  "type": "module",
+  "scripts": {
+    "dev": "npx serve ."
+  },
+  "keywords": [
+    "samsung",
+    "tv",
+    "simulator"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "@vercel/analytics": "^2.0.1",
+    "@vercel/speed-insights": "^2.0.0"
+  },
+  "private": true
+}
