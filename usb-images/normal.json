@@ -2,7 +2,7 @@
   "label": "SANDISK_USB",
   "description": "Standard SanDisk USB with the current firmware package",
   "files": {
-    "version.json": "{\n  \"version\": \"1.0.24\",\n  \"release\": \"Samsung BN59 firmware\",\n  \"date\": \"2026-06-01\"\n}",
-    "Samsung_TV.html": "Samsung BN59 Firmware Package\n============================\nVersion: 1.0.24\nModel: Samsung BN59 / UE32C5000\nCompatible: DishTV, USB OTA, Internet OTA\nFeatures: Multi-path firmware update system\nGenerated: 2026-06-01"
+    "version.json": "{\n  \"version\": \"1.0.25\",\n  \"release\": \"Samsung BN59 firmware\",\n  \"date\": \"2026-06-02\"\n}",
+    "Samsung_TV.html": "Samsung BN59 Firmware Package\n============================\nVersion: 1.0.25\nModel: Samsung BN59 / UE32C5000\nCompatible: DishTV, USB OTA, Internet OTA\nFeatures: Multi-path firmware update system\nGenerated: 2026-06-02"
   }
 }

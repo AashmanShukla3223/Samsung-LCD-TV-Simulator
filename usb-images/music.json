@@ -1,0 +1,11 @@
+{
+  "label": "MUSIC_USB",
+  "description": "USB drive with audio tracks",
+  "files": {
+    "music/01_aajtak_signature.mp3": "https://github.com/AashmanShukla3223/Antigravity-and-OpenCode-CLI-Prompts-and-Skills/releases/download/v1.0.5/aajtak.sound.test.mp3",
+    "music/02_halla_bol_theme.mp3": "https://github.com/AashmanShukla3223/Antigravity-and-OpenCode-CLI-Prompts-and-Skills/releases/download/v1.0.6/halla.bol.mp3",
+    "music/03_batidao_speed.mp3": "https://github.com/AashmanShukla3223/Antigravity-and-OpenCode-CLI-Prompts-and-Skills/releases/download/v1.0.5/Batidao.da.Madrugada.Speed.mp3",
+    "music/04_soundtest_2010.mp3": "https://github.com/AashmanShukla3223/Antigravity-and-OpenCode-CLI-Prompts-and-Skills/releases/download/v1.0/soundtest.mp3",
+    "playlists/favorites.m3u": "# Samsung TV Favorites Playlist\nmusic/03_batidao_speed.mp3\nmusic/02_halla_bol_theme.mp3\nmusic/01_aajtak_signature.mp3"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "label": "VACATION_USB",
+  "description": "USB with photos from vacation",
+  "files": {
+    "DCIM/100SAMSUNG/IMG_0001.jpg": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800",
+    "DCIM/100SAMSUNG/IMG_0002.jpg": "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=800",
+    "DCIM/100SAMSUNG/IMG_0003.jpg": "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800",
+    "DCIM/100SAMSUNG/IMG_0004.jpg": "https://images.unsplash.com/photo-1426604966848-d7adac402bff?w=800",
+    "DCIM/100SAMSUNG/IMG_0005.jpg": "https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=800",
+    "metadata.txt": "Samsung BN59 Photo Collection\nFormat: JPEG\nTotal: 5 photos"
+  }
+}

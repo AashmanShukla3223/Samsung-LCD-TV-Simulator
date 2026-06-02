@@ -1,0 +1,8 @@
+{
+  "label": "OLDER_FW_USB",
+  "description": "USB with older firmware (triggers downgrade warning)",
+  "files": {
+    "version.json": "{\n  \"version\": \"1.0.10\",\n  \"release\": \"Samsung BN59 legacy firmware\",\n  \"date\": \"2026-05-25\"\n}",
+    "Samsung_TV.html": "Samsung BN59 Firmware Package (Legacy)\n========================================\nVersion: 1.0.10\nNote: This is older than current firmware."
+  }
+}

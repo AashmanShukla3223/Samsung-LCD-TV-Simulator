@@ -340,6 +340,7 @@ Reply with STRICT JSON ONLY, no markdown:
     let aiEnabled    = localStorage.getItem(AI_ENABLED_STORE) !== 'false';
     let kbLocked     = localStorage.getItem(KB_LOCK_STORE)    === 'true';
     let tuneShortcutsEnabled = localStorage.getItem(AI_TUNE_SHORTCUTS_STORE) !== 'false';
+    let lastAIResponse = null;
 
     // ── Keyboard guard ──────────────────────────────────────────────────
     //  The host script's keydown handlers fire on EVERY keypress, even when
@@ -404,16 +405,22 @@ Reply with STRICT JSON ONLY, no markdown:
 
       const userKey = localStorage.getItem(AI_GEMINI_KEY_STORE) || '';
       let pickNum, reason, via = 'retrieval';
+      let pickResponse = null;
 
       // ── Strategy 1: server proxy (no key needed; preferred path) ──
       let serverModel = null;
+      let serverSource = null;
+      let serverLatency = null;
       try {
         toast('🤖 Asking AI…', '🤖', 'info');
         const pick = await serverPick(query, candidates);
         pickNum     = pick.channel_number;
         reason      = pick.reason || 'Best match for your request.';
         serverModel = pick.model || null;
+        serverSource = pick.source || null;
+        serverLatency = pick.latency_ms || null;
         via         = 'server';
+        pickResponse = pick;
       } catch (serverErr) {
         // ── Strategy 2: user's pasted key (local dev / no proxy) ──
         if (userKey) {
@@ -439,6 +446,20 @@ Reply with STRICT JSON ONLY, no markdown:
       }
 
       tuneTo(pickNum, reason);
+
+      // Store for "Why this channel?" panel
+      lastAIResponse = {
+        query: query,
+        candidates: candidates,
+        pick: pickResponse || { channel_number: pickNum, reason: reason, source: via, model: serverModel },
+        timestamp: Date.now()
+      };
+
+      // Render provider badge if server gave us data
+      if (pickResponse && pickResponse.source) {
+        renderProviderBadge(pickResponse);
+      }
+
       logToConsole(query, candidates, pickNum, reason, via, serverModel);
     }
 
@@ -452,6 +473,71 @@ Reply with STRICT JSON ONLY, no markdown:
         console.table(cands.map(c => ({ ch: c.doc.number, name: c.doc.name, score: +c.score.toFixed(4) })));
         console.groupEnd();
       } catch {}
+    }
+
+    function renderProviderBadge(response) {
+      const { source, model, latency_ms } = response;
+      const colorClass = {
+        'groq': 'text-emerald-400',
+        'gemini': 'text-sky-400',
+        'openrouter': 'text-purple-400',
+        'both': 'text-amber-400',
+        'retrieval': 'text-zinc-400'
+      }[source] || 'text-zinc-400';
+      const icon = {
+        'groq': '⚡',
+        'gemini': '🤖',
+        'openrouter': '🆓',
+        'both': '⚡🤖',
+        'retrieval': '🔎'
+      }[source] || '?';
+      const shortModel = (model || '').split('/').pop().split('-').slice(0, 2).join('-');
+      const badge = document.createElement('div');
+      badge.className = 'provider-badge font-mono text-[10px] ' + colorClass;
+      badge.style.cssText = 'position: absolute; bottom: 8px; right: 12px; padding: 4px 8px; background: rgba(0,0,0,0.6); border-radius: 4px; backdrop-filter: blur(4px);';
+      badge.textContent = icon + ' ' + source + ' · ' + shortModel + ' · ' + latency_ms + 'ms';
+      resultContainer = document.querySelector('#ai-modal');
+      if (!resultContainer) resultContainer = document.body;
+      resultContainer.appendChild(badge);
+      setTimeout(() => {
+        badge.style.transition = 'opacity 0.5s';
+        badge.style.opacity = '0';
+        setTimeout(() => badge.remove(), 500);
+      }, 5000);
+    }
+
+    function renderWhyPanel() {
+      if (!lastAIResponse) return;
+      const { query, candidates, pick } = lastAIResponse;
+      let panel = document.getElementById('ai-why-panel');
+      if (panel) {
+        panel.remove();
+        const toggle = document.getElementById('ai-why-toggle');
+        if (toggle) toggle.textContent = 'Why this channel? ▾';
+        return;
+      }
+      panel = document.createElement('div');
+      panel.id = 'ai-why-panel';
+      panel.className = 'why-panel';
+      panel.style.cssText = 'padding: 12px; background: rgba(0,0,0,0.8); border-radius: 8px; margin-top: 8px; font-size: 11px; color: #e2e8f0;';
+      panel.innerHTML =
+        '<div style="font-weight: bold; color: #7dd3fc; margin-bottom: 8px;">Why Channel ' + pick.channel_number + '?</div>' +
+        '<div style="margin-bottom: 8px;">' +
+          '<strong>Top candidates from TF-IDF retrieval:</strong>' +
+          '<table style="width: 100%; margin-top: 4px; font-family: monospace; font-size: 10px;">' +
+          candidates.slice(0, 5).map(function(c, i) {
+            var scoreDisplay = c.score.toFixed(3);
+            var star = c.doc.number === pick.channel_number ? ' ★' : '';
+            var color = c.doc.number === pick.channel_number ? '#10b981' : '#64748b';
+            return '<tr><td>' + (i + 1) + '.</td><td>Ch ' + c.doc.number + '</td><td>' + (c.doc.name || '').substring(0, 30) + '</td><td style="text-align: right; color: ' + color + ';">' + scoreDisplay + star + '</td></tr>';
+          }).join('') +
+          '</table>' +
+        '</div>' +
+        '<div><strong>' + (pick.source || 'AI') + '\'s reasoning:</strong><div style="font-style: italic; margin-top: 4px;">"' + (pick.reason || '') + '"</div></div>';
+      var target = document.querySelector('#ai-modal');
+      if (target) target.appendChild(panel);
+      var toggle = document.getElementById('ai-why-toggle');
+      if (toggle) toggle.textContent = 'Hide ▴';
     }
 
     // ── 6. UI: floating button + prompt modal ───────────────────────
@@ -638,6 +724,9 @@ Reply with STRICT JSON ONLY, no markdown:
 
           <div class="chips" id="ai-chips"></div>
 
+          <div style="margin-top: 6px;">
+            <button class="btn ghost" id="ai-why-toggle" style="font-size:10px;padding:4px 10px;width:100%;" title="Show TF-IDF candidates and AI reasoning">Why this channel? ▾</button>
+          </div>
           <div class="actions">
             <button class="btn ghost" id="ai-cancel">Cancel</button>
             <button class="btn" id="ai-ask">Tune Channel →</button>
@@ -736,10 +825,19 @@ Reply with STRICT JSON ONLY, no markdown:
 
       // Open / close
       function openModal() { modal.classList.add('open'); setTimeout(() => queryInput.focus(), 50); }
-      function closeModal() { modal.classList.remove('open'); }
+      function closeModal() { 
+        modal.classList.remove('open');
+        var existingPanel = document.getElementById('ai-why-panel');
+        if (existingPanel) existingPanel.remove();
+        var toggle = document.getElementById('ai-why-toggle');
+        if (toggle) toggle.textContent = 'Why this channel? ▾';
+        var existingBadge = document.querySelector('.provider-badge');
+        if (existingBadge) existingBadge.remove();
+      }
       fab.addEventListener('click', openModal);
       modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
       modal.querySelector('#ai-cancel').addEventListener('click', closeModal);
+      modal.querySelector('#ai-why-toggle').addEventListener('click', renderWhyPanel);
 
       // Submit
       function submit() {
@@ -779,12 +877,12 @@ Reply with STRICT JSON ONLY, no markdown:
       isEnabled: () => aiEnabled,
       setKbLocked: (val) => { kbLocked = val; },
       setTuneShortcuts: (val) => { tuneShortcutsEnabled = val; },
-      version: '1.0.24',
+      version: '1.0.25.0',
       mode: 'server-first (Vercel Edge) with client-key + retrieval fallbacks',
     };
 
     injectUI();
-    console.log('%c[AI Channel Picker] ready · v1.0.24 · server-first via /api/ai-pick · press I',
+    console.log('%c[AI Channel Picker] ready · v1.0.25 · server-first via /api/ai-pick · press I',
                 'color:#06b6d4;font-weight:bold;');
   }
 })();
