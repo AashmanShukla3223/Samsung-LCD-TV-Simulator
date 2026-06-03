@@ -1093,12 +1093,12 @@ Reply with STRICT JSON ONLY, no markdown:
       setKbLocked: (val) => { kbLocked = val; },
       setTuneShortcuts: (val) => { tuneShortcutsEnabled = val; },
       voiceToggle: toggleVoiceInput,
-      version: '1.0.26.0',
+      version: '1.0.27.0',
       mode: 'server-first (Vercel Edge) with client-key + retrieval fallbacks',
     };
 
     injectUI();
-    console.log('%c[AI Channel Picker] ready · v1.0.26 · server-first via /api/ai-pick · press I',
+    console.log('%c[AI Channel Picker] ready · v1.0.27 · server-first via /api/ai-pick · press I',
                 'color:#06b6d4;font-weight:bold;');
   }
 })();

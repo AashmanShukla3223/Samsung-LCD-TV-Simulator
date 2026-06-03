@@ -868,7 +868,7 @@
                             </div>
 
                             <!-- Right Options Panel: Dynamically Rendered based on Category -->
-                            <div id="osdOptionsPanel" class="w-2/3 p-4 flex flex-col gap-2.5 overflow-y-auto">
+                            <div id="osdOptionsPanel" class="w-2/3 p-4 flex flex-col gap-2.5 overflow-y-auto" style="max-height:360px;">
                                 <!-- Dynamic Options filled by Javascript -->
                             </div>
                         </div>
@@ -2264,6 +2264,17 @@
             tvSynth.playFMNote(750, 0.08, 0.15);
         }
         }
+        function navigateLeftOrReturn() {
+            if (!menuOpen) return;
+            if (menuStage === "options") {
+                menuStage = "categories";
+                renderCategories();
+                renderCategoryOptions();
+            } else {
+                closeMenu();
+            }
+        }
+
         function navigateLeftAdjustment() {
             if (!menuOpen || menuStage !== "options") {
                 navigateLeftOrReturn();
@@ -4383,10 +4394,9 @@
             var dialog = document.getElementById('tvDialog');
             var title = document.getElementById('tvDialogTitle');
             var msg = document.getElementById('tvDialogMessage');
-            var confirmBtn = document.getElementById('tvDialogConfirm');
-            var cancelBtn = document.getElementById('tvDialogCancel');
+            var btnContainer = document.getElementById('tvDialogButtons');
             var input = document.getElementById('tvDialogInput');
-            if (!dialog || !title || !msg) return;
+            if (!dialog || !title || !msg || !btnContainer) return;
             if (input) input.style.display = 'none';
             title.innerText = 'Sleep Timer';
             var options = ['Off', '30 min', '60 min', '90 min', '120 min'];
@@ -4397,11 +4407,10 @@
             msg.innerHTML = '<div style="text-align:center;">' + options.map(function(o, i) {
                 return '<div class="sleep-timer-option' + (i === currentIdx ? ' samsung-osd-highlight' : '') + '" data-idx="' + i + '" style="padding:6px 12px;cursor:pointer;border-radius:4px;margin:2px 0;">' + o + '</div>';
             }).join('') + '<\/div><div style="font-size:10px;color:#94a3b8;margin-top:8px;">TV will turn off automatically after selected time.</div>';
+            btnContainer.innerHTML = '<button id="tvDialogCancelBtn" class="bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-bold px-4 py-2 rounded text-[10px] uppercase tracking-wider">Close</button>';
             dialog.classList.remove('hidden');
             dialog.style.display = 'flex';
-            confirmBtn.classList.add('hidden');
-            cancelBtn.innerText = 'Close';
-            cancelBtn.onclick = function() {
+            document.getElementById('tvDialogCancelBtn').onclick = function() {
                 dialog.classList.add('hidden');
                 dialog.style.display = 'none';
             };
