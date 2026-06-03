@@ -1808,6 +1808,7 @@
         /* Power Sequence Logic */
 
         async function togglePower() {
+            try {
             tvSynth.initAudio();
 
             if (powerState === "off") {
@@ -1882,6 +1883,10 @@
                 // Keep screen physically off
                 document.getElementById('screenOff').style.opacity = "1";
                 saveSettings();
+            }
+            } catch(e) {
+                console.error('togglePower error:', e);
+                showToast('Power error: ' + e.message, '⚠️', 'error');
             }
         }
 
