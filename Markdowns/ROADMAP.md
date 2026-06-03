@@ -11,12 +11,12 @@
 |---|---|---|---|
 | **v1.0.25** | The Gold Polish | Features only | 13 high-impact UI/UX/architecture features across 6 categories |
 | **v1.0.26** | The Silver Refinement | Features only | 9 medium-impact refinements |
-| **v1.0.27** | The Bronze Personality | Features only | 7 small charming features |
+| **v1.0.27** | The Bronze Personality | Features only | 7 charming features + AI Picker disambiguation fix (hierarchical News→Network→Show) |
 | **v1.0.28** | News Content Expansion | Channels only | 3 AajTak MP4s + 1 HLS stream (India Today archive 2020) |
 | **v1.0.29** | Kids Imports | Channels only | 2× Peppa Pig + 2× Paw Patrol (Hindi dubs) |
 | **v1.0.30** | Kids Indian Originals | Channels only | 2× Chikoo Aur Bunty + 2× Motu Patlu |
 
-**Total across arc:** 29 features + 12 channels = 41 distinct shippable items, 6 release cycles.
+**Total across arc:** 30 features + 12 channels = 42 distinct shippable items, 6 release cycles.
 
 ---
 
@@ -95,15 +95,16 @@
 
 ## 🥉 v1.0.27 — The Bronze Personality Release
 
-**Scope:** 7 small charming features that add personality without being essential.
+**Scope:** 8 features — 7 small charming personality touches + 1 architectural AI Picker bug fix.
 
-### Features (7):
+### Features (8):
 
 **OSD Menus (1):**
 - Closed Captions menu (vestigial / non-functional, but exists as a UI surface — period-authentic)
 
-**AI Picker (1):**
+**AI Picker (2):**
 - Mode usage stats in modal — "Last 10 picks: 8 Groq, 1 Gemini, 1 retrieval-only"
+- **🎯 Channel Disambiguation Fix** — hierarchical News → Network → Show grouping in the AI Picker corpus + unique edition identifiers for collision channels (Halla Bol I/II/III on 126/128/132, Special Report I/II on 123/130). Restructures candidate list sent to the LLM as a 3-level tree (Category → Network → Show), adds `category` / `network` / `show` / `edition` / `disambiguator` fields per channel, updates the prompt template to instruct the LLM not to default to the lowest-numbered channel on collisions. Fixes the position-bias bug where "Show me Halla Bol" always returned channel 126.
 
 **USB Profiles (1):**
 - WII_SAVES_USB profile (easter egg) — mimics Wii save data folder structure
@@ -116,7 +117,7 @@
 - Sleep timer — "Sleep in 15/30/60/90 minutes"
 - Channel-up/down memory — TV remembers last channel per input source
 
-**Acceptance:** All 7 bronze features verified. APP_VERSION → 1.0.27.
+**Acceptance:** All 8 bronze features verified. APP_VERSION → 1.0.27.
 
 **Post-release:** PLAYBOOK.md Phase 2 continued — Indie Hackers submission, Product Hunt prep.
 
