@@ -5,6 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Samsung LCD TV Simulator</title>
     <!-- Tailwind CSS CDN -->
+    <script>
+        const _twOrigWarn = console.warn.bind(console);
+        console.warn = function(...args) {
+            if (args.length && typeof args[0] === 'string' && args[0].includes('cdn.tailwindcss.com should not be used in production')) return;
+            _twOrigWarn(...args);
+        };
+    </script>
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts (Exo for Frutiger Aero, Share Tech Mono for CRT, Inter, and sans-serif elements) -->
     <link href="https://fonts.googleapis.com/css2?family=Exo:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800&family=Share+Tech+Mono&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -5044,6 +5051,5 @@
 
     </script>
     <!-- AI Channel Picker (RAG) v1.0.25.0 -->
-    <script src="ai-picker.js" defer></script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a043edfcab60518f',t:'MTc4MDIwOTAyMw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+    <script src="ai-picker.js" defer></script></body>
 </html>
