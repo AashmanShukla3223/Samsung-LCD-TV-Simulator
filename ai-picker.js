@@ -42,80 +42,140 @@
     //  Tags + description = the document RAG retrieves over.
     //  Edit freely — richer text = smarter picks.
     const META = {
-      121: {
+       121: {
         category: "general news",
+        network: "AajTak",
+        show: "Main Bulletin",
+        edition: "Daily Headlines",
+        disambiguator: "general daily news headlines samachar",
         tags: ["news", "headlines", "samachar", "general", "aaj tak", "daily"],
         description: "AajTak general news bulletin — daily headlines from India."
       },
-      122: {
+       122: {
         category: "entertainment",
+        network: "AajTak",
+        show: "Saas Bahu aur Betiyaan",
+        edition: "Soap & Gossip",
+        disambiguator: "soap opera serial bollywood entertainment gossip",
         tags: ["saas bahu", "betiyaan", "soap", "tv serial", "bollywood", "celebrity", "entertainment", "gossip", "manoranjan"],
         description: "Saas Bahu aur Betiyaan — TV soap, serial drama and Bollywood entertainment gossip."
       },
-      123: {
+       123: {
         category: "investigation",
+        network: "AajTak",
+        show: "Special Report",
+        edition: "Prime Time Investigation",
+        disambiguator: "8:30 PM long-form investigative journalism",
         tags: ["special report", "investigation", "8:30 pm", "prime time", "in depth", "ground report", "explainer"],
         description: "AajTak Special Report 8:30PM Edition — long-form investigative journalism."
       },
-      124: {
+       124: {
         category: "morning news",
+        network: "AajTak",
+        show: "Aaj Subah",
+        edition: "Morning Round-up",
+        disambiguator: "10 AM morning breakfast news",
         tags: ["morning", "subah", "10am", "breakfast news", "early", "wake up", "subah ki khabar"],
         description: "AajTak Aaj Subah 10AM Edition — morning news round-up."
       },
-      125: {
+       125: {
         category: "politics",
+        network: "AajTak",
+        show: "e-Agenda",
+        edition: "Political Summit 2020",
+        disambiguator: "political agenda debate policy leaders",
         tags: ["politics", "agenda", "2020", "policy", "debate", "panel", "e-agenda", "leaders"],
         description: "AajTak 2020 e-Agenda Edition — political agenda summit, policy debates with leaders."
       },
-      126: {
+       126: {
         category: "debate",
-        tags: ["halla bol", "debate", "6:30 pm", "anchor", "shouting match", "panel discussion", "evening", "opinion"],
-        description: "AajTak Halla Bol 6:30PM Edition — high-voltage prime time political debate show."
+        network: "AajTak",
+        show: "Halla Bol",
+        edition: "Evening Debate Edition",
+        disambiguator: "6:30 PM prime time high-voltage debate",
+        tags: ["halla bol", "debate", "6:30 pm", "anchor", "shouting match", "panel discussion", "evening", "opinion", "prime time", "evening debate"],
+        description: "AajTak Halla Bol [Evening Debate Edition] 6:30PM — high-voltage prime time political debate show."
       },
-      127: {
+       127: {
         category: "late night",
+        network: "AajTak",
+        show: "Das Tak",
+        edition: "Late Night Wrap",
+        disambiguator: "10 PM day-end top 10 stories",
         tags: ["das tak", "10pm", "night news", "late night", "wrap up", "day end", "summary"],
         description: "AajTak Das Tak 10PM Edition — concise late night news wrap of the day's top 10 stories."
       },
-      128: {
+       128: {
         category: "debate",
-        tags: ["halla bol", "debate", "6pm", "panel", "anchor", "evening news", "discussion"],
-        description: "AajTak Halla Bol 6PM Edition — evening debate format show."
+        network: "AajTak",
+        show: "Halla Bol",
+        edition: "Evening Edition",
+        disambiguator: "6 PM slightly earlier shorter format debate",
+        tags: ["halla bol", "debate", "6pm", "panel", "anchor", "evening news", "discussion", "early evening"],
+        description: "AajTak Halla Bol [Evening Edition] 6PM — earlier evening debate format show."
       },
-      129: {
+       129: {
         category: "elections",
+        network: "AajTak",
+        show: "Delhi Exit Poll",
+        edition: "2020 Results",
+        disambiguator: "Delhi election exit poll 2020 predictions voting chunav",
         tags: ["election", "exit poll", "delhi", "2020", "voting", "results", "chunav", "predictions"],
         description: "AajTak Delhi Exit Poll 2020 — election day exit poll coverage and predictions for Delhi."
       },
-      130: {
+       130: {
         category: "investigation",
+        network: "AajTak",
+        show: "Special Report",
+        edition: "2019 Archive",
+        disambiguator: "2019 archived investigation documentary long form",
         tags: ["special report", "2019", "investigation", "documentary", "in depth", "long form"],
         description: "AajTak 2019 Special Report Edition — investigative journalism from 2019."
       },
-      131: {
+       131: {
         category: "panel show",
+        network: "AajTak",
+        show: "Ek aur Ek Gyarah",
+        edition: "Classic 2017",
+        disambiguator: "2017 panel discussion talk show older archive",
         tags: ["ek aur ek gyarah", "2017", "panel", "discussion", "talk show", "older", "archive"],
         description: "AajTak 2017 Ek aur Ek Gyarah Edition — classic panel discussion programme."
       },
-      132: {
+       132: {
         category: "debate",
-        tags: ["halla bol", "2019", "debate", "archive", "panel", "anchor", "Anjana Om Kashyap"],
-        description: "AajTak 2019 Halla Bol Edition — archived 2019 prime time debate."
+        network: "AajTak",
+        show: "Halla Bol",
+        edition: "Late Edition 2019",
+        disambiguator: "2019 archived late edition debate Anjana Om Kashyap",
+        tags: ["halla bol", "2019", "debate", "archive", "panel", "anchor", "Anjana Om Kashyap", "late edition"],
+        description: "AajTak 2019 Halla Bol [Late Edition] — archived 2019 prime time debate."
       },
-      133: {
+       133: {
         category: "Investigation",
+        network: "AajTak",
+        show: "Khabardar",
+        edition: "9PM Binge",
+        disambiguator: "9PM Sweta Singh investigation binge watch",
         tags: ["Khabardar", "2019", "Sweta Singh", "9PM", "21:00", "past"],
         description: "Khabardar - Best for 9PM Binge Watching"
       },
-      134: {
+       134: {
         category: "AajTak live news",
-        tags: ["live", "ndtv", "ndtv india", "24x7", "streaming", "breaking", "alternative", "hls"],
+        network: "AajTak",
+        show: "Live Stream",
+        edition: "24x7",
+        disambiguator: "live breaking news round the clock current",
+        tags: ["live", "aajtak live", "24x7", "streaming", "breaking", "hls"],
         description: "AajTak Live — round-the-clock live news streaming. Best for breaking news right now."
       },
-      135: {
+       135: {
         category: "NDTV live news",
-        tags: ["live", "live tv", "24x7", "streaming", "breaking news", "now", "real time", "current", "hls"],
-        description: "NDTV India Live — alternative 24x7 live Hindi news stream."
+        network: "NDTV",
+        show: "India Live",
+        edition: "24x7 Stream",
+        disambiguator: "alternative Hindi live news stream 24x7",
+        tags: ["live", "live tv", "24x7", "streaming", "breaking news", "now", "real time", "current", "hls", "ndtv india"],
+        description: "NDTV India [24x7 Live Stream] — alternative 24x7 live Hindi news stream."
       },
     };
     window.AI_CHANNEL_META = META;
@@ -132,7 +192,7 @@
           number: num,
           name: ch.name,
           src: ch.src,
-          text: [ch.name, meta.category, meta.tags.join(" "), meta.description].join(" "),
+          text: [ch.name, meta.category, meta.tags.join(" "), meta.description, meta.show || "", meta.edition || "", meta.disambiguator || ""].join(" "),
           meta,
         };
       });
@@ -225,6 +285,9 @@
             number: c.doc.number,
             name: c.doc.name,
             category: c.doc.meta.category,
+            show: c.doc.meta.show || '',
+            edition: c.doc.meta.edition || '',
+            disambiguator: c.doc.meta.disambiguator || '',
             tags: c.doc.meta.tags,
             description: c.doc.meta.description,
           })),
@@ -241,6 +304,8 @@
     async function geminiPick(query, candidates, apiKey) {
       const ctx = candidates.map((c, i) =>
         `[${i + 1}] number=${c.doc.number} | "${c.doc.name}" (${c.doc.meta.category})\n` +
+        `    show: ${c.doc.meta.show || '—'} | edition: ${c.doc.meta.edition || '—'}\n` +
+        `    hint: ${c.doc.meta.disambiguator || '—'}\n` +
         `    tags: ${(c.doc.meta.tags || []).join(", ")}\n` +
         `    about: ${c.doc.meta.description}`
       ).join("\n");
@@ -249,7 +314,7 @@
 `You are the AI inside a Samsung C5000 LCD TV connected via HDMI 3 to a DishTV set-top box. The user just said:
 "${query}"
 
-Below are the top channels retrieved from the DishTV channel guide. Pick the SINGLE best match.
+Below are the top channels retrieved from the DishTV channel guide. Pay close attention to each channel's show name, edition, and hint to disambiguate between similar-sounding channels. Pick the SINGLE best match.
 
 Channels:
 ${ctx}
@@ -335,12 +400,15 @@ Reply with STRICT JSON ONLY, no markdown:
     const AI_ENABLED_STORE  = 'samsung_tv_ai_enabled_v1';
     const KB_LOCK_STORE     = 'samsung_tv_kb_lock_v1';  // master TV-shortcut lock
     const AI_TUNE_SHORTCUTS_STORE = 'samsung_tv_ai_tune_shortcuts_v1';
+    const AI_PICKER_HISTORY_STORE = 'samsung_tv_ai_picker_history_v1';
 
     let INDEX = buildIndex(buildCorpus());
     let aiEnabled    = localStorage.getItem(AI_ENABLED_STORE) !== 'false';
     let kbLocked     = localStorage.getItem(KB_LOCK_STORE)    === 'true';
     let tuneShortcutsEnabled = localStorage.getItem(AI_TUNE_SHORTCUTS_STORE) !== 'false';
     let lastAIResponse = null;
+    let aiPickerHistory = JSON.parse(localStorage.getItem(AI_PICKER_HISTORY_STORE) || '[]');
+    const MAX_AI_HISTORY = 10;
 
     // ── Keyboard guard ──────────────────────────────────────────────────
     //  The host script's keydown handlers fire on EVERY keypress, even when
@@ -464,6 +532,8 @@ Reply with STRICT JSON ONLY, no markdown:
         timestamp: Date.now()
       };
 
+      recordAIPick(query, pickNum, reason, via, serverModel, serverLatency);
+
       // Render provider badge if server gave us data
       if (pickResponse && pickResponse.source) {
         renderProviderBadge(pickResponse);
@@ -482,6 +552,61 @@ Reply with STRICT JSON ONLY, no markdown:
         console.table(cands.map(c => ({ ch: c.doc.number, name: c.doc.name, score: +c.score.toFixed(4) })));
         console.groupEnd();
       } catch {}
+    }
+
+    function recordAIPick(query, channelNum, reason, via, model, latencyMs) {
+      const entry = {
+        query: query,
+        channel: channelNum,
+        reason: reason,
+        via: via,
+        model: model || null,
+        latency: latencyMs || null,
+        timestamp: Date.now()
+      };
+      aiPickerHistory.unshift(entry);
+      if (aiPickerHistory.length > MAX_AI_HISTORY) aiPickerHistory.length = MAX_AI_HISTORY;
+      localStorage.setItem(AI_PICKER_HISTORY_STORE, JSON.stringify(aiPickerHistory));
+    }
+
+    function renderStatsPanel() {
+      var panel = document.getElementById('ai-stats-panel');
+      var toggle = document.getElementById('ai-stats-toggle');
+      if (!panel || !toggle) return;
+      if (panel.style.display !== 'none') {
+        panel.style.display = 'none';
+        toggle.textContent = '\uD83D\uDCCA AI Pick Stats \u25BE';
+        return;
+      }
+      if (!aiPickerHistory.length) {
+        panel.innerHTML = '<div style="padding:8px;color:#94a3b8;text-align:center;">No picks recorded yet.</div>';
+      } else {
+        var html = '<div style="padding:4px 0;">';
+        aiPickerHistory.forEach(function(e, i) {
+          var date = new Date(e.timestamp);
+          var timeStr = date.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+          var src = e.via === 'server' ? (e.model || 'AI') : e.via;
+          var lat = e.latency ? (e.latency + 'ms') : '—';
+          html += '<div style="display:grid;grid-template-columns:20px 1fr 60px 50px 50px;gap:4px;padding:3px 6px;border-bottom:1px solid rgba(255,255,255,0.05);align-items:center;">';
+          html += '<span style="color:#64748b;">' + (i + 1) + '.</span>';
+          html += '<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#e2e8f0;">Ch ' + e.channel + '</span>';
+          html += '<span style="color:#06b6d4;font-size:9px;">' + src + '</span>';
+          html += '<span style="color:#94a3b8;text-align:right;">' + lat + '</span>';
+          html += '<span style="color:#64748b;text-align:right;font-size:9px;">' + timeStr + '</span>';
+          html += '</div>';
+        });
+        html += '</div>';
+        html += '<button id="ai-stats-clear" style="margin-top:4px;background:#450a0a;color:#fca5a5;border:none;border-radius:4px;padding:3px 10px;font-size:9px;cursor:pointer;">Clear History</button>';
+        panel.innerHTML = html;
+        var clearBtn = document.getElementById('ai-stats-clear');
+        if (clearBtn) clearBtn.addEventListener('click', function() {
+          aiPickerHistory = [];
+          localStorage.removeItem(AI_PICKER_HISTORY_STORE);
+          renderStatsPanel();
+        });
+      }
+      panel.style.display = 'block';
+      toggle.textContent = '\uD83D\uDCCA AI Pick Stats \u25B2';
     }
 
     function renderProviderBadge(response) {
@@ -738,6 +863,11 @@ Reply with STRICT JSON ONLY, no markdown:
           <div class="chips" id="ai-chips"></div>
 
           <div style="margin-top: 6px;">
+            <button class="btn ghost" id="ai-stats-toggle" style="font-size:10px;padding:4px 10px;width:100%;" title="Show last 10 AI picks">📊 AI Pick Stats ▾</button>
+          </div>
+          <div id="ai-stats-panel" style="display:none;margin-top:4px;font-size:10px;max-height:160px;overflow-y:auto;"></div>
+
+          <div style="margin-top: 6px;">
             <button class="btn ghost" id="ai-why-toggle" style="font-size:10px;padding:4px 10px;width:100%;" title="Show TF-IDF candidates and AI reasoning">Why this channel? ▾</button>
           </div>
           <div class="actions">
@@ -844,6 +974,10 @@ Reply with STRICT JSON ONLY, no markdown:
         if (existingPanel) existingPanel.remove();
         var toggle = document.getElementById('ai-why-toggle');
         if (toggle) toggle.textContent = 'Why this channel? ▾';
+        var statsPanel = document.getElementById('ai-stats-panel');
+        if (statsPanel) statsPanel.style.display = 'none';
+        var statsToggle = document.getElementById('ai-stats-toggle');
+        if (statsToggle) statsToggle.textContent = '\uD83D\uDCCA AI Pick Stats \u25BE';
         var existingBadge = document.querySelector('.provider-badge');
         if (existingBadge) existingBadge.remove();
       }
@@ -851,6 +985,7 @@ Reply with STRICT JSON ONLY, no markdown:
       modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
       modal.querySelector('#ai-cancel').addEventListener('click', closeModal);
       modal.querySelector('#ai-why-toggle').addEventListener('click', renderWhyPanel);
+      modal.querySelector('#ai-stats-toggle').addEventListener('click', renderStatsPanel);
       var micBtn = modal.querySelector('#ai-mic-button');
       if (micBtn) micBtn.addEventListener('click', toggleVoiceInput);
 

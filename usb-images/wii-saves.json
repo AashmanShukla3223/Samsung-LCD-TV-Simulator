@@ -1,0 +1,14 @@
+{
+  "label": "WII_SAVES_USB",
+  "description": "Wii save data from a friend's SD card",
+  "files": {
+    "private/wii/title/RZDE/save_data.bin": "WII_SAVE:RZDE01\nGame: Mario Kart Wii\nPlayer: ASHMAN\nTrophies: 47\nTime played: 128h\nLicense: Gold\nVR: 8421\nLast played: 2026-05-15",
+    "private/wii/title/RMCE/save_data.bin": "WII_SAVE:RMCE01\nGame: New Super Mario Bros Wii\nPlayer: ASHMAN\nStars: 78\nCoins: 240\nTime played: 42h\nLast level: 8-4\nLast played: 2026-04-28",
+    "private/wii/title/RSBE/save_data.bin": "WII_SAVE:RSBE01\nGame: Super Smash Bros Brawl\nPlayer: ASHMAN\nBrawls: 312\nSubspace: 100%\nUnlocked: All\nStickers: 247\nLast played: 2026-05-10",
+    "private/wii/title/RZTJ/save_data.bin": "WII_SAVE:RZTJ01\nGame: Wii Sports Resort\nPlayer: ASHMAN\nBest Swordplay: 1200\nBest Archery: 98%\nBest Basketball: 45\nUnlocked: All sports\nLast played: 2026-03-22",
+    "private/wii/title/SZBE/save_data.bin": "WII_SAVE:SZBE01\nGame: The Legend of Zelda Twilight Princess\nPlayer: ASHMAN\nHearts: 20/20\nRupees: 999\nItems: All\nCompletion: 96%\nPlaytime: 67h\nLast played: 2026-02-14",
+    "wii-saves/readme.txt": "Wii Save Data SD Card\n=====================\n\nThese are Wii save data files copied from ASHMAN's Wii console.\n\nCompatible with:\n- Nintendo Wii (via SD slot)\n- Samsung BN59 USB Reader\n\nContents:\n- Mario Kart Wii (RZDE01)\n- New Super Mario Bros Wii (RMCE01)\n- Super Smash Bros Brawl (RSBE01)\n- Wii Sports Resort (RZTJ01)\n- Zelda Twilight Princess (SZBE01)\n\nAll saves created using the official Nintendo Wii Save Data Manager.",
+    "wii-saves/screenshot_01.thumb": "THUMB:WII_SAVE_SCREEN\nGame: Mario Kart Wii\nTrack: Rainbow Road\nCharacter: Yoshi\nPosition: 1st/12\nLap: 3/3",
+    "wii-saves/wii_backup.log": "[2026-05-15 19:42:31] Wii SD Card Backup started\n[2026-05-15 19:42:33] Reading RZDE... OK\n[2026-05-15 19:42:35] Reading RMCE... OK\n[2026-05-15 19:42:37] Reading RSBE... OK\n[2026-05-15 19:42:38] Reading RZTJ... OK\n[2026-05-15 19:42:40] Reading SZBE... OK\n[2026-05-15 19:42:41] Checksum verified. 5 saves backed up.\n[2026-05-15 19:42:42] Backup complete."
+  }
+}

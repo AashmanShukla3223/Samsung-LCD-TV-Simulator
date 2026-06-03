@@ -578,6 +578,15 @@
                         </div>
                     </div>
 
+                    <!-- CLOSED CAPTIONS SETTINGS -->
+                    <div id="ccSettingsOverlay" class="absolute inset-0 bg-black/90 flex-col justify-center items-center z-50 hidden px-6" style="display:none;">
+                        <div class="max-w-sm samsung-osd-bg rounded-xl p-5 w-full">
+                            <h2 class="text-sm font-extrabold text-amber-400 uppercase tracking-widest mb-4 aero-font text-center">Closed Captions</h2>
+                            <div id="ccSettingsList" class="max-h-64 overflow-y-auto text-[11px] font-mono"></div>
+                            <button id="ccSettingsBackBtn" class="mt-4 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-bold px-4 py-1.5 rounded text-[10px] uppercase tracking-wider transition-all w-full">Back</button>
+                        </div>
+                    </div>
+
                     <!-- INPUT 1: TV / NO SIGNAL (Standard TV Environment) -->
                     <div id="inputTV" class="absolute inset-0 bg-gradient-to-b from-[#0b1b36] to-[#040914] z-10 hidden">
                         <canvas id="tvStaticCanvas" class="absolute inset-0 w-full h-full z-0 opacity-20"></canvas>
@@ -1270,7 +1279,7 @@
         const GH8 = 'https://github.com/AashmanShukla3223/Antigravity-and-OpenCode-CLI-Prompts-and-Skills/releases/download/v1.0.7/';
         const LIVE = 'https://feeds.intoday.in/aajtak/api/aajtakhd/master.m3u8';
         const NDTV = 'https://ndtvindiaelemarchana.akamaized.net/hls/live/2003679/ndtvindia/master.m3u8';
-        let APP_VERSION = '1.0.26';
+        let APP_VERSION = '1.0.27';
         const VERCEL_URL = 'https://samsung-lcd-tv.vercel.app';
         const audioStartup = new Audio(GH + 'startup.mp3');
         const audioShutdown = new Audio(GH + 'shutdown.mp3');
@@ -1467,16 +1476,16 @@
             { name: "Channel 123: AajTak — Special Report (8:30 PM)", src: GH + "dishtv_source3.mp4" },
             { name: "Channel 124: AajTak — Aaj Subah (10 AM)", src: GH + "dishtv_source4.mp4" },
             { name: "Channel 125: AajTak — e-Agenda", src: GH + "dishtv_source5.mp4" },
-            { name: "Channel 126: AajTak — Halla Bol (6 PM)", src: GH + "dishtv_source6.mp4" },
+            { name: "Channel 126: AajTak — Halla Bol [Evening Debate Edition]", src: GH + "dishtv_source6.mp4" },
             { name: "Channel 127: AajTak — Das Tak (10 PM)", src: GH2 + "dishtv_source7.mp4" },
-            { name: "Channel 128: AajTak — Halla Bol Evening (6:30 PM)", src: GH3 + "dishtv_source8.mp4" },
+            { name: "Channel 128: AajTak — Halla Bol [Evening Edition]", src: GH3 + "dishtv_source8.mp4" },
             { name: "Channel 129: AajTak — Delhi Exit Poll", src: GH3 + "dishtv_source9.mp4" },
             { name: "Channel 130: AajTak — Special Report (8:30 PM)", src: GH4 + "dishtv_source10.mp4" },
             { name: "Channel 131: AajTak — Ek aur Ek Gyarah", src: GH4 + "dishtv_source11.mp4" },
-            { name: "Channel 132: AajTak — Halla Bol (6 PM)", src: GH5 + "dishtv_source12.mp4" },
+            { name: "Channel 132: AajTak — Halla Bol [Late Edition] 2019", src: GH5 + "dishtv_source12.mp4" },
             { name: "Channel 133: AajTak — Khabardar (9 PM)", src: GH8 + "dishtv_source13.mp4" },
             { name: "Channel 134: AajTak Live", src: LIVE },
-            { name: "Channel 135: NDTV India Live", src: NDTV }
+            { name: "Channel 135: NDTV India [24x7 Live Stream]", src: NDTV }
         ];
         function loadDishVideo(video, src, seekTime) {
             if (video._hls) { video._hls.destroy(); delete video._hls; }
@@ -1496,6 +1505,7 @@
                 video.load();
                 video.play().catch(() => {});
             }
+            if (pipState !== 'off') setTimeout(applyPiP, 100);
         }
         let volume = 15;
         let dishVolume = 50;
@@ -1606,8 +1616,10 @@
                     { name: "On/Off Timer", type: "toggle", current: false },
                     { name: "AI Tune Channel Shortcuts", type: "toggle", current: true },
                     { name: "Lock Keyboard Shortcuts", type: "toggle", current: false },
+                    { name: "Closed Captions", type: "action", action: openCCSettings },
                     { name: "Retail Demo Mode", type: "action", action: toggleDemoMode },
-                    { name: "AajTak Exhale Schedule", type: "select", values: ["Every Hour", "Once Daily", "Off"], current: 0 }
+                    { name: "AajTak Exhale Schedule", type: "select", values: ["Every Hour", "Once Daily", "Off"], current: 0 },
+                    { name: "Sleep Timer", type: "action", action: openSleepTimerSettings }
                 ]
             },
             {
@@ -1865,6 +1877,10 @@
                 closeMenu();
                 closeSourceMenu();
                 stopSoundTest();
+                if (sleepTimerInterval) {
+                    clearInterval(sleepTimerInterval);
+                    sleepTimerInterval = null;
+                }
 
                 hideAllScreens();
                 
@@ -1928,6 +1944,8 @@
             applyPictureSettings();
             applySoundMode(menuConfig[1].options[0].current);
             setupEnergySaving();
+            restorePiP();
+            restoreSleepTimer();
 
             document.getElementById('deckOffState').classList.add('hidden');
             document.getElementById('deckWiiRemote').classList.add('hidden');
@@ -2094,7 +2112,7 @@
         }
 
         function renderCategories() {
-            for (let i = 0; i < 5; i++) {
+            for (let i = 0; i < menuConfig.length; i++) {
                 const el = document.getElementById(`cat-${i}`);
                 el.className = "px-4 py-2 flex items-center gap-3 samsung-osd-unselected-glow border-l-4 border-transparent text-zinc-400 font-medium transition-all cursor-pointer";
                 if (menuStage === "categories" && i === currentMenuCategory) {
@@ -2154,7 +2172,7 @@
         function navigateUp() {
             if (!menuOpen) return;
             if (menuStage === "categories") {
-                currentMenuCategory = (currentMenuCategory - 1 + 5) % 5;
+                currentMenuCategory = (currentMenuCategory - 1 + menuConfig.length) % menuConfig.length;
                 renderCategories();
                 renderCategoryOptions();
             } else if (menuStage === "options") {
@@ -2168,7 +2186,7 @@
         function navigateDown() {
             if (!menuOpen) return;
             if (menuStage === "categories") {
-                currentMenuCategory = (currentMenuCategory + 1) % 5;
+                currentMenuCategory = (currentMenuCategory + 1) % menuConfig.length;
                 renderCategories();
                 renderCategoryOptions();
             } else if (menuStage === "options") {
@@ -2581,6 +2599,81 @@
             modal.classList.add('hidden');
         }
 
+        // ── Closed Captions Settings ──────────────────────────────
+        var ccSettings = {
+            options: [
+                { name: 'Caption Mode', values: ['Off', 'On', 'Mute On'], current: 0 },
+                { name: 'Default Mode', values: ['CC1', 'CC2', 'CC3', 'CC4', 'Text1', 'Text2', 'Text3', 'Text4'], current: 0 },
+                { name: 'Size', values: ['Default', 'Small', 'Standard', 'Large'], current: 0 },
+                { name: 'Font Style', values: ['Default', 'Style 0', 'Style 1', 'Style 2', 'Style 3', 'Style 4', 'Style 5', 'Style 6', 'Style 7'], current: 0 },
+                { name: 'Foreground Color', values: ['Default', 'White', 'Black', 'Red', 'Green', 'Blue', 'Yellow', 'Magenta', 'Cyan'], current: 0 },
+                { name: 'Foreground Opacity', values: ['Default', 'Transparent', 'Translucent', 'Solid', 'Flashing'], current: 0 },
+                { name: 'Background Color', values: ['Default', 'White', 'Black', 'Red', 'Green', 'Blue', 'Yellow', 'Magenta', 'Cyan'], current: 0 },
+                { name: 'Background Opacity', values: ['Default', 'Transparent', 'Translucent', 'Solid', 'Flashing'], current: 0 },
+                { name: 'Edge Type', values: ['Default', 'None', 'Raised', 'Depressed', 'Uniform', 'Left Shadow', 'Right Shadow'], current: 0 },
+                { name: 'Edge Color', values: ['Default', 'White', 'Black', 'Red', 'Green', 'Blue', 'Yellow', 'Magenta', 'Cyan'], current: 0 }
+            ],
+            selectedIndex: 0
+        };
+
+        function loadCCSettings() {
+            try {
+                var saved = JSON.parse(localStorage.getItem('cc_settings_v1'));
+                if (saved && Array.isArray(saved)) {
+                    ccSettings.options.forEach(function(opt, i) {
+                        if (i < saved.length && typeof saved[i] === 'number') opt.current = saved[i];
+                    });
+                }
+            } catch(e) {}
+        }
+        function saveCCSettings() {
+            try {
+                localStorage.setItem('cc_settings_v1', JSON.stringify(ccSettings.options.map(function(o) { return o.current; })));
+            } catch(e) {}
+        }
+        function openCCSettings() {
+            closeMenu();
+            loadCCSettings();
+            ccSettings.selectedIndex = 0;
+            document.getElementById('ccSettingsOverlay').style.display = 'flex';
+            document.getElementById('ccSettingsOverlay').classList.remove('hidden');
+            renderCCSettings();
+            document.getElementById('ccSettingsBackBtn').onclick = closeCCSettings;
+        }
+        function closeCCSettings() {
+            document.getElementById('ccSettingsOverlay').style.display = 'none';
+            document.getElementById('ccSettingsOverlay').classList.add('hidden');
+        }
+        function renderCCSettings() {
+            var list = document.getElementById('ccSettingsList');
+            if (!list) return;
+            list.innerHTML = '';
+            ccSettings.options.forEach(function(opt, idx) {
+                var row = document.createElement('div');
+                row.className = 'p-2 rounded flex justify-between items-center transition-all' + (idx === ccSettings.selectedIndex ? ' samsung-osd-highlight' : '');
+                row.innerHTML = '<span class="font-semibold">' + opt.name + '</span><span class="font-mono font-bold text-sky-400' + (idx === ccSettings.selectedIndex ? ' text-white' : '') + '">' + opt.values[opt.current] + '</span>';
+                list.appendChild(row);
+            });
+        }
+        function navigateCCSettings(direction) {
+            if (direction === 'up') {
+                ccSettings.selectedIndex = (ccSettings.selectedIndex - 1 + ccSettings.options.length) % ccSettings.options.length;
+            } else if (direction === 'down') {
+                ccSettings.selectedIndex = (ccSettings.selectedIndex + 1) % ccSettings.options.length;
+            } else if (direction === 'right' || direction === 'enter') {
+                var opt = ccSettings.options[ccSettings.selectedIndex];
+                opt.current = (opt.current + 1) % opt.values.length;
+                saveCCSettings();
+                showToast('Closed Captions: ' + opt.name + ' set to ' + opt.values[opt.current], '<i class="fa-solid fa-closed-captioning"></i>', 'info');
+            } else if (direction === 'left') {
+                var opt = ccSettings.options[ccSettings.selectedIndex];
+                opt.current = (opt.current - 1 + opt.values.length) % opt.values.length;
+                saveCCSettings();
+                showToast('Closed Captions: ' + opt.name + ' set to ' + opt.values[opt.current], '<i class="fa-solid fa-closed-captioning"></i>', 'info');
+            }
+            renderCCSettings();
+        }
+
         function renderUpdateMethodMenu() {
             const options = document.querySelectorAll('.update-method-option');
             options.forEach((el, i) => {
@@ -2785,6 +2878,35 @@
             return entries;
         }
 
+        function usbEnsureThumbnails(dirPath) {
+            var cleaned = dirPath.replace(/\/+/g, '/').replace(/\/$/, '') || '/';
+            var prefix = cleaned === '/' ? '' : cleaned + '/';
+            var imageFiles = [];
+            var thumbPrefix = prefix + '.thumbnails/';
+            var hasThumbDir = false;
+            Object.keys(virtualUSB.files).forEach(function(key) {
+                if (key.startsWith(thumbPrefix)) hasThumbDir = true;
+                if (key.startsWith(prefix) && key !== prefix) {
+                    var remainder = key.substring(prefix.length);
+                    if (remainder.indexOf('/') === -1) {
+                        var ext = remainder.split('.').pop().toLowerCase();
+                        if (['jpg', 'jpeg', 'png', 'gif', 'webp'].indexOf(ext) >= 0) {
+                            imageFiles.push(remainder);
+                        }
+                    }
+                }
+            });
+            if (imageFiles.length > 0 && !hasThumbDir) {
+                imageFiles.forEach(function(f, i) {
+                    var thumbKey = thumbPrefix + 'thumb_' + f;
+                    if (!virtualUSB.files[thumbKey]) {
+                        virtualUSB.files[thumbKey] = 'THUMBNAIL:w=120,h=90,src=' + f;
+                    }
+                });
+                usbSaveState();
+            }
+        }
+
         function usbReadFile(filePath) {
             const key = filePath.replace(/^\//, '');
             return virtualUSB.files[key] || null;
@@ -2894,6 +3016,7 @@
             const pathEl = document.getElementById('usbBrowserPath');
             if (!listEl || !pathEl) return;
             pathEl.innerText = usbFileBrowserPath;
+            usbEnsureThumbnails(usbFileBrowserPath);
             const entries = usbGetDirContents(usbFileBrowserPath);
             listEl.innerHTML = '';
 
@@ -3238,7 +3361,7 @@
         let usbProfileDropdownOpen = false;
 
         function usbFetchProfiles() {
-            const profileNames = ['normal', 'empty', 'corrupted', 'multi-firmware', 'music', 'vacation', 'older-firmware'];
+            const profileNames = ['normal', 'empty', 'corrupted', 'multi-firmware', 'music', 'vacation', 'older-firmware', 'wii-saves'];
             const base = VERCEL_URL + '/usb-images/';
             usbProfiles = [];
             profileNames.forEach(name => {
@@ -4192,6 +4315,142 @@
             return ind;
         }
 
+        // --- PICTURE-IN-PICTURE (PiP) ---
+        let pipState = 'off';
+        var PIP_SIZES = ['off', 'small', 'medium', 'large'];
+        var PIP_DIMS = { small: { w: 180, h: 120 }, medium: { w: 280, h: 190 }, large: { w: 400, h: 270 } };
+
+        function createPiPOverlay() {
+            var el = document.createElement('div');
+            el.id = 'pipOverlay';
+            el.style.cssText = 'position:fixed; bottom:80px; right:20px; z-index:55; border:2px solid rgba(34,211,238,0.6); border-radius:8px; overflow:hidden; display:none; box-shadow:0 4px 20px rgba(0,0,0,0.6); cursor:pointer;';
+            el.innerHTML = '<video id="pipVideo" autoplay muted loop style="display:block;object-fit:contain;background:#000;"></video><div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.7);color:#22d3ee;padding:2px 6px;border-radius:4px;font-size:9px;font-weight:bold;font-family:monospace;">PiP</div>';
+            el.addEventListener('click', function() { cyclePiP(); });
+            document.body.appendChild(el);
+            return el;
+        }
+
+        function cyclePiP() {
+            var idx = PIP_SIZES.indexOf(pipState);
+            idx = (idx + 1) % PIP_SIZES.length;
+            pipState = PIP_SIZES[idx];
+            applyPiP();
+        }
+
+        function applyPiP() {
+            var el = document.getElementById('pipOverlay');
+            if (!el) el = createPiPOverlay();
+            var video = document.getElementById('pipVideo');
+            if (!video) return;
+            if (pipState === 'off') {
+                el.style.display = 'none';
+                video.pause();
+                video.src = '';
+                localStorage.setItem('samsung_pip_state', 'off');
+                return;
+            }
+            var dims = PIP_DIMS[pipState];
+            el.style.width = dims.w + 'px';
+            el.style.height = dims.h + 'px';
+            el.style.display = 'block';
+            // Mirror the active video source
+            var activeVideo = document.querySelector('#dishVideo, #wiiVideo, #appleVideo, #ps3Video, #tvVideo:not(.hidden)');
+            if (activeVideo && activeVideo.src) {
+                if (video.src !== activeVideo.src) {
+                    video.src = activeVideo.src;
+                    video.play().catch(function(){});
+                }
+            } else {
+                video.src = '';
+            }
+            localStorage.setItem('samsung_pip_state', pipState);
+        }
+
+        function restorePiP() {
+            var saved = localStorage.getItem('samsung_pip_state');
+            if (saved && saved !== 'off') {
+                pipState = saved;
+                applyPiP();
+            }
+        }
+
+        // --- SLEEP TIMER ---
+        var sleepTimerMinutes = parseInt(localStorage.getItem('samsung_sleep_timer') || '0');
+        var sleepTimerInterval = null;
+
+        function openSleepTimerSettings() {
+            closeMenu();
+            var dialog = document.getElementById('tvDialog');
+            var title = document.getElementById('tvDialogTitle');
+            var msg = document.getElementById('tvDialogMessage');
+            var confirmBtn = document.getElementById('tvDialogConfirm');
+            var cancelBtn = document.getElementById('tvDialogCancel');
+            var input = document.getElementById('tvDialogInput');
+            if (!dialog || !title || !msg) return;
+            if (input) input.style.display = 'none';
+            title.innerText = 'Sleep Timer';
+            var options = ['Off', '30 min', '60 min', '90 min', '120 min'];
+            var values = [0, 30, 60, 90, 120];
+            var currentVal = sleepTimerMinutes;
+            var currentIdx = values.indexOf(currentVal);
+            if (currentIdx < 0) currentIdx = 0;
+            msg.innerHTML = '<div style="text-align:center;">' + options.map(function(o, i) {
+                return '<div class="sleep-timer-option' + (i === currentIdx ? ' samsung-osd-highlight' : '') + '" data-idx="' + i + '" style="padding:6px 12px;cursor:pointer;border-radius:4px;margin:2px 0;">' + o + '</div>';
+            }).join('') + '<\/div><div style="font-size:10px;color:#94a3b8;margin-top:8px;">TV will turn off automatically after selected time.</div>';
+            dialog.classList.remove('hidden');
+            dialog.style.display = 'flex';
+            confirmBtn.classList.add('hidden');
+            cancelBtn.innerText = 'Close';
+            cancelBtn.onclick = function() {
+                dialog.classList.add('hidden');
+                dialog.style.display = 'none';
+            };
+            msg.querySelectorAll('.sleep-timer-option').forEach(function(el) {
+                el.addEventListener('click', function() {
+                    var idx = parseInt(el.dataset.idx);
+                    var val = values[idx];
+                    sleepTimerMinutes = val;
+                    localStorage.setItem('samsung_sleep_timer', String(val));
+                    setupSleepTimer();
+                    dialog.classList.add('hidden');
+                    dialog.style.display = 'none';
+                    showToast('Sleep Timer: ' + options[idx], '<i class="fa-regular fa-clock"></i>', 'info');
+                });
+            });
+        }
+
+        function setupSleepTimer() {
+            if (sleepTimerInterval) {
+                clearInterval(sleepTimerInterval);
+                sleepTimerInterval = null;
+            }
+            var indicator = document.getElementById('sleepTimerIndicator');
+            if (indicator) { indicator.remove(); }
+            if (sleepTimerMinutes <= 0) return;
+            var remaining = sleepTimerMinutes * 60;
+            var indicatorEl = document.createElement('div');
+            indicatorEl.id = 'sleepTimerIndicator';
+            indicatorEl.style.cssText = 'position:fixed;bottom:12px;right:12px;background:rgba(30,41,59,0.9);color:#fbbf24;padding:4px 10px;border-radius:4px;font-size:10px;font-weight:bold;z-index:60;border:1px solid rgba(251,191,36,0.3);font-family:monospace;';
+            document.body.appendChild(indicatorEl);
+            function updateIndicator() {
+                if (remaining <= 0) {
+                    if (indicatorEl.parentNode) indicatorEl.remove();
+                    togglePower();
+                    return;
+                }
+                var m = Math.floor(remaining / 60);
+                var s = remaining % 60;
+                indicatorEl.textContent = '\u23F1 Sleep: ' + m + ':' + (s < 10 ? '0' : '') + s;
+                remaining--;
+            }
+            updateIndicator();
+            sleepTimerInterval = setInterval(updateIndicator, 1000);
+        }
+
+        function restoreSleepTimer() {
+            if (sleepTimerMinutes > 0) setupSleepTimer();
+        }
+
         // --- HDMI-CEC SIMULATION ---
         function handleCEC(oldSource, newSource) {
             const cecSetting = menuConfig[2].options[1].current;
@@ -4813,7 +5072,9 @@
             switch(e.key) {
                 case 'ArrowUp':
                     e.preventDefault();
-                    if (!document.getElementById('screenConflictPicker').classList.contains('hidden')) {
+                    if (document.getElementById('ccSettingsOverlay') && !document.getElementById('ccSettingsOverlay').classList.contains('hidden')) {
+                        navigateCCSettings('up');
+                    } else if (!document.getElementById('screenConflictPicker').classList.contains('hidden')) {
                         conflictNavigate('up');
                     } else if (updateMethodMenuOpen) navigateUpdateMethod("up");
                     else if (sourceMenuOpen) sourceSelectUp();
@@ -4823,7 +5084,9 @@
                     break;
                 case 'ArrowDown':
                     e.preventDefault();
-                    if (!document.getElementById('screenConflictPicker').classList.contains('hidden')) {
+                    if (document.getElementById('ccSettingsOverlay') && !document.getElementById('ccSettingsOverlay').classList.contains('hidden')) {
+                        navigateCCSettings('down');
+                    } else if (!document.getElementById('screenConflictPicker').classList.contains('hidden')) {
                         conflictNavigate('down');
                     } else if (updateMethodMenuOpen) navigateUpdateMethod("down");
                     else if (sourceMenuOpen) sourceSelectDown();
@@ -4833,7 +5096,9 @@
                     break;
                 case 'ArrowRight':
                     e.preventDefault();
-                    if (usbPhotoViewerOpen) usbNavigatePhoto('next');
+                    if (document.getElementById('ccSettingsOverlay') && !document.getElementById('ccSettingsOverlay').classList.contains('hidden')) {
+                        navigateCCSettings('right');
+                    } else if (usbPhotoViewerOpen) usbNavigatePhoto('next');
                     else if (pictureTestOpen) cyclePictureTest('next');
                     else if (updateMethodMenuOpen) activateUpdateMethod();
                     else if (menuOpen) navigateRightOrEnter();
@@ -4843,7 +5108,9 @@
                     break;
                 case 'ArrowLeft':
                     e.preventDefault();
-                    if (usbPhotoViewerOpen) usbNavigatePhoto('prev');
+                    if (document.getElementById('ccSettingsOverlay') && !document.getElementById('ccSettingsOverlay').classList.contains('hidden')) {
+                        navigateCCSettings('left');
+                    } else if (usbPhotoViewerOpen) usbNavigatePhoto('prev');
                     else if (pictureTestOpen) cyclePictureTest('prev');
                     else if (updateMethodMenuOpen) closeUpdateMethodMenu();
                     else if (menuOpen) navigateLeftAdjustment();
@@ -4853,7 +5120,9 @@
                     break;
                 case 'Enter':
                     e.preventDefault();
-                    if (!document.getElementById('screenConflictPicker').classList.contains('hidden')) {
+                    if (document.getElementById('ccSettingsOverlay') && !document.getElementById('ccSettingsOverlay').classList.contains('hidden')) {
+                        navigateCCSettings('enter');
+                    } else if (!document.getElementById('screenConflictPicker').classList.contains('hidden')) {
                         conflictActivate();
                     } else if (updateMethodMenuOpen) activateUpdateMethod();
                     else if (sourceMenuOpen) sourceSelectConfirm();
@@ -4866,7 +5135,9 @@
                 case 'Escape':
                     if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable) return;
                     e.preventDefault();
-                    if (usbMediaPlayerOpen) usbCloseMediaPlayer();
+                    if (document.getElementById('ccSettingsOverlay') && !document.getElementById('ccSettingsOverlay').classList.contains('hidden')) {
+                        closeCCSettings();
+                    } else if (usbMediaPlayerOpen) usbCloseMediaPlayer();
                     else if (usbPhotoViewerOpen) usbClosePhotoViewer();
                     else if (pictureTestOpen) closePictureTest();
                     else if (aboutTVOpen) closeAboutTV();
@@ -4913,7 +5184,11 @@
                 case 'p':
                 case 'P':
                     e.preventDefault();
-                    togglePower();
+                    if (e.altKey) {
+                        cyclePiP();
+                    } else {
+                        togglePower();
+                    }
                     break;
                 case '0':
                     e.preventDefault();
@@ -4952,7 +5227,25 @@
         function switchInputSource(idx) {
             if (idx === activeInputSource) return;
             var oldSource = activeInputSource;
+            // Save channel memory for the source we're leaving
+            if (oldSource === 4) {
+                try {
+                    var mem = JSON.parse(localStorage.getItem('samsung_channel_memory') || '{}');
+                    mem['src_' + oldSource] = dishChannel;
+                    localStorage.setItem('samsung_channel_memory', JSON.stringify(mem));
+                } catch(e) {}
+            }
             activeInputSource = idx;
+            // Restore channel memory for the source we're entering
+            if (idx === 4) {
+                try {
+                    var mem = JSON.parse(localStorage.getItem('samsung_channel_memory') || '{}');
+                    var savedChannel = mem['src_4'];
+                    if (savedChannel !== undefined && savedChannel !== null && savedChannel >= 0 && savedChannel < dishChannels.length) {
+                        dishChannel = savedChannel;
+                    }
+                } catch(e) {}
+            }
             renderActiveScreen();
             if (typeof handleCEC === 'function') handleCEC(oldSource, activeInputSource);
             if (typeof showToast === 'function') showToast('Input switched to: ' + (['TV/RF','AV/Component','HDMI 1 (Apple TV)','HDMI 2 (PS3)','HDMI 3 (DishTV)'][idx] || 'Source ' + idx), '<i class="fa-solid fa-circle-nodes"></i>', 'success');
