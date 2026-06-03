@@ -324,7 +324,7 @@ Reply with STRICT JSON ONLY, no markdown:
     }
 
     // ── 5. State, persistence, and full pipeline ────────────────────
-    const AI_GEMINI_MODEL         = 'gemini-2.0-flash-lite';
+    const AI_GEMINI_MODEL         = 'gemini-3.1-flash-lite';
     const AI_GEMINI_KEY_STORE     = 'samsung_tv_ai_gemini_key_v1';
     const AI_GROQ_KEY_STORE       = 'samsung_tv_ai_groq_key_v1';
     const AI_OPENROUTER_KEY_STORE = 'samsung_tv_ai_openrouter_key_v1';
@@ -443,6 +443,15 @@ Reply with STRICT JSON ONLY, no markdown:
           pickNum = candidates[0].doc.number;
           reason  = `Fallback (retrieval-only) · score ${candidates[0].score.toFixed(3)}`;
         }
+      }
+
+      // Low-confidence hint
+      if (candidates.length && candidates[0].score < 0.15) {
+        toast(
+          'No exact match for "' + query + '". Closest: ' + (candidates[0].doc.name || 'Ch ' + pickNum) + '. Try a different query?',
+          '\u{1F914}',
+          'info'
+        );
       }
 
       tuneTo(pickNum, reason);
@@ -680,7 +689,7 @@ Reply with STRICT JSON ONLY, no markdown:
                 <span class="slider"></span>
               </label>
             </div>
-            <input id="ai-key-gemini" type="password" placeholder="AIza… (optional — server key used if blank)" autocomplete="off" style="width:100%;" />
+            <input id="ai-key-gemini" type="password" placeholder="AQ… (optional — server key used if blank)" autocomplete="off" style="width:100%;" />
             <div class="hint" style="font-size:11px;">Deep reasoning, slower (~3s). Free: <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener" style="color:#7dd3fc;">aistudio.google.com/apikey</a></div>
           </div>
 
@@ -721,7 +730,10 @@ Reply with STRICT JSON ONLY, no markdown:
           <div class="hint" style="font-size:11px;">🛡 On the deployed site, server keys handle everything. Paste your own only if you want to override.</div>
 
           <label>What do you want to watch?</label>
-          <input id="ai-query-input" type="text" placeholder='e.g. "मुझे ताज़ा खबरें live दिखाओ"' />
+          <div class="row">
+            <input id="ai-query-input" type="text" placeholder='e.g. "मुझे ताज़ा खबरें live दिखाओ"' style="flex:1;" />
+            <button id="ai-mic-button" title="Voice input" style="background: linear-gradient(135deg, #06b6d4, #6366f1); color: white; border: none; border-radius: 999px; width: 36px; height: 36px; cursor: pointer; flex-shrink:0;">&#x1F3A4;</button>
+          </div>
 
           <div class="chips" id="ai-chips"></div>
 
@@ -839,6 +851,8 @@ Reply with STRICT JSON ONLY, no markdown:
       modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
       modal.querySelector('#ai-cancel').addEventListener('click', closeModal);
       modal.querySelector('#ai-why-toggle').addEventListener('click', renderWhyPanel);
+      var micBtn = modal.querySelector('#ai-mic-button');
+      if (micBtn) micBtn.addEventListener('click', toggleVoiceInput);
 
       // Submit
       function submit() {
@@ -870,6 +884,71 @@ Reply with STRICT JSON ONLY, no markdown:
       });
     }
 
+    // ── 6b. Voice recognition (Web Speech API) ──────────────────────
+    var voiceRecognition = null;
+    var isListening = false;
+
+    function initVoiceRecognition() {
+      var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognition) {
+        var btn = document.getElementById('ai-mic-button');
+        if (btn) btn.style.display = 'none';
+        return;
+      }
+      voiceRecognition = new SpeechRecognition();
+      voiceRecognition.continuous = false;
+      voiceRecognition.interimResults = false;
+      voiceRecognition.maxAlternatives = 1;
+      voiceRecognition.lang = 'hi-IN';
+      voiceRecognition.onstart = function() {
+        isListening = true;
+        var btn = document.getElementById('ai-mic-button');
+        if (btn) {
+          btn.style.background = 'linear-gradient(135deg, #ef4444, #dc2626)';
+          btn.textContent = '\uD83D\uDD34';
+          btn.title = 'Listening\u2026 click to stop';
+        }
+        toast('\uD83C\uDFA4 Listening\u2026 speak your query', '\uD83C\uDFA4', 'info');
+      };
+      voiceRecognition.onresult = function(event) {
+        var transcript = event.results[0][0].transcript;
+        var input = document.getElementById('ai-query-input');
+        if (input) {
+          input.value = transcript;
+          input.focus();
+          toast('Heard: "' + transcript + '"', '\u2713', 'success');
+        }
+      };
+      voiceRecognition.onerror = function(event) {
+        toast('Voice error: ' + event.error, '\u26A0\uFE0F', 'error');
+        resetMicButton();
+      };
+      voiceRecognition.onend = function() {
+        isListening = false;
+        resetMicButton();
+      };
+    }
+    function resetMicButton() {
+      var btn = document.getElementById('ai-mic-button');
+      if (!btn) return;
+      btn.style.background = 'linear-gradient(135deg, #06b6d4, #6366f1)';
+      btn.textContent = '\uD83C\uDFA4';
+      btn.title = 'Voice input';
+    }
+    function toggleVoiceInput() {
+      if (!voiceRecognition) initVoiceRecognition();
+      if (!voiceRecognition) return;
+      if (isListening) {
+        voiceRecognition.stop();
+      } else {
+        try {
+          voiceRecognition.start();
+        } catch (e) {
+          toast('Voice start failed: ' + e.message, '\u26A0\uFE0F', 'error');
+        }
+      }
+    }
+
     // ── 7. Expose a tiny public API for debugging / external triggers
     window.AI_PICKER = {
       ask,
@@ -878,12 +957,13 @@ Reply with STRICT JSON ONLY, no markdown:
       isEnabled: () => aiEnabled,
       setKbLocked: (val) => { kbLocked = val; },
       setTuneShortcuts: (val) => { tuneShortcutsEnabled = val; },
-      version: '1.0.25.0',
+      voiceToggle: toggleVoiceInput,
+      version: '1.0.26.0',
       mode: 'server-first (Vercel Edge) with client-key + retrieval fallbacks',
     };
 
     injectUI();
-    console.log('%c[AI Channel Picker] ready · v1.0.25 · server-first via /api/ai-pick · press I',
+    console.log('%c[AI Channel Picker] ready · v1.0.26 · server-first via /api/ai-pick · press I',
                 'color:#06b6d4;font-weight:bold;');
   }
 })();

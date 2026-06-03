@@ -235,6 +235,35 @@
             background: linear-gradient(135deg, #444446 0%, #2c2c2e 100%);
             box-shadow: 0 1px 3px rgba(0,0,0,0.4), inset 0 1px 1px rgba(255,255,255,0.1);
         }
+        .usb-file-row {
+            display: grid;
+            grid-template-columns: 24px 1fr 80px 100px;
+            gap: 8px;
+            align-items: center;
+            padding: 4px 8px;
+            cursor: pointer;
+            font-size: 10px;
+        }
+        .usb-file-row:hover { background: rgba(255,255,255,0.05); }
+        .usb-file-row-selected { background: rgba(14, 165, 233, 0.2) !important; color: #7dd3fc; }
+        .usb-file-row .icon { text-align: center; }
+        .usb-file-row .name { font-family: 'Share Tech Mono', monospace; font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .usb-file-row .size, .usb-file-row .date { font-family: 'Share Tech Mono', monospace; font-size: 10px; color: #94a3b8; text-align: right; }
+        .usb-file-header {
+            display: grid;
+            grid-template-columns: 24px 1fr 80px 100px;
+            gap: 8px;
+            align-items: center;
+            padding: 4px 8px;
+            font-size: 9px;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 1px solid rgba(14, 165, 233, 0.15);
+            margin-bottom: 2px;
+        }
+        .usb-file-header .name, .usb-file-header .size, .usb-file-header .date { font-family: 'Share Tech Mono', monospace; font-weight: bold; }
+        .usb-file-header .size, .usb-file-header .date { text-align: right; }
     </style>
 </head>
 <body class="h-full flex flex-col justify-between overflow-x-hidden text-slate-200">
@@ -408,6 +437,7 @@
                                 <button id="usbNewFileBtn" class="bg-zinc-800 hover:bg-zinc-700 text-zinc-300 px-2 py-1 rounded text-[9px] font-bold uppercase tracking-wider">+ File</button>
                                 <button id="usbNewFolderBtn" class="bg-zinc-800 hover:bg-zinc-700 text-zinc-300 px-2 py-1 rounded text-[9px] font-bold uppercase tracking-wider">+ Folder</button>
                             </div>
+                            <div class="usb-file-header"><span class="icon"></span><span class="name">Name</span><span class="size">Size</span><span class="date">Date</span></div>
                             <div id="usbBrowserList" class="max-h-48 overflow-y-auto text-left text-[10px] divide-y divide-sky-900/20 border border-sky-900/30 rounded mb-2"></div>
                             <div class="flex gap-1 mt-2">
                                 <button id="usbResetBtn" class="bg-red-800 hover:bg-red-700 text-white px-3 py-1 rounded text-[9px] font-bold uppercase tracking-wider" title="Restore profile to original content">Reset USB</button>
@@ -478,6 +508,27 @@
                             <p class="text-xs text-zinc-400 leading-relaxed">Take a deep breath. The news can wait.</p>
                             <p class="text-[9px] text-zinc-600 mt-3 font-mono" id="exhaleCountdown">Auto-dismiss in 60s</p>
                         </div>
+                    </div>
+
+                    <!-- EPG (Electronic Program Guide) -->
+                    <div id="epgOverlay" class="absolute inset-0 bg-black/90 z-50 hidden p-6 overflow-auto" style="display:none;">
+                      <div class="max-w-2xl mx-auto bg-zinc-900 border border-amber-400/40 rounded-xl p-4">
+                        <div class="flex justify-between items-center mb-3">
+                          <h2 class="text-sm font-extrabold text-amber-400 uppercase tracking-widest aero-font">DishTV Program Guide</h2>
+                          <span class="text-[10px] text-zinc-400 font-mono" id="epgDateNow"></span>
+                        </div>
+                        <table class="w-full text-[11px] font-mono">
+                          <thead>
+                            <tr class="text-zinc-500 border-b border-zinc-700">
+                              <th class="text-left py-1">Time</th>
+                              <th class="text-left py-1">Channel</th>
+                              <th class="text-left py-1">Now Playing</th>
+                            </tr>
+                          </thead>
+                          <tbody id="epgRows"></tbody>
+                        </table>
+                        <button id="epgCloseBtn" class="mt-4 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-bold px-4 py-1.5 rounded text-[10px] uppercase tracking-wider transition-all">Close (Back)</button>
+                      </div>
                     </div>
 
                     <!-- TV DIALOG (replaces browser confirm/alert) -->
@@ -1211,7 +1262,7 @@
         const GH8 = 'https://github.com/AashmanShukla3223/Antigravity-and-OpenCode-CLI-Prompts-and-Skills/releases/download/v1.0.7/';
         const LIVE = 'https://feeds.intoday.in/aajtak/api/aajtakhd/master.m3u8';
         const NDTV = 'https://ndtvindiaelemarchana.akamaized.net/hls/live/2003679/ndtvindia/master.m3u8';
-        let APP_VERSION = '1.0.25';
+        let APP_VERSION = '1.0.26';
         const VERCEL_URL = 'https://samsung-lcd-tv.vercel.app';
         const audioStartup = new Audio(GH + 'startup.mp3');
         const audioShutdown = new Audio(GH + 'shutdown.mp3');
@@ -1483,6 +1534,12 @@
         let usbPhotoList = [];
         let usbPhotoIndex = 0;
 
+        // Picture filter state (v1.0.26)
+        let currentBrightnessFilter = 1;
+        let currentColorFilter = 1;
+        let currentContrastFilter = 1;
+        let currentEnergyMultiplier = 1;
+
         // Broadcast OTA
         let broadcastState = {
             scanning: false,
@@ -1509,7 +1566,10 @@
                     { name: "Backlight", type: "range", min: 0, max: 20, current: 15 },
                     { name: "Contrast", type: "range", min: 0, max: 100, current: 95 },
                     { name: "Brightness", type: "range", min: 0, max: 100, current: 45 },
-                    { name: "Watermark", type: "toggle", current: true }
+                    { name: "Color", type: "range", min: 0, max: 100, current: 50 },
+                    { name: "Sharpness", type: "range", min: 0, max: 100, current: 50 },
+                    { name: "Watermark", type: "toggle", current: true },
+                    { name: "Energy Saving", type: "select", values: ["Off", "Low", "Medium", "High", "Auto"], current: 0 }
                 ]
             },
             {
@@ -1535,11 +1595,11 @@
                 icon: "fa-gear",
                 options: [
                     { name: "Language", type: "select", values: ["English", "Español", "Français"], current: 0 },
-                    { name: "Energy Saving", type: "select", values: ["Off", "Low", "Medium", "High"], current: 0 },
                     { name: "On/Off Timer", type: "toggle", current: false },
                     { name: "AI Tune Channel Shortcuts", type: "toggle", current: true },
                     { name: "Lock Keyboard Shortcuts", type: "toggle", current: false },
-                    { name: "Retail Demo Mode", type: "action", action: toggleDemoMode }
+                    { name: "Retail Demo Mode", type: "action", action: toggleDemoMode },
+                    { name: "AajTak Exhale Schedule", type: "select", values: ["Every Hour", "Once Daily", "Off"], current: 0 }
                 ]
             },
             {
@@ -1608,10 +1668,17 @@
                     // Sync AI picker localStorage keys after restoring menuConfig
                     const setupOpts = menuConfig[3]?.options;
                     if (setupOpts) {
-                        const tuneVal = setupOpts[3]?.current;
-                        const lockVal = setupOpts[4]?.current;
+                        const tuneVal = setupOpts[2]?.current;
+                        const lockVal = setupOpts[3]?.current;
+                        const exhaleVal = setupOpts[4]?.current;
                         if (tuneVal !== undefined) localStorage.setItem('samsung_tv_ai_tune_shortcuts_v1', tuneVal ? 'true' : 'false');
                         if (lockVal !== undefined) localStorage.setItem('samsung_tv_kb_lock_v1', lockVal ? 'true' : 'false');
+                        if (exhaleVal !== undefined) {
+                            var exhaleOpt = setupOpts[4].values[exhaleVal];
+                            if (exhaleOpt === 'Every Hour') setExhaleMode('hourly');
+                            else if (exhaleOpt === 'Once Daily') setExhaleMode('daily');
+                            else setExhaleMode('off');
+                        }
                     }
                 }
             } catch(e) {}
@@ -2138,8 +2205,18 @@
                     if (opt.name === "Melody Level") {
                         tvSynth.playFMNote(659.25, 0.8, 0.35); 
                     }
-                    if (opt.name === "Sound Mode") {
+                if (opt.name === "Sound Mode") {
                         applySoundMode(opt.current);
+                    }
+                    if (opt.name === "Energy Saving") {
+                        var mode = opt.values[opt.current].toLowerCase();
+                        applyEnergySaving(mode);
+                    }
+                    if (opt.name === "AajTak Exhale Schedule") {
+                        var exhaleVal = opt.values[opt.current];
+                        if (exhaleVal === "Every Hour") setExhaleMode('hourly');
+                        else if (exhaleVal === "Once Daily") setExhaleMode('daily');
+                        else setExhaleMode('off');
                     }
                 } else if (opt.type === "range") {
                     opt.current = Math.min(opt.max, opt.current + 1);
@@ -2149,24 +2226,12 @@
                     }
                 } else if (opt.type === "action") {
                     opt.action();
-                }
-                saveSettings();
+                } else {
+                navigateLeftOrReturn();
             }
-            tvSynth.playFMNote(1050, 0.08, 0.2);
-        }
-
-        function navigateLeftOrReturn() {
-            if (!menuOpen) return;
-            if (menuStage === "options") {
-                menuStage = "categories";
-                renderCategories();
-                renderCategoryOptions();
-            } else if (menuStage === "categories") {
-                closeMenu();
-            }
+            saveSettings();
             tvSynth.playFMNote(750, 0.08, 0.15);
         }
-
         function navigateLeftAdjustment() {
             if (!menuOpen || menuStage !== "options") {
                 navigateLeftOrReturn();
@@ -2176,6 +2241,19 @@
             if (opt.type === "select") {
                 opt.current = (opt.current - 1 + opt.values.length) % opt.values.length;
                 renderCategoryOptions();
+                if (opt.name === "Sound Mode") {
+                    applySoundMode(opt.current);
+                }
+                if (opt.name === "Energy Saving") {
+                    var mode = opt.values[opt.current].toLowerCase();
+                    applyEnergySaving(mode);
+                }
+                if (opt.name === "AajTak Exhale Schedule") {
+                    var exhaleVal = opt.values[opt.current];
+                    if (exhaleVal === "Every Hour") setExhaleMode('hourly');
+                    else if (exhaleVal === "Once Daily") setExhaleMode('daily');
+                    else setExhaleMode('off');
+                }
             } else if (opt.type === "range") {
                 opt.current = Math.max(opt.min, opt.current - 1);
                 renderCategoryOptions();
@@ -2188,7 +2266,6 @@
             saveSettings();
             tvSynth.playFMNote(750, 0.08, 0.15);
         }
-
 
         /* The Sound Test Procedure */
 
@@ -2563,10 +2640,40 @@
             showToast('USB drive connected: ' + virtualUSB.label, '<i class="fa-solid fa-usb"></i>', 'success');
         }
 
+        function playUsbEjectSound() {
+            if (!tvSynth || !tvSynth.context) return;
+            var ctx = tvSynth.context;
+            var osc = ctx.createOscillator();
+            var gain = ctx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(800, ctx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(200, ctx.currentTime + 0.08);
+            gain.gain.setValueAtTime(0.08, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.12);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start();
+            osc.stop(ctx.currentTime + 0.15);
+        }
+        function animateUsbEject() {
+            var badge = document.getElementById('usbPortBtn');
+            if (!badge) return;
+            badge.style.transition = 'transform 0.4s ease-in, opacity 0.4s ease-in';
+            badge.style.transform = 'translateY(20px)';
+            badge.style.opacity = '0';
+            setTimeout(function() {
+                badge.style.display = 'none';
+                badge.style.transform = '';
+                badge.style.opacity = '';
+                badge.style.transition = '';
+            }, 450);
+        }
         function usbDisconnect() {
             if (!virtualUSB.connected) return;
             virtualUSB.connected = false;
             usbSaveState();
+            playUsbEjectSound();
+            animateUsbEject();
             usbUpdatePortUI();
             usbUpdateMenuStatus();
             if (usbFileBrowserOpen) usbCloseBrowser();
@@ -2576,6 +2683,10 @@
         function usbUpdatePortUI() {
             const btn = document.getElementById('usbPortBtn');
             if (!btn) return;
+            // Restore display in case animateUsbEject hid it
+            btn.style.display = '';
+            btn.style.transform = '';
+            btn.style.opacity = '';
             if (virtualUSB.connected) {
                 btn.className = 'text-[8px] px-2 py-1 rounded bg-emerald-700 hover:bg-emerald-600 text-white font-bold uppercase tracking-wider border border-emerald-500/50 transition-all';
                 btn.innerHTML = '<i class="fa-solid fa-usb mr-1"></i>USB: ' + virtualUSB.label;
@@ -2624,6 +2735,7 @@
         function usbWriteFile(filePath, content) {
             const key = filePath.replace(/^\//, '');
             virtualUSB.files[key] = content;
+            localStorage.setItem('usbmtime_' + virtualUSB.label + '_' + key, String(Date.now()));
             usbSaveState();
         }
 
@@ -2639,6 +2751,7 @@
         function usbMkdir(dirPath) {
             const key = dirPath.replace(/^\//, '') + '/.folder';
             virtualUSB.files[key] = '';
+            localStorage.setItem('usbmtime_' + virtualUSB.label + '_' + key, String(Date.now()));
             usbSaveState();
         }
 
@@ -2648,6 +2761,48 @@
             const parts = cleaned.split('/');
             parts.pop();
             return parts.join('/') || '/';
+        }
+
+        // ── File metadata helpers ───────────────────────────────────
+        var recentlyViewed = JSON.parse(localStorage.getItem('samsung_recently_viewed') || '[]');
+        var MAX_RECENT = 10;
+        var usbShowingRecentlyViewed = false;
+
+        function getFileIcon(filename) {
+            var ext = filename.split('.').pop().toLowerCase();
+            if (filename.endsWith('/')) return '\uD83D\uDCC1';
+            if (['mp3','wav','m4a','ogg'].indexOf(ext) >= 0) return '\uD83C\uDFB5';
+            if (['jpg','jpeg','png','gif','webp'].indexOf(ext) >= 0) return '\uD83D\uDDBC\uFE0F';
+            if (['mp4','mov','mkv','webm'].indexOf(ext) >= 0) return '\uD83C\uDFAC';
+            if (['json'].indexOf(ext) >= 0) return '\u2699\uFE0F';
+            if (['html','htm'].indexOf(ext) >= 0) return '\uD83D\uDCE6';
+            if (['txt','md','log'].indexOf(ext) >= 0) return '\uD83D\uDCC4';
+            if (['xml'].indexOf(ext) >= 0) return '\uD83D\uDCCB';
+            return '\uD83D\uDCC4';
+        }
+        function humanFileSize(bytes) {
+            if (!bytes || bytes < 1024) return (bytes || 0) + ' B';
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+            if (bytes < 1024 * 1024 * 1024) return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+            return (bytes / (1024 * 1024 * 1024)).toFixed(2) + ' GB';
+        }
+        function getFileSize(value) {
+            if (typeof value === 'string' && value.startsWith('http')) return '\u2014 remote \u2014';
+            if (typeof value === 'string') return humanFileSize(value.length);
+            return '0 B';
+        }
+        function getModifiedDate(filename) {
+            var key = 'usbmtime_' + virtualUSB.label + '_' + filename;
+            var stored = localStorage.getItem(key);
+            if (stored) return new Date(parseInt(stored)).toLocaleDateString('en-IN');
+            return '\u2014';
+        }
+        function trackFileView(filename) {
+            var entry = { filename: filename, profileLabel: virtualUSB.label, timestamp: Date.now() };
+            recentlyViewed = recentlyViewed.filter(function(e) { return e.filename !== filename || e.profileLabel !== virtualUSB.label; });
+            recentlyViewed.unshift(entry);
+            recentlyViewed = recentlyViewed.slice(0, MAX_RECENT);
+            localStorage.setItem('samsung_recently_viewed', JSON.stringify(recentlyViewed));
         }
 
         function usbOpenBrowser() {
@@ -2667,6 +2822,15 @@
             document.getElementById('usbFileBrowser').style.display = 'none';
         }
 
+        function renderFileRow(type, name, icon, size, date, selected) {
+            var row = document.createElement('div');
+            row.className = 'usb-file-row' + (selected ? ' usb-file-row-selected' : '');
+            row.dataset.type = type;
+            row.dataset.name = name;
+            row.innerHTML = '<span class="icon">' + icon + '</span><span class="name">' + name + '</span><span class="size">' + size + '</span><span class="date">' + date + '</span>';
+            return row;
+        }
+
         function usbRenderBrowser() {
             const listEl = document.getElementById('usbBrowserList');
             const pathEl = document.getElementById('usbBrowserPath');
@@ -2674,38 +2838,93 @@
             pathEl.innerText = usbFileBrowserPath;
             const entries = usbGetDirContents(usbFileBrowserPath);
             listEl.innerHTML = '';
-            if (usbFileBrowserPath !== '/') {
-                const parentItem = document.createElement('div');
-                parentItem.className = 'py-1 px-2 cursor-pointer flex items-center gap-2 text-zinc-400 hover:text-zinc-200 text-[10px]';
-                parentItem.dataset.type = 'parent';
-                parentItem.innerHTML = '<i class="fa-solid fa-level-up-alt text-[8px]"></i> ..';
-                listEl.appendChild(parentItem);
+
+            // Virtual "Recently Viewed" folder at root
+            if (usbFileBrowserPath === '/' && !usbShowingRecentlyViewed) {
+                var recents = recentlyViewed.filter(function(e) { return e.profileLabel === virtualUSB.label; });
+                if (recents.length > 0) {
+                    var recentRow = renderFileRow('pseudo-recents', '\uD83D\uDD50  Recently Viewed/', '', recents.length + ' items', '\u2014 virtual \u2014', false);
+                    listEl.appendChild(recentRow);
+                }
             }
-            entries.dirs.forEach((dir, idx) => {
-                const item = document.createElement('div');
-                const dirOffset = usbFileBrowserPath !== '/' ? 1 : 0;
-                const dirSelected = (dirOffset + idx) === usbFileBrowserSelectedIndex;
-                item.className = 'py-1 px-2 cursor-pointer flex items-center gap-2 text-[10px] ' + (dirSelected ? 'bg-sky-800/40 text-sky-200' : 'text-zinc-400 hover:text-zinc-200 hover:bg-sky-900/20');
-                item.dataset.type = 'dir';
-                item.dataset.name = dir;
-                item.innerHTML = '<i class="fa-solid fa-folder text-amber-400 text-[8px]"></i> ' + dir;
-                listEl.appendChild(item);
+
+            var idx = 0;
+            if (usbFileBrowserPath !== '/') {
+                var parentRow = renderFileRow('parent', '..', '<i class="fa-solid fa-level-up-alt text-[8px]"></i>', '', '', idx === usbFileBrowserSelectedIndex);
+                listEl.appendChild(parentRow);
+                idx++;
+            }
+            entries.dirs.forEach(function(dir) {
+                var selected = idx === usbFileBrowserSelectedIndex;
+                var row = renderFileRow('dir', dir, '\uD83D\uDCC1', '\u2014', '\u2014', selected);
+                listEl.appendChild(row);
+                idx++;
             });
-            entries.files.forEach((file, idx) => {
-                const item = document.createElement('div');
-                const fileOffset = (usbFileBrowserPath !== '/' ? 1 : 0) + entries.dirs.length;
-                const fileSelected = (fileOffset + idx) === usbFileBrowserSelectedIndex;
-                item.className = 'py-1 px-2 cursor-pointer flex items-center gap-2 text-[10px] ' + (fileSelected ? 'bg-sky-800/40 text-sky-200' : 'text-zinc-400 hover:text-zinc-200 hover:bg-sky-900/20');
-                item.dataset.type = 'file';
-                item.dataset.name = file;
-                item.innerHTML = '<i class="fa-solid fa-file text-sky-400 text-[8px]"></i> ' + file;
-                listEl.appendChild(item);
+            entries.files.forEach(function(file) {
+                var selected = idx === usbFileBrowserSelectedIndex;
+                var filePath = (usbFileBrowserPath === '/' ? '/' : usbFileBrowserPath + '/') + file;
+                var value = usbReadFile(filePath);
+                var icon = getFileIcon(file);
+                var size = getFileSize(value);
+                var date = getModifiedDate(file);
+                var row = renderFileRow('file', file, icon, size, date, selected);
+                listEl.appendChild(row);
+                idx++;
             });
         }
 
+        function usbShowRecentlyViewed() {
+            usbShowingRecentlyViewed = true;
+            usbFileBrowserPath = '/';
+            var listEl = document.getElementById('usbBrowserList');
+            var pathEl = document.getElementById('usbBrowserPath');
+            if (pathEl) pathEl.innerText = 'Recently Viewed/';
+            if (!listEl) return;
+            listEl.innerHTML = '';
+            var recents = recentlyViewed.filter(function(e) { return e.profileLabel === virtualUSB.label; });
+            if (recents.length === 0) return;
+            recents.forEach(function(entry, idx) {
+                var selected = idx === usbFileBrowserSelectedIndex;
+                var row = document.createElement('div');
+                row.className = 'usb-file-row' + (selected ? ' usb-file-row-selected' : '');
+                row.dataset.type = 'file';
+                row.dataset.name = entry.filename;
+                row.dataset.recent = '1';
+                var icon = getFileIcon(entry.filename);
+                var date = new Date(entry.timestamp).toLocaleDateString('en-IN');
+                row.innerHTML = '<span class="icon">' + icon + '</span><span class="name">' + entry.filename + '</span><span class="size">\u2014</span><span class="date">' + date + '</span>';
+                listEl.appendChild(row);
+            });
+            // Add back button
+            var backRow = document.createElement('div');
+            backRow.className = 'usb-file-row';
+            backRow.dataset.type = 'parent';
+            backRow.innerHTML = '<span class="icon"><i class="fa-solid fa-level-up-alt text-[8px]"></i></span><span class="name">\u2190 Back</span><span class="size"></span><span class="date"></span>';
+            listEl.appendChild(backRow);
+        }
+
         function usbNavigateBrowser(direction) {
+            if (usbShowingRecentlyViewed) {
+                var listEl = document.getElementById('usbBrowserList');
+                if (!listEl) return;
+                var children = listEl.children;
+                var total = children.length;
+                if (direction === 'up') {
+                    usbFileBrowserSelectedIndex = (usbFileBrowserSelectedIndex - 1 + total) % total;
+                } else if (direction === 'down') {
+                    usbFileBrowserSelectedIndex = (usbFileBrowserSelectedIndex + 1) % total;
+                }
+                usbShowRecentlyViewed();
+                return;
+            }
             const entries = usbGetDirContents(usbFileBrowserPath);
-            const total = entries.dirs.length + entries.files.length + (usbFileBrowserPath !== '/' ? 1 : 0);
+            var rootExtra = 0;
+            if (usbFileBrowserPath === '/') {
+                var recents = recentlyViewed.filter(function(e) { return e.profileLabel === virtualUSB.label; });
+                if (recents.length > 0) rootExtra = 1;
+            }
+            var parentExtra = usbFileBrowserPath !== '/' ? 1 : 0;
+            var total = rootExtra + parentExtra + entries.dirs.length + entries.files.length;
             if (direction === 'up') {
                 usbFileBrowserSelectedIndex = (usbFileBrowserSelectedIndex - 1 + total) % total;
             } else if (direction === 'down') {
@@ -2724,10 +2943,19 @@
             if (!child) return;
             const type = child.dataset.type;
             const name = child.dataset.name;
-            if (type === 'parent') {
-                usbFileBrowserPath = usbGetParentPath(usbFileBrowserPath);
-                usbFileBrowserSelectedIndex = 0;
-                usbRenderBrowser();
+            if (type === 'pseudo-recents') {
+                usbShowRecentlyViewed();
+            } else if (type === 'parent') {
+                if (usbShowingRecentlyViewed) {
+                    usbShowingRecentlyViewed = false;
+                    usbFileBrowserPath = '/';
+                    usbFileBrowserSelectedIndex = 0;
+                    usbRenderBrowser();
+                } else {
+                    usbFileBrowserPath = usbGetParentPath(usbFileBrowserPath);
+                    usbFileBrowserSelectedIndex = 0;
+                    usbRenderBrowser();
+                }
             } else if (type === 'dir') {
                 usbFileBrowserPath = (usbFileBrowserPath === '/' ? '/' : usbFileBrowserPath + '/') + name;
                 usbFileBrowserSelectedIndex = 0;
@@ -2735,6 +2963,7 @@
             } else if (type === 'file') {
                 const filePath = (usbFileBrowserPath === '/' ? '/' : usbFileBrowserPath + '/') + name;
                 const content = usbReadFile(filePath);
+                trackFileView(name);
                 if (name === 'version.json') {
                     if (content) {
                         (async function() {
@@ -3113,15 +3342,41 @@
             showUpdateOverlay(version);
         }
 
-        // ========== AAJTAK :55 EXHALE WINDOW ==========
+        // ========== AAJTAK EXHALE WINDOW (customizable schedule) ==========
         let exhaleTimerActive = false;
         let exhaleInterval = null;
+        var exhaleMode = localStorage.getItem('samsung_exhale_mode') || 'hourly';
+        var exhaleDailyTime = parseInt(localStorage.getItem('samsung_exhale_daily_time') || '21', 10);
+        var lastDailyExhaleDate = localStorage.getItem('samsung_last_daily_exhale') || '';
+        var lastExhaleMinute = -1;
+
+        function shouldTriggerExhale() {
+            var now = new Date();
+            if (exhaleMode === 'off') return false;
+            if (exhaleMode === 'hourly') {
+                return now.getMinutes() === 55 && now.getSeconds() < 5;
+            }
+            if (exhaleMode === 'daily') {
+                var today = now.toISOString().split('T')[0];
+                if (now.getHours() === exhaleDailyTime && now.getMinutes() === 0 && now.getSeconds() < 5 && lastDailyExhaleDate !== today) {
+                    lastDailyExhaleDate = today;
+                    localStorage.setItem('samsung_last_daily_exhale', today);
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        function setExhaleMode(mode) {
+            exhaleMode = mode;
+            localStorage.setItem('samsung_exhale_mode', mode);
+            showToast('AajTak Exhale: ' + (mode === 'off' ? 'OFF' : mode === 'hourly' ? 'Every Hour' : 'Daily at ' + exhaleDailyTime + ':00'), '🌬️', 'info');
+        }
 
         function startExhaleTimer() {
             if (exhaleInterval) return;
             exhaleInterval = setInterval(() => {
-                const now = new Date();
-                if (now.getMinutes() === 55 && now.getSeconds() < 5) {
+                if (shouldTriggerExhale()) {
                     if (!exhaleTimerActive && powerState === 'active') {
                         exhaleTimerActive = true;
                         showExhaleOverlay();
@@ -3158,6 +3413,52 @@
             if (el) {
                 el.classList.add('hidden');
                 el.style.display = 'none';
+            }
+        }
+
+        // ========== EPG (Electronic Program Guide) ==========
+        var EPG_DATA = [
+            { time: '10:00 AM', channel: '124', showName: 'AajTak \u2014 Aaj Subah' },
+            { time: '11:00 AM', channel: '131', showName: 'AajTak \u2014 Ek aur Ek Gyarah' },
+            { time: '05:00 PM', channel: '136', showName: 'AajTak \u2014 Dangal' },
+            { time: '06:00 PM', channel: '126', showName: 'AajTak \u2014 Halla Bol' },
+            { time: '06:30 PM', channel: '128', showName: 'AajTak \u2014 Halla Bol (Evening)' },
+            { time: '07:00 PM', channel: '137', showName: 'AajTak \u2014 Desh Tak' },
+            { time: '08:30 PM', channel: '123', showName: 'AajTak \u2014 Special Report' },
+            { time: '09:00 PM', channel: '133', showName: 'AajTak \u2014 Khabardar' },
+            { time: '09:30 PM', channel: '127', showName: 'AajTak \u2014 Black and White' },
+            { time: '10:00 PM', channel: '127', showName: 'AajTak \u2014 Das Tak' }
+        ];
+
+        function renderEPG() {
+            var tbody = document.getElementById('epgRows');
+            if (!tbody) return;
+            tbody.innerHTML = EPG_DATA.map(function(row) {
+                return '<tr class="border-b border-zinc-800 hover:bg-zinc-800/50">' +
+                  '<td class="py-1 text-amber-400">' + row.time + '</td>' +
+                  '<td class="py-1 text-zinc-300">Ch ' + row.channel + '</td>' +
+                  '<td class="py-1 text-white">' + row.showName + '</td>' +
+                '</tr>';
+            }).join('');
+            var dateEl = document.getElementById('epgDateNow');
+            if (dateEl) dateEl.textContent = new Date().toLocaleString('en-IN');
+        }
+
+        function openEPG() {
+            renderEPG();
+            var overlay = document.getElementById('epgOverlay');
+            if (overlay) {
+                overlay.classList.remove('hidden');
+                overlay.style.display = '';
+            }
+            if (tvSynth && tvSynth.playFMNote) tvSynth.playFMNote(660, 0.15, 0.2);
+        }
+
+        function closeEPG() {
+            var overlay = document.getElementById('epgOverlay');
+            if (overlay) {
+                overlay.classList.add('hidden');
+                overlay.style.display = 'none';
             }
         }
 
@@ -3712,20 +4013,28 @@
             const backlight = pic[1].current;
             const contrast = pic[2].current;
             const brightness = pic[3].current;
+            const color = pic[4] ? pic[4].current : 50;
             const blEl = document.getElementById('pictureBacklight');
             const brEl = document.getElementById('pictureBrightness');
             if (blEl) blEl.style.opacity = backlight / 20;
             if (brEl) brEl.style.opacity = 1 - (brightness / 100);
-            const saturateVal = (contrast / 100) * 1.5;
-            const screenArea = document.querySelector('.aspect-video');
-            if (screenArea) {
-                const existing = screenArea.style.filter || '';
-                if (existing.includes('saturate')) {
-                    screenArea.style.filter = existing.replace(/saturate\([^)]+\)/, `saturate(${saturateVal})`);
-                } else {
-                    screenArea.style.filter = `saturate(${saturateVal})`;
-                }
-            }
+            currentBrightnessFilter = 0.5 + (brightness / 100);
+            currentContrastFilter = 0.5 + (contrast / 100);
+            currentColorFilter = color / 50;
+            applyPictureCombinedFilters();
+            localStorage.setItem('samsung_picture_brightness', brightness);
+            localStorage.setItem('samsung_picture_contrast', contrast);
+            localStorage.setItem('samsung_picture_color', color);
+        }
+        function applyPictureCombinedFilters() {
+            var userBrightness = currentBrightnessFilter || 1;
+            var finalBrightness = userBrightness * (currentEnergyMultiplier || 1);
+            var saturate = currentColorFilter || 1;
+            var contrast = currentContrastFilter || 1;
+            var filterVal = 'brightness(' + finalBrightness + ') saturate(' + saturate + ') contrast(' + contrast + ')';
+            document.querySelectorAll('video').forEach(function(v) {
+                v.style.filter = filterVal;
+            });
         }
 
         // --- SOUND MODE EQ FILTER ---
@@ -3775,34 +4084,52 @@
             }
         }
 
-        // --- ENERGY SAVING AUTO-DIMMING ---
+        // --- ENERGY SAVING SYSTEM (v1.0.26) ---
+        var ENERGY_MULTIPLIERS = {
+            'off': 1.00,
+            'low': 0.90,
+            'medium': 0.75,
+            'high': 0.55,
+            'auto': null
+        };
+        function applyEnergySaving(mode) {
+            var multiplier = ENERGY_MULTIPLIERS[mode];
+            if (mode === 'auto') {
+                var hour = new Date().getHours();
+                multiplier = (hour >= 18 || hour < 6) ? 0.65 : 0.95;
+            }
+            currentEnergyMultiplier = multiplier;
+            applyPictureCombinedFilters();
+            var indicator = document.getElementById('energySavingIndicator');
+            if (!indicator) indicator = createEnergyIndicator();
+            if (mode === 'off' || !mode) {
+                indicator.style.display = 'none';
+            } else {
+                indicator.style.display = 'flex';
+                indicator.textContent = '\uD83C\uDF31 Energy: ' + mode.toUpperCase();
+            }
+            localStorage.setItem('samsung_energy_mode', mode);
+        }
         function setupEnergySaving() {
-            if (energySavingInterval) clearInterval(energySavingInterval);
-            lastInteractionTime = Date.now();
-            energySavingInterval = setInterval(() => {
-                const es = menuConfig[3].options[1].current;
-                if (es === 0) {
-                    document.getElementById('energyOverlay').style.opacity = '0';
-                    energySavingActive = false;
-                    return;
-                }
-                const elapsed = Date.now() - lastInteractionTime;
-                if (elapsed > 60000) {
-                    energySavingActive = true;
-                    const levels = [0, 0.2, 0.4, 0.6];
-                    document.getElementById('energyOverlay').style.opacity = levels[es];
-                } else {
-                    energySavingActive = false;
-                    document.getElementById('energyOverlay').style.opacity = '0';
-                }
-            }, 10000);
+            var savedMode = localStorage.getItem('samsung_energy_mode');
+            if (!savedMode) savedMode = 'off';
+            var picOpts = menuConfig[0].options;
+            var esOpt = picOpts[picOpts.length - 1];
+            if (esOpt && esOpt.name === 'Energy Saving') {
+                var idx = esOpt.values.map(function(v) { return v.toLowerCase(); }).indexOf(savedMode);
+                if (idx >= 0) esOpt.current = idx;
+            }
+            applyEnergySaving(savedMode);
         }
         function resetEnergySaving() {
-            lastInteractionTime = Date.now();
-            if (energySavingActive) {
-                energySavingActive = false;
-                document.getElementById('energyOverlay').style.opacity = '0';
-            }
+            // no-op: repurposed for v1.0.26, handled by applyEnergySaving
+        }
+        function createEnergyIndicator() {
+            var ind = document.createElement('div');
+            ind.id = 'energySavingIndicator';
+            ind.style.cssText = 'position: fixed; top: 12px; right: 12px; background: rgba(34, 197, 94, 0.85); color: white; padding: 4px 10px; border-radius: 4px; font-size: 10px; font-weight: bold; z-index: 60; display: none;';
+            document.body.appendChild(ind);
+            return ind;
         }
 
         // --- HDMI-CEC SIMULATION ---
@@ -4330,6 +4657,9 @@
         addSafeListener('broadcastInstallBtn', 'click', installBroadcastUpdate);
         addSafeListener('broadcastLaterBtn', 'click', dismissBroadcastUpdate);
 
+        // EPG close
+        addSafeListener('epgCloseBtn', 'click', closeEPG);
+
         // Conflict picker buttons
         addSafeListener('conflictCancelBtn', 'click', () => {
             hideConflictPicker();
@@ -4406,6 +4736,19 @@
                 toggleShortcutOverlay();
                 return;
             }
+            if (e.key && e.key.toLowerCase() === 'g' && !e.ctrlKey && !e.metaKey) {
+                var tag = (e.target && e.target.tagName) || '';
+                if (tag !== 'INPUT' && tag !== 'TEXTAREA' && !(e.target && e.target.isContentEditable)) {
+                    e.preventDefault();
+                    var epg = document.getElementById('epgOverlay');
+                    if (epg && !epg.classList.contains('hidden')) {
+                        closeEPG();
+                    } else {
+                        openEPG();
+                    }
+                    return;
+                }
+            }
 
             switch(e.key) {
                 case 'ArrowUp':
@@ -4467,6 +4810,7 @@
                     else if (usbPhotoViewerOpen) usbClosePhotoViewer();
                     else if (pictureTestOpen) closePictureTest();
                     else if (aboutTVOpen) closeAboutTV();
+                    else if (document.getElementById('epgOverlay') && !document.getElementById('epgOverlay').classList.contains('hidden')) closeEPG();
                     else if (document.getElementById('screenConflictPicker') && !document.getElementById('screenConflictPicker').classList.contains('hidden')) {
                         hideConflictPicker();
                         clearAllPendingUpdates();
@@ -4677,6 +5021,8 @@
             usbRenderProfileButton();
             // Start the AajTak :55 exhale timer
             startExhaleTimer();
+            // Restore energy saving mode
+            setupEnergySaving();
 
             // Phase 6 — Retail Demo Mode auto-start
             if (localStorage.getItem('samsung_demo_mode') === 'true') {
