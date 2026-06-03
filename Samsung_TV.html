@@ -4533,6 +4533,8 @@
 
         // Samsung TV Remote bindings
         addSafeListener('remotePower', 'click', togglePower);
+        const rp = document.getElementById('remotePower');
+        if (rp) rp.addEventListener('click', function(e) { console.log('remotePower clicked, calling togglePower'); togglePower(); });
         addSafeListener('remoteMenu', 'click', toggleMenu);
         addSafeListener('remoteSource', 'click', toggleSourceMenu);
 
@@ -4723,6 +4725,7 @@
         document.addEventListener('click', () => resetEnergySaving());
 
         window.addEventListener('keydown', (e) => {
+            console.log('keydown:', e.key, 'powerState:', powerState);
             resetEnergySaving();
             if (powerState === "off" || powerState === "booting") {
                 if (e.key === 'p' || e.key === 'P') {
