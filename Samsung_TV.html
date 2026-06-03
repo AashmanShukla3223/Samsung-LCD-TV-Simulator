@@ -976,7 +976,7 @@
 
                     <!-- Power & Source Row -->
                     <div class="flex justify-between w-full px-1">
-                        <button id="remotePower" class="remote-btn w-10 h-10 rounded-full bg-red-700 hover:bg-red-600 border border-red-500/40 text-white flex flex-col items-center justify-center font-bold text-[8px]">
+                        <button id="remotePower" onclick="togglePower()" class="remote-btn w-10 h-10 rounded-full bg-red-700 hover:bg-red-600 border border-red-500/40 text-white flex flex-col items-center justify-center font-bold text-[8px]">
                             <i class="fa-solid fa-power-off text-sm pointer-events-none"></i>
                         </button>
                         <button id="remoteSource" class="remote-btn w-10 h-10 rounded-full bg-zinc-800 hover:bg-zinc-700 border border-zinc-700/30 text-zinc-300 flex flex-col items-center justify-center font-semibold text-[8px] uppercase tracking-wider">
@@ -1808,6 +1808,7 @@
         /* Power Sequence Logic */
 
         async function togglePower() {
+            showToast('togglePower called, state=' + powerState, '🔌', 'info');
             try {
             tvSynth.initAudio();
 
