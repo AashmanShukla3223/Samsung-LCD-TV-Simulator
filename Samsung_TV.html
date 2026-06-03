@@ -543,6 +543,7 @@
                         <div class="samsung-osd-bg rounded-xl p-5 max-w-sm w-full mx-4">
                             <h3 id="tvDialogTitle" class="text-sm font-extrabold text-amber-400 uppercase tracking-widest mb-3 aero-font">Confirm</h3>
                             <div id="tvDialogMessage" class="text-xs text-zinc-300 mb-5 leading-relaxed whitespace-pre-line"></div>
+                            <input id="tvDialogInput" class="w-full bg-zinc-800 border border-zinc-600 rounded px-3 py-2 text-xs text-white mb-4 hidden" type="text" placeholder="" autocomplete="off">
                             <div id="tvDialogButtons" class="flex justify-end gap-3"></div>
                         </div>
                     </div>
@@ -2500,6 +2501,7 @@
             return new Promise(function(resolve) {
                 tvDialogResolve = resolve;
                 var modal = document.getElementById('tvDialog');
+                document.getElementById('tvDialogInput').classList.add('hidden');
                 document.getElementById('tvDialogTitle').textContent = title;
                 document.getElementById('tvDialogTitle').className = 'text-sm font-extrabold text-amber-400 uppercase tracking-widest mb-3 aero-font';
                 document.getElementById('tvDialogMessage').textContent = message;
@@ -2516,6 +2518,7 @@
             return new Promise(function(resolve) {
                 tvDialogResolve = resolve;
                 var modal = document.getElementById('tvDialog');
+                document.getElementById('tvDialogInput').classList.add('hidden');
                 document.getElementById('tvDialogTitle').textContent = title;
                 document.getElementById('tvDialogTitle').className = 'text-sm font-extrabold text-sky-400 uppercase tracking-widest mb-3 aero-font';
                 document.getElementById('tvDialogMessage').textContent = message;
@@ -2524,6 +2527,48 @@
                 modal.style.display = 'flex';
                 modal.classList.remove('hidden');
                 document.getElementById('tvDialogOkBtn').onclick = function() { tvDialogResolve = null; modal.style.display = 'none'; modal.classList.add('hidden'); resolve(); };
+            });
+        }
+        function showTVPrompt(title, message, defaultValue) {
+            return new Promise(function(resolve) {
+                tvDialogResolve = resolve;
+                var modal = document.getElementById('tvDialog');
+                var input = document.getElementById('tvDialogInput');
+                input.value = defaultValue || '';
+                input.classList.remove('hidden');
+                input.placeholder = message;
+                document.getElementById('tvDialogTitle').textContent = title;
+                document.getElementById('tvDialogTitle').className = 'text-sm font-extrabold text-amber-400 uppercase tracking-widest mb-3 aero-font';
+                document.getElementById('tvDialogMessage').textContent = '';
+                document.getElementById('tvDialogButtons').innerHTML =
+                    '<button id="tvDialogCancelBtn" class="bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-bold px-4 py-2 rounded text-[10px] uppercase tracking-wider">Cancel</button>' +
+                    '<button id="tvDialogOkBtn" class="bg-sky-700 hover:bg-sky-600 text-white font-bold px-4 py-2 rounded text-[10px] uppercase tracking-wider">OK</button>';
+                modal.style.display = 'flex';
+                modal.classList.remove('hidden');
+                input.focus();
+                input.select();
+                document.getElementById('tvDialogOkBtn').onclick = function() {
+                    var val = input.value;
+                    tvDialogResolve = null;
+                    modal.style.display = 'none';
+                    modal.classList.add('hidden');
+                    input.classList.add('hidden');
+                    resolve(val);
+                };
+                document.getElementById('tvDialogCancelBtn').onclick = function() {
+                    tvDialogResolve = null;
+                    modal.style.display = 'none';
+                    modal.classList.add('hidden');
+                    input.classList.add('hidden');
+                    resolve(null);
+                };
+                input.onkeydown = function(e) {
+                    if (e.key === 'Enter') {
+                        document.getElementById('tvDialogOkBtn').click();
+                    } else if (e.key === 'Escape') {
+                        document.getElementById('tvDialogCancelBtn').click();
+                    }
+                };
             });
         }
         function closeTVDialog() {
@@ -3123,21 +3168,23 @@
         }
 
         function usbNewFile() {
-            const name = prompt('Enter file name:');
-            if (!name || name.trim() === '') return;
-            const filePath = (usbFileBrowserPath === '/' ? '/' : usbFileBrowserPath + '/') + name.trim();
-            usbWriteFile(filePath, '');
-            usbRenderBrowser();
-            showToast('File created: ' + name.trim(), '<i class="fa-solid fa-file-circle-plus"></i>', 'success');
+            showTVPrompt('New File', 'Enter file name:').then(function(name) {
+                if (!name || name.trim() === '') return;
+                var filePath = (usbFileBrowserPath === '/' ? '/' : usbFileBrowserPath + '/') + name.trim();
+                usbWriteFile(filePath, '');
+                usbRenderBrowser();
+                showToast('File created: ' + name.trim(), '<i class="fa-solid fa-file-circle-plus"></i>', 'success');
+            });
         }
 
         function usbNewFolder() {
-            const name = prompt('Enter folder name:');
-            if (!name || name.trim() === '') return;
-            const dirPath = (usbFileBrowserPath === '/' ? '/' : usbFileBrowserPath + '/') + name.trim();
-            usbMkdir(dirPath);
-            usbRenderBrowser();
-            showToast('Folder created: ' + name.trim(), '<i class="fa-solid fa-folder-plus"></i>', 'success');
+            showTVPrompt('New Folder', 'Enter folder name:').then(function(name) {
+                if (!name || name.trim() === '') return;
+                var dirPath = (usbFileBrowserPath === '/' ? '/' : usbFileBrowserPath + '/') + name.trim();
+                usbMkdir(dirPath);
+                usbRenderBrowser();
+                showToast('Folder created: ' + name.trim(), '<i class="fa-solid fa-folder-plus"></i>', 'success');
+            });
         }
 
         function usbResetToDefaults() {
