@@ -827,7 +827,7 @@
                             </div>
                         </div>
                         <!-- Live iframe (hidden until powered on) -->
-                        <iframe id="macosFrame" src="/macos/index.html" style="width:100%;height:100%;border:0;display:block;pointer-events:auto;background:transparent;" allowfullscreen></iframe>
+                        <iframe id="macosFrame" src="https://macos-26-tahoe.vercel.app" style="width:100%;height:100%;border:0;display:block;pointer-events:auto;background:transparent;" allowfullscreen sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-popups allow-top-navigation-by-user-activation"></iframe>
                         <div id="hdmi4Watermark" class="absolute top-4 left-4 text-[10px] text-white font-mono bg-black/50 px-2 py-1 rounded watermark pointer-events-none">
                             HDMI 4 | PC/Mac | macOS 26 Tahoe
                         </div>
@@ -1878,7 +1878,7 @@
                 showToast('PC/Mac powered on', '<i class="fa-solid fa-desktop"></i>', 'success');
                 // Reload iframe to ensure fresh state
                 const frame = document.getElementById('macosFrame');
-                if (frame) frame.src = '/macos/index.html';
+                if (frame) frame.src = 'https://macos-26-tahoe.vercel.app';
             } else {
                 document.getElementById('hdmi4PowerOff').classList.remove('hidden');
                 document.getElementById('macosFrame').classList.add('hidden');
