@@ -1124,7 +1124,7 @@ Reply with STRICT JSON ONLY, no markdown:
           submit();
           return;
         }
-        if (e.key && e.key.toLowerCase() === 'i') {
+        if (e.key && e.key.toLowerCase() === 'i' && e.altKey) {
           const t = e.target;
           const tag = (t && t.tagName) || '';
           if (tag === 'INPUT' || tag === 'TEXTAREA' || (t && t.isContentEditable)) return;
