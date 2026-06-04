@@ -826,10 +826,12 @@
                                 <span class="text-[10px] text-zinc-600 font-mono">Press to turn on</span>
                             </div>
                         </div>
-                        <!-- Live iframe (hidden until powered on) -->
-                        <iframe id="macosFrame" src="https://macos-26-tahoe.vercel.app" style="width:100%;height:100%;border:0;display:block;pointer-events:auto;background:transparent;" allowfullscreen sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-popups allow-top-navigation-by-user-activation"></iframe>
+                        <!-- Live iframe at 1366x768 (768p), scaled to fill -->
+                        <div id="macosFrameWrapper" style="position:absolute;inset:0;overflow:hidden;">
+                            <iframe id="macosFrame" src="https://macos-26-tahoe.vercel.app" style="width:1366px;height:768px;border:0;display:block;pointer-events:auto;background:transparent;position:absolute;top:50%;left:50%;transform-origin:center center;" allowfullscreen sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-popups allow-top-navigation-by-user-activation"></iframe>
+                        </div>
                         <div id="hdmi4Watermark" class="absolute top-4 left-4 text-[10px] text-white font-mono bg-black/50 px-2 py-1 rounded watermark pointer-events-none">
-                            HDMI 4 | PC/Mac | 720p @ 60Hz
+                            HDMI 4 | PC/Mac | 768p @ 60Hz
                         </div>
                     </div>
 
@@ -862,7 +864,7 @@
                             </div>
                             <div id="source-item-5" class="p-1.5 rounded flex justify-between items-center transition-all">
                                 <span>HDMI 4</span>
-                                <span class="text-[8px] opacity-60 flex items-center gap-1"><span class="source-active-icon hidden text-amber-400"><i class="fa-solid fa-play text-[6px]"></i></span>PC / Mac — 720p</span>
+                                <span class="text-[8px] opacity-60 flex items-center gap-1"><span class="source-active-icon hidden text-amber-400"><i class="fa-solid fa-play text-[6px]"></i></span>PC / Mac — 768p</span>
                             </div>
                         </div>
                     </div>
@@ -1879,6 +1881,7 @@
                 // Reload iframe to ensure fresh state
                 const frame = document.getElementById('macosFrame');
                 if (frame) frame.src = 'https://macos-26-tahoe.vercel.app';
+                setTimeout(resizeMacFrame, 150);
             } else {
                 document.getElementById('hdmi4PowerOff').classList.remove('hidden');
                 document.getElementById('macosFrame').classList.add('hidden');
@@ -1886,6 +1889,17 @@
                 showToast('PC/Mac powered off', '<i class="fa-solid fa-desktop"></i>', 'info');
             }
             saveSettings();
+        }
+
+        function resizeMacFrame() {
+            const container = document.getElementById('inputHDMI4');
+            const frame = document.getElementById('macosFrame');
+            if (!container || !frame) return;
+            const cw = container.clientWidth;
+            const ch = container.clientHeight;
+            if (!cw || !ch) return;
+            const scale = Math.min(cw / 1366, ch / 768);
+            frame.style.transform = `translate(-50%, -50%) scale(${scale})`;
         }
 
         async function togglePower() {
@@ -2082,6 +2096,7 @@
                         document.getElementById('hdmi4PowerOff').classList.add('hidden');
                         document.getElementById('macosFrame').classList.remove('hidden');
                         document.getElementById('hdmi4Watermark').classList.remove('hidden');
+                        setTimeout(resizeMacFrame, 50);
                     } else {
                         document.getElementById('hdmi4PowerOff').classList.remove('hidden');
                         document.getElementById('macosFrame').classList.add('hidden');
@@ -5488,6 +5503,7 @@
             // Phase 6 — Channel bug init
             updateChannelBug();
 
+            window.addEventListener('resize', resizeMacFrame);
         };
 
     </script>
