@@ -815,8 +815,20 @@
 
                     <!-- INPUT 6: HDMI 4 — PC/Mac (macOS 26 Tahoe) -->
                     <div id="inputHDMI4" class="absolute inset-0 bg-black z-10 hidden">
+                        <!-- Power-off overlay with big power button -->
+                        <div id="hdmi4PowerOff" class="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-b from-zinc-950 to-zinc-900 z-20">
+                            <div class="flex flex-col items-center gap-4">
+                                <i class="fa-solid fa-desktop text-4xl text-zinc-700 mb-2"></i>
+                                <span class="text-[11px] font-mono text-zinc-500 uppercase tracking-widest">HDMI 4 — PC / Mac</span>
+                                <button id="hdmi4PowerBtn" class="w-20 h-20 rounded-full bg-zinc-800 hover:bg-zinc-700 border-2 border-zinc-600 hover:border-red-500/60 flex items-center justify-center transition-all active:scale-90 cursor-pointer group">
+                                    <i class="fa-solid fa-power-off text-3xl text-zinc-400 group-hover:text-red-400 transition-colors"></i>
+                                </button>
+                                <span class="text-[10px] text-zinc-600 font-mono">Press to turn on</span>
+                            </div>
+                        </div>
+                        <!-- Live iframe (hidden until powered on) -->
                         <iframe id="macosFrame" src="/macos/index.html" class="w-full h-full" loading="lazy" allowfullscreen sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-popups"></iframe>
-                        <div class="absolute top-4 left-4 text-[10px] text-white font-mono bg-black/50 px-2 py-1 rounded watermark pointer-events-none">
+                        <div id="hdmi4Watermark" class="absolute top-4 left-4 text-[10px] text-white font-mono bg-black/50 px-2 py-1 rounded watermark pointer-events-none">
                             HDMI 4 | PC/Mac | macOS 26 Tahoe
                         </div>
                     </div>
@@ -984,6 +996,11 @@
                     <div class="text-white/90 font-semibold text-[9px] md:text-[10px] tracking-[0.2em] select-none leading-none">SAMSUNG</div>
                     <div id="bezelLED" class="w-1 h-1 rounded-full bg-red-600 shadow-[0_0_8px_rgba(220,38,38,0.85)] animate-pulse transition-all duration-500 mt-[2px]"></div>
                 </div>
+
+                <!-- Physical power button on chassis bezel -->
+                <button id="chassisPowerBtn" class="absolute bottom-1.5 left-4 z-50 w-6 h-6 rounded-full bg-zinc-800 hover:bg-zinc-700 border border-zinc-700/50 flex items-center justify-center transition-all active:scale-90 cursor-pointer" title="Power">
+                    <i class="fa-solid fa-power-off text-[10px] text-red-400"></i>
+                </button>
 
                 <!-- USB Port on chassis -->
                 <div class="absolute bottom-2 right-4 z-50 flex items-center gap-1">
@@ -1302,7 +1319,7 @@
         const GH9 = 'https://github.com/AashmanShukla3223/Antigravity-and-OpenCode-CLI-Prompts-and-Skills/releases/download/v1.0.8/';
         const LIVE = 'https://feeds.intoday.in/aajtak/api/aajtakhd/master.m3u8';
         const NDTV = 'https://ndtvindiaelemarchana.akamaized.net/hls/live/2003679/ndtvindia/master.m3u8';
-        let APP_VERSION = '1.0.27.1';
+        let APP_VERSION = '1.0.27.5';
         const VERCEL_URL = 'https://samsung-lcd-tv.vercel.app';
         const audioStartup = new Audio(GH + 'startup.mp3');
         const audioShutdown = new Audio(GH + 'shutdown.mp3');
@@ -1491,7 +1508,7 @@
         let ps3Power = false;
         let applePower = false;
         let dishPower = true;
-        let hdmi4Power = true;
+        let hdmi4Power = false;
         let dishChannel = 12;
         let dishInputBuffer = '';
         let watermarkEnabled = true;
@@ -1852,6 +1869,25 @@
 
         /* Power Sequence Logic */
 
+        function toggleHDMI4Power() {
+            hdmi4Power = !hdmi4Power;
+            if (hdmi4Power) {
+                document.getElementById('hdmi4PowerOff').classList.add('hidden');
+                document.getElementById('macosFrame').classList.remove('hidden');
+                document.getElementById('hdmi4Watermark').classList.remove('hidden');
+                showToast('PC/Mac powered on', '<i class="fa-solid fa-desktop"></i>', 'success');
+                // Reload iframe to ensure fresh state
+                const frame = document.getElementById('macosFrame');
+                if (frame) frame.src = '/macos/index.html';
+            } else {
+                document.getElementById('hdmi4PowerOff').classList.remove('hidden');
+                document.getElementById('macosFrame').classList.add('hidden');
+                document.getElementById('hdmi4Watermark').classList.add('hidden');
+                showToast('PC/Mac powered off', '<i class="fa-solid fa-desktop"></i>', 'info');
+            }
+            saveSettings();
+        }
+
         async function togglePower() {
             try {
             tvSynth.initAudio();
@@ -2037,8 +2073,15 @@
                     break;
                 case 5: // HDMI 4 — PC/Mac
                     document.getElementById('deckOffState').classList.remove('hidden');
+                    document.getElementById('inputHDMI4').classList.remove('hidden');
                     if (hdmi4Power) {
-                        document.getElementById('inputHDMI4').classList.remove('hidden');
+                        document.getElementById('hdmi4PowerOff').classList.add('hidden');
+                        document.getElementById('macosFrame').classList.remove('hidden');
+                        document.getElementById('hdmi4Watermark').classList.remove('hidden');
+                    } else {
+                        document.getElementById('hdmi4PowerOff').classList.remove('hidden');
+                        document.getElementById('macosFrame').classList.add('hidden');
+                        document.getElementById('hdmi4Watermark').classList.add('hidden');
                     }
                     break;
             }
@@ -4900,6 +4943,7 @@
 
         // Samsung TV Remote bindings
         addSafeListener('remotePower', 'click', togglePower);
+        addSafeListener('hdmi4PowerBtn', 'click', toggleHDMI4Power);
         addSafeListener('remoteMenu', 'click', toggleMenu);
         addSafeListener('remoteSource', 'click', toggleSourceMenu);
 
