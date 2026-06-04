@@ -830,9 +830,7 @@
                         <div id="macosFrameWrapper" style="position:absolute;inset:0;overflow:hidden;">
                             <iframe id="macosFrame" src="https://macos-26-tahoe.vercel.app" style="width:1366px;height:768px;border:0;display:block;pointer-events:auto;background:transparent;position:absolute;top:50%;left:50%;transform-origin:center center;" allowfullscreen sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-popups allow-top-navigation-by-user-activation"></iframe>
                         </div>
-                        <div id="hdmi4Watermark" class="absolute top-4 left-4 text-[10px] text-white font-mono bg-black/50 px-2 py-1 rounded watermark pointer-events-none">
-                            HDMI 4 | PC/Mac | 768p @ 60Hz
-                        </div>
+                        <!-- HDMI 4 watermark removed for accessibility -->
                     </div>
 
                     <!-- THE SAMSUNG SOURCE LIST OVERLAY MENU -->
@@ -1876,7 +1874,6 @@
             if (hdmi4Power) {
                 document.getElementById('hdmi4PowerOff').classList.add('hidden');
                 document.getElementById('macosFrame').classList.remove('hidden');
-                document.getElementById('hdmi4Watermark').classList.remove('hidden');
                 showToast('PC/Mac powered on', '<i class="fa-solid fa-desktop"></i>', 'success');
                 // Reload iframe to ensure fresh state
                 const frame = document.getElementById('macosFrame');
@@ -1885,7 +1882,6 @@
             } else {
                 document.getElementById('hdmi4PowerOff').classList.remove('hidden');
                 document.getElementById('macosFrame').classList.add('hidden');
-                document.getElementById('hdmi4Watermark').classList.add('hidden');
                 showToast('PC/Mac powered off', '<i class="fa-solid fa-desktop"></i>', 'info');
             }
             saveSettings();
@@ -2095,12 +2091,10 @@
                     if (hdmi4Power) {
                         document.getElementById('hdmi4PowerOff').classList.add('hidden');
                         document.getElementById('macosFrame').classList.remove('hidden');
-                        document.getElementById('hdmi4Watermark').classList.remove('hidden');
                         setTimeout(resizeMacFrame, 50);
                     } else {
                         document.getElementById('hdmi4PowerOff').classList.remove('hidden');
                         document.getElementById('macosFrame').classList.add('hidden');
-                        document.getElementById('hdmi4Watermark').classList.add('hidden');
                     }
                     break;
             }
