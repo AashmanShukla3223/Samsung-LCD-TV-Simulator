@@ -827,7 +827,7 @@
                             </div>
                         </div>
                         <!-- Live iframe (hidden until powered on) -->
-                        <iframe id="macosFrame" src="/macos/index.html" class="w-full h-full" allowfullscreen sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-popups allow-top-navigation-by-user-activation"></iframe>
+                        <iframe id="macosFrame" src="/macos/index.html" style="width:100%;height:100%;border:0;display:block;pointer-events:auto;background:transparent;" allowfullscreen></iframe>
                         <div id="hdmi4Watermark" class="absolute top-4 left-4 text-[10px] text-white font-mono bg-black/50 px-2 py-1 rounded watermark pointer-events-none">
                             HDMI 4 | PC/Mac | macOS 26 Tahoe
                         </div>
@@ -1993,7 +1993,9 @@
             document.getElementById('inputHDMI4').classList.add('hidden');
             const dishVid = document.getElementById('dishVideo');
             if (dishVid) { dishVideoTime = dishVid.currentTime; dishVid.pause(); }
-            document.getElementById('screenOff').style.opacity = "1";
+            const screenOffEl = document.getElementById('screenOff');
+            screenOffEl.style.opacity = "1";
+            screenOffEl.classList.remove('pointer-events-none');
             if (requestAnimId) {
                 cancelAnimationFrame(requestAnimId);
                 requestAnimId = null;
@@ -2002,7 +2004,9 @@
 
         function renderActiveScreen() {
             hideAllScreens();
-            document.getElementById('screenOff').style.opacity = "0";
+            const so = document.getElementById('screenOff');
+            so.style.opacity = "0";
+            so.classList.add('pointer-events-none');
             applyPictureSettings();
             applySoundMode(menuConfig[1].options[0].current);
             setupEnergySaving();
