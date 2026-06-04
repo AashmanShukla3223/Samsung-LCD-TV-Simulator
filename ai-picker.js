@@ -177,6 +177,42 @@
         tags: ["live", "live tv", "24x7", "streaming", "breaking news", "now", "real time", "current", "hls", "ndtv india"],
         description: "NDTV India [24x7 Live Stream] — alternative 24x7 live Hindi news stream."
       },
+       221: {
+        category: "kids",
+        network: "Nick Jr.",
+        show: "Paw Patrol",
+        edition: "Mission 1",
+        disambiguator: "paw patrol episode 1 rescue mission kids cartoon children",
+        tags: ["paw patrol", "nick jr", "kids", "cartoon", "children", "rescue", "mission", "animated", "toddler"],
+        description: "Nick Jr. Paw Patrol Mission 1 — the PAW Patrol team goes on a rescue mission. Best for kids and toddlers."
+      },
+       222: {
+        category: "kids",
+        network: "Nick Jr.",
+        show: "Paw Patrol",
+        edition: "Mission 2",
+        disambiguator: "paw patrol episode 2 second mission kids cartoon",
+        tags: ["paw patrol", "nick jr", "kids", "cartoon", "children", "rescue", "mission 2", "animated", "toddler"],
+        description: "Nick Jr. Paw Patrol Mission 2 — another exciting rescue adventure with the PAW Patrol pups."
+      },
+       223: {
+        category: "kids",
+        network: "Nick Jr.",
+        show: "Peppa Pig",
+        edition: "Samundar Yatra",
+        disambiguator: "peppa pig ocean sea journey samundar yatra kids cartoon",
+        tags: ["peppa pig", "nick jr", "kids", "cartoon", "children", "samundar", "ocean", "sea", "animated", "toddler", "hindi"],
+        description: "Nick Jr. Peppa Pig Samundar Yatra — Peppa and her family go on an ocean adventure."
+      },
+       224: {
+        category: "kids",
+        network: "Nick Jr.",
+        show: "Peppa Pig",
+        edition: "Shopping Spree",
+        disambiguator: "peppa pig shopping mall store kids cartoon fun",
+        tags: ["peppa pig", "nick jr", "kids", "cartoon", "children", "shopping", "mall", "store", "animated", "toddler", "hindi"],
+        description: "Nick Jr. Peppa Pig Shopping Spree — Peppa goes on a fun shopping trip with her family."
+      },
     };
     window.AI_CHANNEL_META = META;
 
