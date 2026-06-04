@@ -2,9 +2,9 @@
   "label": "MULTI_USB",
   "description": "USB with multiple firmware candidates in subdirectories",
   "files": {
-    "version.json": "{\n  \"version\": \"1.0.28\",\n  \"release\": \"Samsung BN59 firmware (root)\",\n  \"date\": \"2026-06-02\"\n}",
-    "beta/version.json": "{\n  \"version\": \"1.0.29\",\n  \"release\": \"Samsung BN59 beta firmware\",\n  \"date\": \"2026-06-02\"\n}",
-    "stable/version.json": "{\n  \"version\": \"1.0.28\",\n  \"release\": \"Samsung BN59 stable firmware\",\n  \"date\": \"2026-06-02\"\n}",
+    "version.json": "{\n  \"version\": \"1.0.28.5\",\n  \"release\": \"Samsung BN59 firmware (root)\",\n  \"date\": \"2026-06-04\"\n}",
+    "beta/version.json": "{\n  \"version\": \"1.0.29.1\",\n  \"release\": \"Samsung BN59 beta firmware\",\n  \"date\": \"2026-06-04\"\n}",
+    "stable/version.json": "{\n  \"version\": \"1.0.28.5\",\n  \"release\": \"Samsung BN59 stable firmware\",\n  \"date\": \"2026-06-04\"\n}",
     "archive/readme.txt": "Archived firmware packages from previous releases."
   }
 }
