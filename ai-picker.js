@@ -213,6 +213,42 @@
         tags: ["peppa pig", "nick jr", "kids", "cartoon", "children", "shopping", "mall", "store", "animated", "toddler", "hindi"],
         description: "Nick Jr. Peppa Pig Shopping Spree — Peppa goes on a fun shopping trip with her family."
       },
+       225: {
+        category: "kids",
+        network: "Nick",
+        show: "Chikoo Aur Bunty",
+        edition: "Adventure 1",
+        disambiguator: "chikoo aur bunty episode 1 kids cartoon comedy",
+        tags: ["chikoo aur bunty", "nick", "kids", "cartoon", "children", "comedy", "animated", "hindi"],
+        description: "Nick Chikoo Aur Bunty Adventure 1 — the hilarious duo Chikoo and Bunty go on a fun adventure."
+      },
+       226: {
+        category: "kids",
+        network: "Nick",
+        show: "Chikoo Aur Bunty",
+        edition: "Adventure 2",
+        disambiguator: "chikoo aur bunty episode 2 kids cartoon comedy",
+        tags: ["chikoo aur bunty", "nick", "kids", "cartoon", "children", "comedy", "animated", "hindi"],
+        description: "Nick Chikoo Aur Bunty Adventure 2 — another comedy adventure with Chikoo and Bunty."
+      },
+       227: {
+        category: "kids",
+        network: "Nick",
+        show: "Motu Patlu",
+        edition: "Episode 1",
+        disambiguator: "motu patlu episode 1 kids cartoon comedy",
+        tags: ["motu patlu", "nick", "kids", "cartoon", "children", "comedy", "animated", "hindi", "motu", "patlu"],
+        description: "Nick Motu Patlu Episode 1 — the famous duo Motu and Patlu's first hilarious adventure."
+      },
+       228: {
+        category: "kids",
+        network: "Nick",
+        show: "Motu Patlu",
+        edition: "Episode 2",
+        disambiguator: "motu patlu episode 2 kids cartoon comedy",
+        tags: ["motu patlu", "nick", "kids", "cartoon", "children", "comedy", "animated", "hindi", "motu", "patlu"],
+        description: "Nick Motu Patlu Episode 2 — another round of laughs with Motu Patlu."
+      },
     };
     window.AI_CHANNEL_META = META;
 

@@ -1318,9 +1318,10 @@
         const GH8 = 'https://github.com/AashmanShukla3223/Antigravity-and-OpenCode-CLI-Prompts-and-Skills/releases/download/v1.0.7/';
         const GH9 = 'https://github.com/AashmanShukla3223/Antigravity-and-OpenCode-CLI-Prompts-and-Skills/releases/download/v1.0.8/';
         const GH10 = 'https://github.com/AashmanShukla3223/Antigravity-and-OpenCode-CLI-Prompts-and-Skills/releases/download/v1.1.11/';
+        const GH11 = 'https://github.com/AashmanShukla3223/Antigravity-and-OpenCode-CLI-Prompts-and-Skills/releases/download/v1.1.12/';
         const LIVE = 'https://feeds.intoday.in/aajtak/api/aajtakhd/master.m3u8';
         const NDTV = 'https://ndtvindiaelemarchana.akamaized.net/hls/live/2003679/ndtvindia/master.m3u8';
-        let APP_VERSION = '1.0.28.2';
+        let APP_VERSION = '1.0.29';
         const VERCEL_URL = 'https://samsung-lcd-tv.vercel.app';
         const audioStartup = new Audio(GH + 'startup.mp3');
         const audioShutdown = new Audio(GH + 'shutdown.mp3');
@@ -1532,7 +1533,11 @@
             { name: "Channel 221: Paw Patrol — Mission 1", src: GH10 + "pawpatrol_1.mp4" },
             { name: "Channel 222: Paw Patrol — Mission 2", src: GH10 + "pawpatrol_2.mp4" },
             { name: "Channel 223: Peppa Pig — Samundar Yatra", src: GH10 + "peppa_samundar.mp4" },
-            { name: "Channel 224: Peppa Pig — Shopping Spree", src: GH10 + "peppa_shopping.mp4" }
+            { name: "Channel 224: Peppa Pig — Shopping Spree", src: GH10 + "peppa_shopping.mp4" },
+            { name: "Channel 225: Chikoo Aur Bunty — Adventure 1", src: GH11 + "chikoo_bunty_1.mp4" },
+            { name: "Channel 226: Chikoo Aur Bunty — Adventure 2", src: GH11 + "chikoo_bunty_2.mp4" },
+            { name: "Channel 227: Motu Patlu — Episode 1", src: GH11 + "motu_patlu_1.mp4" },
+            { name: "Channel 228: Motu Patlu — Episode 2", src: GH11 + "motu_patlu_2.mp4" }
         ];
         function loadDishVideo(video, src, seekTime) {
             if (video._hls) { video._hls.destroy(); delete video._hls; }
@@ -3715,6 +3720,10 @@
             { time: '06:30 AM', channel: '222', showName: 'Nick Jr. \u2014 Paw Patrol (Mission 2)' },
             { time: '07:00 AM', channel: '223', showName: 'Nick Jr. \u2014 Peppa Pig (Samundar Yatra)' },
             { time: '07:30 AM', channel: '224', showName: 'Nick Jr. \u2014 Peppa Pig (Shopping Spree)' },
+            { time: '08:00 AM', channel: '225', showName: 'Nick \u2014 Chikoo Aur Bunty (Adventure 1)' },
+            { time: '08:30 AM', channel: '226', showName: 'Nick \u2014 Chikoo Aur Bunty (Adventure 2)' },
+            { time: '09:00 AM', channel: '227', showName: 'Nick \u2014 Motu Patlu (Episode 1)' },
+            { time: '09:30 AM', channel: '228', showName: 'Nick \u2014 Motu Patlu (Episode 2)' },
             { time: '10:00 AM', channel: '124', showName: 'AajTak \u2014 Aaj Subah' },
             { time: '11:00 AM', channel: '131', showName: 'AajTak \u2014 Ek aur Ek Gyarah' },
             { time: '05:00 PM', channel: '136', showName: 'AajTak \u2014 Dangal' },
@@ -5403,6 +5412,8 @@
                 bug.innerHTML = '<div style="background:#DC2626;padding:6px 12px;border-radius:4px;color:white;font-weight:900;font-size:11px;box-shadow:0 2px 8px rgba(0,0,0,0.5);">NDTV INDIA</div>';
             } else if (channelName.indexOf('Paw Patrol') !== -1 || channelName.indexOf('Peppa Pig') !== -1) {
                 bug.innerHTML = '<div style="background:linear-gradient(135deg,#FF6B00,#FFAA00);padding:6px 12px;border-radius:4px;color:white;font-weight:900;font-size:11px;box-shadow:0 2px 8px rgba(0,0,0,0.5);">NICK JR.</div>';
+            } else if (channelName.indexOf('Chikoo') !== -1 || channelName.indexOf('Motu Patlu') !== -1) {
+                bug.innerHTML = '<div style="background:linear-gradient(135deg,#FF6B00,#FFAA00);padding:6px 12px;border-radius:4px;color:white;font-weight:900;font-size:11px;box-shadow:0 2px 8px rgba(0,0,0,0.5);">NICK</div>';
             } else {
                 bug.innerHTML = '';
             }
