@@ -828,10 +828,10 @@
                         </div>
                         <!-- Live iframe at 1920x1080, scaled to fit -->
                         <div id="macosFrameWrapper" style="position:absolute;inset:0;overflow:hidden;display:flex;align-items:center;justify-content:center;">
-                            <iframe id="macosFrame" src="https://macos-26-tahoe.vercel.app" style="width:1920px;height:1080px;border:0;display:block;pointer-events:auto;background:transparent;flex-shrink:0;" allowfullscreen sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-popups allow-top-navigation-by-user-activation"></iframe>
+                            <iframe id="macosFrame" src="https://macos-26-tahoe.vercel.app" style="width:1280px;height:720px;border:0;display:block;pointer-events:auto;background:transparent;flex-shrink:0;" allowfullscreen sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-popups allow-top-navigation-by-user-activation"></iframe>
                         </div>
                         <div id="hdmi4Watermark" class="absolute top-4 left-4 text-[10px] text-white font-mono bg-black/50 px-2 py-1 rounded watermark pointer-events-none">
-                            HDMI 4 | PC/Mac | 1920x1080 @ 60Hz
+                            HDMI 4 | PC/Mac | 720p @ 60Hz
                         </div>
                     </div>
 
@@ -864,7 +864,7 @@
                             </div>
                             <div id="source-item-5" class="p-1.5 rounded flex justify-between items-center transition-all">
                                 <span>HDMI 4</span>
-                                <span class="text-[8px] opacity-60 flex items-center gap-1"><span class="source-active-icon hidden text-amber-400"><i class="fa-solid fa-play text-[6px]"></i></span>PC / Mac — 1920x1080</span>
+                                <span class="text-[8px] opacity-60 flex items-center gap-1"><span class="source-active-icon hidden text-amber-400"><i class="fa-solid fa-play text-[6px]"></i></span>PC / Mac — 720p</span>
                             </div>
                         </div>
                     </div>
@@ -1898,7 +1898,7 @@
             const cw = container.clientWidth;
             const ch = container.clientHeight;
             if (!cw || !ch) return;
-            const scale = Math.min(cw / 1920, ch / 1080);
+            const scale = Math.min(cw / 1280, ch / 720);
             frame.style.transform = `scale(${scale})`;
             frame.style.transformOrigin = 'center center';
         }
