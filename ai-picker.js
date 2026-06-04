@@ -178,13 +178,13 @@
         description: "AajTak Desh Tak — national news analysis and current affairs show."
       },
         136: {
-        category: "news magazine",
+        category: "news bulletin",
         network: "India Today",
-        show: "Files",
-        edition: "Vol. 2",
-        disambiguator: "india today files volume 2 investigative documentary",
-        tags: ["india today", "files", "investigation", "documentary", "vol 2", "expose"],
-        description: "India Today Files Vol. 2 — second volume of India Today's investigative documentary series."
+        show: "Mid Morning Bulletin",
+        edition: "11 AM",
+        disambiguator: "india today mid morning bulletin 11am news update",
+        tags: ["india today", "mid morning", "bulletin", "11am", "news", "morning"],
+        description: "India Today Mid Morning Bulletin (11 AM) — your morning news update at 11."
       },
         137: {
         category: "live news",
