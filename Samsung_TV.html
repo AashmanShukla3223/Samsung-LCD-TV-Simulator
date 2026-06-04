@@ -1319,9 +1319,12 @@
         const GH9 = 'https://github.com/AashmanShukla3223/Antigravity-and-OpenCode-CLI-Prompts-and-Skills/releases/download/v1.0.8/';
         const GH10 = 'https://github.com/AashmanShukla3223/Antigravity-and-OpenCode-CLI-Prompts-and-Skills/releases/download/v1.1.11/';
         const GH11 = 'https://github.com/AashmanShukla3223/Antigravity-and-OpenCode-CLI-Prompts-and-Skills/releases/download/v1.1.12/';
+        const GH12 = 'https://github.com/AashmanShukla3223/Antigravity-and-OpenCode-CLI-Prompts-and-Skills/releases/download/v1.1.13/';
         const LIVE = 'https://feeds.intoday.in/aajtak/api/aajtakhd/master.m3u8';
         const NDTV = 'https://ndtvindiaelemarchana.akamaized.net/hls/live/2003679/ndtvindia/master.m3u8';
-        let APP_VERSION = '1.0.29';
+        const INDIA_TODAY_LIVE = 'https://indiatodaylive.akamaized.net/hls/live/2014320/indiatoday/indiatodaylive/playlist.m3u8';
+        const NDTV24X7 = 'https://ndtv24x7elemarchana.akamaized.net/hls/live/2003678/ndtv24x7/master.m3u8';
+        let APP_VERSION = '1.0.30';
         const VERCEL_URL = 'https://samsung-lcd-tv.vercel.app';
         const audioStartup = new Audio(GH + 'startup.mp3');
         const audioShutdown = new Audio(GH + 'shutdown.mp3');
@@ -1528,8 +1531,13 @@
             { name: "Channel 131: AajTak — Ek aur Ek Gyarah", src: GH4 + "dishtv_source11.mp4" },
             { name: "Channel 132: AajTak — Halla Bol [Late Edition] 2019", src: GH5 + "dishtv_source12.mp4" },
             { name: "Channel 133: AajTak — Khabardar (9 PM)", src: GH8 + "dishtv_source13.mp4" },
-            { name: "Channel 134: AajTak Live", src: LIVE },
-            { name: "Channel 135: NDTV India [24x7 Live Stream]", src: NDTV },
+            { name: "Channel 134: AajTak — Plus", src: GH12 + "dishtv_source14.mp4" },
+            { name: "Channel 135: India Today — Files Vol. 1", src: GH12 + "dishtv_source15.mp4" },
+            { name: "Channel 136: India Today — Files Vol. 2", src: GH12 + "dishtv_source16.mp4" },
+            { name: "Channel 137: AajTak Live", src: LIVE },
+            { name: "Channel 138: India Today Live", src: INDIA_TODAY_LIVE },
+            { name: "Channel 139: NDTV India [24x7 Live Stream]", src: NDTV },
+            { name: "Channel 140: NDTV 24x7 [24x7 Live Stream]", src: NDTV24X7 },
             { name: "Channel 221: Paw Patrol — Mission 1", src: GH10 + "pawpatrol_1.mp4" },
             { name: "Channel 222: Paw Patrol — Mission 2", src: GH10 + "pawpatrol_2.mp4" },
             { name: "Channel 223: Peppa Pig — Samundar Yatra", src: GH10 + "peppa_samundar.mp4" },
@@ -3724,12 +3732,17 @@
             { time: '08:30 AM', channel: '226', showName: 'Nick \u2014 Chikoo Aur Bunty (Adventure 2)' },
             { time: '09:00 AM', channel: '227', showName: 'Nick \u2014 Motu Patlu (Episode 1)' },
             { time: '09:30 AM', channel: '228', showName: 'Nick \u2014 Motu Patlu (Episode 2)' },
+            { time: '10:00 AM', channel: '134', showName: 'AajTak \u2014 Plus' },
+            { time: '11:00 AM', channel: '135', showName: 'India Today \u2014 Files Vol. 1' },
+            { time: '12:00 PM', channel: '136', showName: 'India Today \u2014 Files Vol. 2' },
+            { time: '02:00 PM', channel: '137', showName: 'AajTak Live' },
+            { time: '04:00 PM', channel: '138', showName: 'India Today Live' },
+            { time: '06:00 PM', channel: '139', showName: 'NDTV India Live' },
+            { time: '08:00 PM', channel: '140', showName: 'NDTV 24x7 Live' },
             { time: '10:00 AM', channel: '124', showName: 'AajTak \u2014 Aaj Subah' },
             { time: '11:00 AM', channel: '131', showName: 'AajTak \u2014 Ek aur Ek Gyarah' },
-            { time: '05:00 PM', channel: '136', showName: 'AajTak \u2014 Dangal' },
-            { time: '06:00 PM', channel: '126', showName: 'AajTak \u2014 Halla Bol' },
-            { time: '06:30 PM', channel: '128', showName: 'AajTak \u2014 Halla Bol (Evening)' },
-            { time: '07:00 PM', channel: '137', showName: 'AajTak \u2014 Desh Tak' },
+            { time: '05:00 PM', channel: '126', showName: 'AajTak \u2014 Halla Bol' },
+            { time: '06:00 PM', channel: '128', showName: 'AajTak \u2014 Halla Bol (Evening)' },
             { time: '08:30 PM', channel: '123', showName: 'AajTak \u2014 Special Report' },
             { time: '09:00 PM', channel: '133', showName: 'AajTak \u2014 Khabardar' },
             { time: '09:30 PM', channel: '127', showName: 'AajTak \u2014 Black and White' },
@@ -5409,7 +5422,9 @@
             if (channelName.indexOf('AajTak') !== -1) {
                 bug.innerHTML = '<div style="background:linear-gradient(135deg,#DC2626,#EAB308);padding:6px 12px;border-radius:4px;color:white;font-weight:900;font-size:11px;box-shadow:0 2px 8px rgba(0,0,0,0.5);">AAJ TAK</div>';
             } else if (channelName.indexOf('NDTV') !== -1) {
-                bug.innerHTML = '<div style="background:#DC2626;padding:6px 12px;border-radius:4px;color:white;font-weight:900;font-size:11px;box-shadow:0 2px 8px rgba(0,0,0,0.5);">NDTV INDIA</div>';
+                bug.innerHTML = '<div style="background:#DC2626;padding:6px 12px;border-radius:4px;color:white;font-weight:900;font-size:11px;box-shadow:0 2px 8px rgba(0,0,0,0.5);">NDTV</div>';
+            } else if (channelName.indexOf('India Today') !== -1) {
+                bug.innerHTML = '<div style="background:linear-gradient(135deg,#E53935,#1E88E5);padding:6px 12px;border-radius:4px;color:white;font-weight:900;font-size:11px;box-shadow:0 2px 8px rgba(0,0,0,0.5);">INDIA TODAY</div>';
             } else if (channelName.indexOf('Paw Patrol') !== -1 || channelName.indexOf('Peppa Pig') !== -1) {
                 bug.innerHTML = '<div style="background:linear-gradient(135deg,#FF6B00,#FFAA00);padding:6px 12px;border-radius:4px;color:white;font-weight:900;font-size:11px;box-shadow:0 2px 8px rgba(0,0,0,0.5);">NICK JR.</div>';
             } else if (channelName.indexOf('Chikoo') !== -1 || channelName.indexOf('Motu Patlu') !== -1) {

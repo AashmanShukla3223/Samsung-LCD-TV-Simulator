@@ -159,8 +159,35 @@
         tags: ["Khabardar", "2019", "Sweta Singh", "9PM", "21:00", "past"],
         description: "Khabardar - Best for 9PM Binge Watching"
       },
-       134: {
-        category: "AajTak live news",
+        134: {
+        category: "news magazine",
+        network: "AajTak",
+        show: "Plus",
+        edition: "News Magazine",
+        disambiguator: "aajtak plus news magazine current affairs deep dive",
+        tags: ["aajtak plus", "news magazine", "current affairs", "deep dive", "analysis", "feature"],
+        description: "AajTak Plus — a news magazine-style show with in-depth analysis and feature stories."
+      },
+        135: {
+        category: "news magazine",
+        network: "India Today",
+        show: "Files",
+        edition: "Vol. 1",
+        disambiguator: "india today files volume 1 investigative documentary",
+        tags: ["india today", "files", "investigation", "documentary", "vol 1", "expose"],
+        description: "India Today Files Vol. 1 — investigative documentary series from the India Today group."
+      },
+        136: {
+        category: "news magazine",
+        network: "India Today",
+        show: "Files",
+        edition: "Vol. 2",
+        disambiguator: "india today files volume 2 investigative documentary",
+        tags: ["india today", "files", "investigation", "documentary", "vol 2", "expose"],
+        description: "India Today Files Vol. 2 — second volume of India Today's investigative documentary series."
+      },
+        137: {
+        category: "live news",
         network: "AajTak",
         show: "Live Stream",
         edition: "24x7",
@@ -168,16 +195,34 @@
         tags: ["live", "aajtak live", "24x7", "streaming", "breaking", "hls"],
         description: "AajTak Live — round-the-clock live news streaming. Best for breaking news right now."
       },
-       135: {
-        category: "NDTV live news",
+        138: {
+        category: "live news",
+        network: "India Today",
+        show: "Live Stream",
+        edition: "24x7",
+        disambiguator: "india today live news stream 24x7 breaking",
+        tags: ["live", "india today live", "24x7", "streaming", "breaking news", "hls"],
+        description: "India Today Live — 24x7 live news streaming from India Today. Best for breaking news."
+      },
+        139: {
+        category: "live news",
         network: "NDTV",
         show: "India Live",
         edition: "24x7 Stream",
-        disambiguator: "alternative Hindi live news stream 24x7",
+        disambiguator: "hindi live news stream 24x7 ndtv india",
         tags: ["live", "live tv", "24x7", "streaming", "breaking news", "now", "real time", "current", "hls", "ndtv india"],
-        description: "NDTV India [24x7 Live Stream] — alternative 24x7 live Hindi news stream."
+        description: "NDTV India [24x7 Live Stream] — 24x7 live Hindi news stream."
       },
-       221: {
+        140: {
+        category: "live news",
+        network: "NDTV",
+        show: "24x7 Live",
+        edition: "English News",
+        disambiguator: "ndtv 24x7 english live news stream",
+        tags: ["live", "ndtv 24x7", "24x7", "streaming", "breaking news", "english", "hls", "ndtv"],
+        description: "NDTV 24x7 [24x7 Live Stream] — round-the-clock English news from NDTV."
+      },
+        221: {
         category: "kids",
         network: "Nick Jr.",
         show: "Paw Patrol",
