@@ -813,6 +813,14 @@
                         </div>
                     </div>
 
+                    <!-- INPUT 6: HDMI 4 — PC/Mac (macOS 26 Tahoe) -->
+                    <div id="inputHDMI4" class="absolute inset-0 bg-black z-10 hidden">
+                        <iframe id="macosFrame" src="/macos/index.html" class="w-full h-full" loading="lazy" allowfullscreen sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-popups"></iframe>
+                        <div class="absolute top-4 left-4 text-[10px] text-white font-mono bg-black/50 px-2 py-1 rounded watermark pointer-events-none">
+                            HDMI 4 | PC/Mac | macOS 26 Tahoe
+                        </div>
+                    </div>
+
                     <!-- THE SAMSUNG SOURCE LIST OVERLAY MENU -->
                     <div id="samsungSourceOverlay" class="absolute top-4 right-4 bg-slate-950/95 border border-sky-400/40 rounded-xl p-3 z-30 w-44 shadow-2xl select-none hidden">
                         <div class="border-b border-sky-950 pb-1.5 mb-1.5 flex justify-between items-center">
@@ -839,6 +847,10 @@
                             <div id="source-item-4" class="p-1.5 rounded flex justify-between items-center transition-all">
                                 <span>HDMI 3</span>
                                 <span class="text-[8px] opacity-60 flex items-center gap-1"><span class="source-active-icon hidden text-amber-400"><i class="fa-solid fa-play text-[6px]"></i></span>DishTV DTH</span>
+                            </div>
+                            <div id="source-item-5" class="p-1.5 rounded flex justify-between items-center transition-all">
+                                <span>HDMI 4</span>
+                                <span class="text-[8px] opacity-60 flex items-center gap-1"><span class="source-active-icon hidden text-amber-400"><i class="fa-solid fa-play text-[6px]"></i></span>PC / Mac</span>
                             </div>
                         </div>
                     </div>
@@ -1307,7 +1319,7 @@
 
         // Phase 6 — Bonus feature globals
         let demoModeTimer = null;
-        const DEMO_INPUTS = [0, 1, 2, 3, 4];
+        const DEMO_INPUTS = [0, 1, 2, 3, 4, 5];
         let demoInputIdx = 0;
         let subtitleMode = localStorage.getItem('samsung_subtitle_mode') || 'off';
 
@@ -1479,6 +1491,7 @@
         let ps3Power = false;
         let applePower = false;
         let dishPower = true;
+        let hdmi4Power = true;
         let dishChannel = 12;
         let dishInputBuffer = '';
         let watermarkEnabled = true;
@@ -1534,7 +1547,7 @@
         let cecEnabled = true;
         
         // Input Channels Definition
-        // 0: TV (No Signal), 1: AV (Wii), 2: HDMI 1 (Apple TV), 3: HDMI 2 (PlayStation 3), 4: HDMI 3 (DishTV)
+        // 0: TV (No Signal), 1: AV (Wii), 2: HDMI 1 (Apple TV), 3: HDMI 2 (PlayStation 3), 4: HDMI 3 (DishTV), 5: HDMI 4 (PC/Mac)
         let activeInputSource = 4; 
         let activeSourceSelectIndex = 4;
 
@@ -1616,7 +1629,7 @@
                 name: "Input",
                 icon: "fa-arrow-right-to-bracket",
                 options: [
-                    { name: "Input List", type: "select", values: ["HDMI 3", "TV", "AV", "HDMI 1", "HDMI 2"], current: 0 },
+                    { name: "Input List", type: "select", values: ["HDMI 3", "TV", "AV", "HDMI 1", "HDMI 2", "HDMI 4"], current: 0 },
                     { name: "Anynet+ (HDMI-CEC)", type: "toggle", current: true }
                 ]
             },
@@ -1662,6 +1675,7 @@
                 ps3Power,
                 applePower,
                 dishPower,
+                hdmi4Power,
                 broadcastAutoUpdateEnabled,
                 menuConfig: menuConfig.map(cat =>
                     cat.options.map(opt =>
@@ -1687,6 +1701,7 @@
                 if (data.ps3Power !== undefined) ps3Power = data.ps3Power;
                 if (data.applePower !== undefined) applePower = data.applePower;
                 if (data.dishPower !== undefined) dishPower = data.dishPower;
+                if (data.hdmi4Power !== undefined) hdmi4Power = data.hdmi4Power;
                 if (data.broadcastAutoUpdateEnabled !== undefined) broadcastAutoUpdateEnabled = data.broadcastAutoUpdateEnabled;
                 if (data.menuConfig) {
                     data.menuConfig.forEach((cat, ci) => {
@@ -1939,6 +1954,7 @@
             document.getElementById('inputPS3').classList.add('hidden');
             document.getElementById('inputAppleTV').classList.add('hidden');
             document.getElementById('inputDishTV').classList.add('hidden');
+            document.getElementById('inputHDMI4').classList.add('hidden');
             const dishVid = document.getElementById('dishVideo');
             if (dishVid) { dishVideoTime = dishVid.currentTime; dishVid.pause(); }
             document.getElementById('screenOff').style.opacity = "1";
@@ -1962,6 +1978,7 @@
             document.getElementById('deckPS3Controller').classList.add('hidden');
             document.getElementById('deckAppleRemote').classList.add('hidden');
             document.getElementById('deckDishRemote').classList.add('hidden');
+            document.getElementById('deckOffState').classList.add('hidden');
 
             switch(activeInputSource) {
                 case 0: // TV
@@ -2018,6 +2035,12 @@
                         document.getElementById('dishVideo').pause();
                     }
                     break;
+                case 5: // HDMI 4 — PC/Mac
+                    document.getElementById('deckOffState').classList.remove('hidden');
+                    if (hdmi4Power) {
+                        document.getElementById('inputHDMI4').classList.remove('hidden');
+                    }
+                    break;
             }
         }
 
@@ -2043,7 +2066,7 @@
         }
 
         function renderSourceMenuOptions() {
-            for (let i = 0; i < 5; i++) {
+            for (let i = 0; i < 6; i++) {
                 const el = document.getElementById(`source-item-${i}`);
                 const icon = el.querySelector('.source-active-icon');
                 if (i === activeSourceSelectIndex) {
@@ -2060,13 +2083,13 @@
         }
 
         function sourceSelectUp() {
-            activeSourceSelectIndex = (activeSourceSelectIndex - 1 + 5) % 5;
+            activeSourceSelectIndex = (activeSourceSelectIndex - 1 + 6) % 6;
             renderSourceMenuOptions();
             tvSynth.playFMNote(880, 0.08, 0.2); // Beep
         }
 
         function sourceSelectDown() {
-            activeSourceSelectIndex = (activeSourceSelectIndex + 1) % 5;
+            activeSourceSelectIndex = (activeSourceSelectIndex + 1) % 6;
             renderSourceMenuOptions();
             tvSynth.playFMNote(880, 0.08, 0.2); // Beep
         }
@@ -2093,6 +2116,7 @@
                 case 2: return "HDMI 1 (Apple TV)";
                 case 3: return "HDMI 2 (PlayStation 3)";
                 case 4: return "HDMI 3 (DishTV)";
+                case 5: return "HDMI 4 (PC/Mac)";
             }
         }
 
@@ -4489,6 +4513,7 @@
                 case 2: if (applePower) { applePower = false; showToast("CEC: Apple TV powering off", '<i class="fa-solid fa-tv"></i>', "info"); } break;
                 case 3: if (ps3Power) { ps3Power = false; showToast("CEC: PS3 powering off", '<i class="fa-solid fa-tv"></i>', "info"); } break;
                 case 4: if (dishPower) { dishPower = false; showToast("CEC: DishTV powering off", '<i class="fa-solid fa-tv"></i>', "info"); } break;
+                case 5: if (hdmi4Power) { hdmi4Power = false; showToast("CEC: PC/Mac powering off", '<i class="fa-solid fa-tv"></i>', "info"); } break;
             }
             // Power on new device
             switch(newSource) {
@@ -4496,6 +4521,7 @@
                 case 2: if (!applePower) { applePower = true; showToast("CEC: Apple TV powering on", '<i class="fa-solid fa-tv"></i>', "success"); } break;
                 case 3: if (!ps3Power) { ps3Power = true; showToast("CEC: PS3 powering on", '<i class="fa-solid fa-tv"></i>', "success"); } break;
                 case 4: if (!dishPower) { dishPower = true; showToast("CEC: DishTV powering on", '<i class="fa-solid fa-tv"></i>', "success"); } break;
+                case 5: if (!hdmi4Power) { hdmi4Power = true; showToast("CEC: PC/Mac powering on", '<i class="fa-solid fa-tv"></i>', "success"); } break;
             }
             saveSettings();
         }
@@ -5276,7 +5302,7 @@
             }
             renderActiveScreen();
             if (typeof handleCEC === 'function') handleCEC(oldSource, activeInputSource);
-            if (typeof showToast === 'function') showToast('Input switched to: ' + (['TV/RF','AV/Component','HDMI 1 (Apple TV)','HDMI 2 (PS3)','HDMI 3 (DishTV)'][idx] || 'Source ' + idx), '<i class="fa-solid fa-circle-nodes"></i>', 'success');
+            if (typeof showToast === 'function') showToast('Input switched to: ' + (['TV/RF','AV/Component','HDMI 1 (Apple TV)','HDMI 2 (PS3)','HDMI 3 (DishTV)','HDMI 4 (PC/Mac)'][idx] || 'Source ' + idx), '<i class="fa-solid fa-circle-nodes"></i>', 'success');
             if (typeof saveSettings === 'function') saveSettings();
             if (idx === 4 && typeof startBroadcastScanner === 'function') startBroadcastScanner();
             else if (typeof stopBroadcastScanner === 'function') stopBroadcastScanner();
