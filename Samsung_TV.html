@@ -1320,7 +1320,7 @@
         const GH10 = 'https://github.com/AashmanShukla3223/Antigravity-and-OpenCode-CLI-Prompts-and-Skills/releases/download/v1.1.11/';
         const LIVE = 'https://feeds.intoday.in/aajtak/api/aajtakhd/master.m3u8';
         const NDTV = 'https://ndtvindiaelemarchana.akamaized.net/hls/live/2003679/ndtvindia/master.m3u8';
-        let APP_VERSION = '1.0.27.5';
+        let APP_VERSION = '1.0.28.1';
         const VERCEL_URL = 'https://samsung-lcd-tv.vercel.app';
         const audioStartup = new Audio(GH + 'startup.mp3');
         const audioShutdown = new Audio(GH + 'shutdown.mp3');
@@ -5397,6 +5397,8 @@
                 bug.innerHTML = '<div style="background:linear-gradient(135deg,#DC2626,#EAB308);padding:6px 12px;border-radius:4px;color:white;font-weight:900;font-size:11px;box-shadow:0 2px 8px rgba(0,0,0,0.5);">AAJ TAK</div>';
             } else if (channelName.indexOf('NDTV') !== -1) {
                 bug.innerHTML = '<div style="background:#DC2626;padding:6px 12px;border-radius:4px;color:white;font-weight:900;font-size:11px;box-shadow:0 2px 8px rgba(0,0,0,0.5);">NDTV INDIA</div>';
+            } else if (channelName.indexOf('Paw Patrol') !== -1 || channelName.indexOf('Peppa Pig') !== -1) {
+                bug.innerHTML = '<div style="background:linear-gradient(135deg,#FF6B00,#FFAA00);padding:6px 12px;border-radius:4px;color:white;font-weight:900;font-size:11px;box-shadow:0 2px 8px rgba(0,0,0,0.5);">NICK JR.</div>';
             } else {
                 bug.innerHTML = '';
             }
