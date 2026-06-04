@@ -160,22 +160,22 @@
         description: "Khabardar - Best for 9PM Binge Watching"
       },
         134: {
-        category: "news magazine",
+        category: "news debate",
         network: "AajTak",
-        show: "Plus",
-        edition: "News Magazine",
-        disambiguator: "aajtak plus news magazine current affairs deep dive",
-        tags: ["aajtak plus", "news magazine", "current affairs", "deep dive", "analysis", "feature"],
-        description: "AajTak Plus — a news magazine-style show with in-depth analysis and feature stories."
+        show: "Dangal",
+        edition: "Prime Time",
+        disambiguator: "aajtak dangal debate prime time news analysis",
+        tags: ["aajtak", "dangal", "debate", "prime time", "news", "analysis", "feature"],
+        description: "AajTak Dangal — a prime-time news debate show with in-depth analysis."
       },
         135: {
-        category: "news magazine",
-        network: "India Today",
-        show: "Files",
-        edition: "Vol. 1",
-        disambiguator: "india today files volume 1 investigative documentary",
-        tags: ["india today", "files", "investigation", "documentary", "vol 1", "expose"],
-        description: "India Today Files Vol. 1 — investigative documentary series from the India Today group."
+        category: "news analysis",
+        network: "AajTak",
+        show: "Desh Tak",
+        edition: "National News",
+        disambiguator: "aajtak desh tak national news analysis current affairs",
+        tags: ["aajtak", "desh tak", "national news", "analysis", "current affairs", "feature"],
+        description: "AajTak Desh Tak — national news analysis and current affairs show."
       },
         136: {
         category: "news magazine",
