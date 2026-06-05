@@ -5445,6 +5445,7 @@
         document.addEventListener('click', () => resetEnergySaving());
 
         window.addEventListener('keydown', (e) => {
+            if (localStorage.getItem('samsung_tv_kb_lock_v1') === 'true') return;
             resetEnergySaving();
             if (powerState === "off" || powerState === "booting") {
                 if (e.key === 'p' || e.key === 'P') {
