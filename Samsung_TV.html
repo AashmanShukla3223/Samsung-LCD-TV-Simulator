@@ -502,7 +502,7 @@
                                 <div class="text-xs text-zinc-400 mb-1">Now Playing</div>
                                 <div id="mediaPlayerTitle" class="text-sm text-white font-bold"></div>
                             </div>
-                            <audio id="mediaPlayerAudio" controls class="w-full mb-2"></audio>
+                            <audio id="mediaPlayerAudio" controls crossorigin="anonymous" class="w-full mb-2"></audio>
                             <div id="mediaPlayerTime" class="text-[10px] text-zinc-500 font-mono text-center mb-3"></div>
                             <button id="mediaPlayerClose" class="w-full bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-bold py-2 rounded text-[10px] uppercase tracking-wider">Close</button>
                         </div>
@@ -521,7 +521,7 @@
 
                     <!-- USB VIDEO PLAYER -->
                     <div id="usbVideoPlayer" class="absolute inset-0 bg-black z-60 hidden flex-col items-center justify-center">
-                        <video id="usbVideo" class="w-full h-full" controls playsinline style="object-fit:contain;"></video>
+                        <video id="usbVideo" class="w-full h-full" controls playsinline crossorigin="anonymous" style="object-fit:contain;"></video>
                         <div class="absolute bottom-6 left-0 right-0 flex justify-center">
                             <button id="usbVideoClose" class="bg-red-700 hover:bg-red-600 text-white font-bold px-6 py-2 rounded text-[10px] uppercase tracking-wider transition-all">Close (Esc)</button>
                         </div>
@@ -662,7 +662,7 @@
                         <div id="dishNoSignal" class="absolute inset-0 flex items-center justify-center text-sky-400/60 text-sm font-mono hidden">
                             No Signal
                         </div>
-                        <video id="dishVideo" class="w-full h-full object-cover" loop playsinline muted preload="auto"></video>
+                        <video id="dishVideo" class="w-full h-full object-cover" loop playsinline muted crossorigin="anonymous" preload="auto"></video>
                            <div id="dishContent" class="absolute bottom-4 right-4 text-white p-2 bg-black/50 rounded z-20 watermark">
                                  <div class="text-sm font-bold">DishTV</div>
                               </div>
@@ -1384,16 +1384,11 @@
         let APP_VERSION = '1.0.31';
         const VERCEL_URL = 'https://samsung-lcd-tv.vercel.app';
         const audioStartup = new Audio(GH + 'startup.mp3');
+        audioStartup.crossOrigin = 'anonymous';
         const audioShutdown = new Audio(GH + 'shutdown.mp3');
-        const soundTestTracks = [
-            { name: "2010 Soundtest", src: GH + "soundtest.mp3" },
-            { name: "AajTak", src: GH6 + "aajtak.sound.test.mp3" },
-            { name: "Batidao", src: GH6 + "Batidao.da.Madrugada.Speed.mp3" },
-            { name: "Halla Bol", src: GH7 + "halla.bol.mp3" },
-            { name: "Luz Roja", src: GH9 + "LUZ.ROJA.-.Sped.Up.-.bxkq.mp3" },
-        ];
-        let currentSoundTestTrack = 0;
+        audioShutdown.crossOrigin = 'anonymous';
         const soundTestAudio = new Audio();
+        soundTestAudio.crossOrigin = 'anonymous';
         soundTestAudio.loop = true;
 
         // Phase 6 — Bonus feature globals
@@ -1433,9 +1428,9 @@
                 try {
                     this.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
                     
-                    // Safari/iOS: AudioContext starts suspended — resume on any user gesture
+                    // Safari/iOS: AudioContext starts suspended — resume on next user gesture
                     if (this.audioCtx.state === 'suspended') {
-                        const resumeHandler = function() {
+                        var resumeHandler = function() {
                             if (tvSynth && tvSynth.audioCtx && tvSynth.audioCtx.state === 'suspended') {
                                 tvSynth.audioCtx.resume();
                             }
@@ -2005,6 +2000,10 @@
         async function togglePower() {
             try {
             tvSynth.initAudio();
+            // Safari/iOS: resume AudioContext immediately (we're in a user gesture handler)
+            if (tvSynth.audioCtx && tvSynth.audioCtx.state === 'suspended') {
+                tvSynth.audioCtx.resume();
+            }
 
             if (powerState === "off") {
                 // Turn On sequence
