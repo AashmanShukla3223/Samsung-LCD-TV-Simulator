@@ -897,6 +897,10 @@
                                 <span>HDMI 4</span>
                                 <span class="text-[8px] opacity-60 flex items-center gap-1"><span class="source-active-icon hidden text-amber-400"><i class="fa-solid fa-play text-[6px]"></i></span>PC / Mac — 768p</span>
                             </div>
+                            <div id="source-item-6" class="p-1.5 rounded flex justify-between items-center transition-all">
+                                <span>USB</span>
+                                <span class="text-[8px] opacity-60 flex items-center gap-1"><span class="source-active-icon hidden text-amber-400"><i class="fa-solid fa-play text-[6px]"></i></span>File Browser</span>
+                            </div>
                         </div>
                     </div>
 
@@ -2064,6 +2068,7 @@
             stopPS3Clock();
             stopTVStatic();
             if (energySavingInterval) { clearInterval(energySavingInterval); energySavingInterval = null; }
+            if (usbFileBrowserOpen) { usbFileBrowserOpen = false; document.getElementById('usbFileBrowser').style.display = 'none'; }
             document.getElementById('screenUpdate').classList.add('hidden');
             document.getElementById('screenUpToDate').classList.add('hidden');
             document.getElementById('inputTV').classList.add('hidden');
@@ -2168,6 +2173,13 @@
                         document.getElementById('macosFrame').classList.add('hidden');
                     }
                     break;
+                case 6: // USB File Browser
+                    if (virtualUSB.connected) {
+                        usbOpenBrowser();
+                    } else {
+                        showToast('No USB drive connected. Please connect a USB drive first.', '<i class="fa-solid fa-usb"></i>', 'warning');
+                    }
+                    break;
             }
         }
 
@@ -2193,7 +2205,7 @@
         }
 
         function renderSourceMenuOptions() {
-            for (let i = 0; i < 6; i++) {
+            for (let i = 0; i < 7; i++) {
                 const el = document.getElementById(`source-item-${i}`);
                 const icon = el.querySelector('.source-active-icon');
                 if (i === activeSourceSelectIndex) {
@@ -2210,13 +2222,13 @@
         }
 
         function sourceSelectUp() {
-            activeSourceSelectIndex = (activeSourceSelectIndex - 1 + 6) % 6;
+            activeSourceSelectIndex = (activeSourceSelectIndex - 1 + 7) % 7;
             renderSourceMenuOptions();
             tvSynth.playFMNote(880, 0.08, 0.2); // Beep
         }
 
         function sourceSelectDown() {
-            activeSourceSelectIndex = (activeSourceSelectIndex + 1) % 6;
+            activeSourceSelectIndex = (activeSourceSelectIndex + 1) % 7;
             renderSourceMenuOptions();
             tvSynth.playFMNote(880, 0.08, 0.2); // Beep
         }
@@ -2244,6 +2256,7 @@
                 case 3: return "HDMI 2 (PlayStation 3)";
                 case 4: return "HDMI 3 (DishTV)";
                 case 5: return "HDMI 4 (PC/Mac)";
+                case 6: return "USB File Browser";
             }
         }
 
@@ -3003,7 +3016,14 @@
                 usbUpdatePortUI();
             });
             usbUpdateMenuStatus();
-            if (usbFileBrowserOpen) usbCloseBrowser();
+            if (usbFileBrowserOpen) {
+                var wasUsbSource = activeInputSource === 6;
+                usbCloseBrowser();
+                if (wasUsbSource) {
+                    activeInputSource = 4;
+                    renderActiveScreen();
+                }
+            }
             showToast('USB drive disconnected', '<i class="fa-solid fa-usb"></i>', 'error');
         }
 
@@ -3032,11 +3052,12 @@
         function usbGetDirContents(dirPath) {
             const cleaned = dirPath.replace(/\/+/g, '/').replace(/\/$/, '') || '/';
             const prefix = cleaned === '/' ? '' : cleaned + '/';
+            const keyPrefix = prefix.replace(/^\//, '');
             const entries = { dirs: [], files: [] };
             const seen = new Set();
             Object.keys(virtualUSB.files).forEach(key => {
-                if (key.startsWith(prefix) && key !== prefix) {
-                    const remainder = key.substring(prefix.length);
+                if (key.startsWith(keyPrefix) && key !== keyPrefix) {
+                    const remainder = key.substring(keyPrefix.length);
                     const slashIdx = remainder.indexOf('/');
                     if (slashIdx >= 0) {
                         const dirName = remainder.substring(0, slashIdx);
@@ -3057,13 +3078,14 @@
         function usbEnsureThumbnails(dirPath) {
             var cleaned = dirPath.replace(/\/+/g, '/').replace(/\/$/, '') || '/';
             var prefix = cleaned === '/' ? '' : cleaned + '/';
+            var keyPrefix = prefix.replace(/^\//, '');
             var imageFiles = [];
-            var thumbPrefix = prefix + '.thumbnails/';
+            var thumbPrefix = keyPrefix + '.thumbnails/';
             var hasThumbDir = false;
             Object.keys(virtualUSB.files).forEach(function(key) {
                 if (key.startsWith(thumbPrefix)) hasThumbDir = true;
-                if (key.startsWith(prefix) && key !== prefix) {
-                    var remainder = key.substring(prefix.length);
+                if (key.startsWith(keyPrefix) && key !== keyPrefix) {
+                    var remainder = key.substring(keyPrefix.length);
                     if (remainder.indexOf('/') === -1) {
                         var ext = remainder.split('.').pop().toLowerCase();
                         if (['jpg', 'jpeg', 'png', 'gif', 'webp'].indexOf(ext) >= 0) {
@@ -3601,6 +3623,11 @@
             usbSaveState();
             usbUpdatePortUI();
             usbUpdateMenuStatus();
+            if (usbFileBrowserOpen) {
+                usbFileBrowserPath = '/';
+                usbFileBrowserSelectedIndex = 0;
+                usbRenderBrowser();
+            }
             usbProfileDropdownOpen = false;
             document.getElementById('usbProfileDropdown').classList.add('hidden');
             showToast('USB profile loaded: ' + profile.label, '<i class="fa-solid fa-usb"></i>', 'success');
@@ -5431,9 +5458,17 @@
         document.addEventListener('keydown', (e) => {
             if (usbFileBrowserOpen) {
                 if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+                    if (usbMediaPlayerOpen || usbPhotoViewerOpen) {
+                        e.preventDefault();
+                        return;
+                    }
                     e.preventDefault();
                     usbNavigateBrowser(e.key === 'ArrowUp' ? 'up' : 'down');
                 } else if (e.key === 'Enter') {
+                    if (usbMediaPlayerOpen || usbPhotoViewerOpen) {
+                        e.preventDefault();
+                        return;
+                    }
                     e.preventDefault();
                     usbActivateBrowserItem();
                 } else if (e.key === 'Backspace' || e.key === 'Escape') {
@@ -5441,8 +5476,17 @@
                     e.preventDefault();
                     if (usbFileEditOpen) {
                         usbCloseFileEditor();
+                    } else if (usbMediaPlayerOpen) {
+                        usbCloseMediaPlayer();
+                    } else if (usbPhotoViewerOpen) {
+                        usbClosePhotoViewer();
                     } else {
+                        var wasUsbSource = activeInputSource === 6;
                         usbCloseBrowser();
+                        if (wasUsbSource) {
+                            activeInputSource = 4;
+                            renderActiveScreen();
+                        }
                     }
                 }
                 return;
@@ -5593,7 +5637,6 @@
                     clearAllPendingUpdates();
                     hideExhaleOverlay();
                     if (usbFileEditOpen) { usbCloseFileEditor(); }
-                    if (usbFileBrowserOpen) { usbCloseBrowser(); }
                     if (updateMethodMenuOpen) { closeUpdateMethodMenu(); }
                     if (sourceMenuOpen) { closeSourceMenu(); }
                     if (aboutTVOpen) { closeAboutTV(); }
