@@ -511,6 +511,14 @@
                         </div>
                     </div>
 
+                    <!-- USB VIDEO PLAYER -->
+                    <div id="usbVideoPlayer" class="absolute inset-0 bg-black z-60 hidden flex-col items-center justify-center">
+                        <video id="usbVideo" class="w-full h-full" controls playsinline style="object-fit:contain;"></video>
+                        <div class="absolute bottom-6 left-0 right-0 flex justify-center">
+                            <button id="usbVideoClose" class="bg-red-700 hover:bg-red-600 text-white font-bold px-6 py-2 rounded text-[10px] uppercase tracking-wider transition-all">Close (Esc)</button>
+                        </div>
+                    </div>
+
                     <!-- BROADCAST OTA READY NOTIFICATION OVERLAY -->
                     <div id="broadcastReadyOverlay" class="absolute inset-0 bg-black/95 flex-col justify-center items-center z-50 hidden px-6 text-center" style="display:none;">
                         <div class="max-w-sm samsung-osd-bg rounded-xl p-4 w-full">
@@ -1668,6 +1676,7 @@
         let usbPhotoViewerOpen = false;
         let usbPhotoList = [];
         let usbPhotoIndex = 0;
+        let usbVideoPlayerOpen = false;
 
         // Picture filter state (v1.0.26)
         let currentBrightnessFilter = 1;
@@ -3379,8 +3388,10 @@
                     }
                 } else if (name.toLowerCase().endsWith('.mp3')) {
                     usbOpenMediaPlayer(filePath, content || '');
-                } else if (name.toLowerCase().endsWith('.jpg') || name.toLowerCase().endsWith('.jpeg')) {
+                } else if (['.jpg','.jpeg','.png','.gif','.webp'].some(function(e) { return name.toLowerCase().endsWith(e); })) {
                     usbOpenPhotoViewer(filePath);
+                } else if (['.mp4','.mov','.mkv','.webm'].some(function(e) { return name.toLowerCase().endsWith(e); })) {
+                    usbOpenVideoPlayer(filePath, content || '');
                 } else {
                     usbOpenFileEditor(filePath, content || '');
                 }
@@ -3451,7 +3462,8 @@
             usbPhotoViewerOpen = true;
             const entries = usbGetDirContents(usbFileBrowserPath);
             usbPhotoList = entries.files.filter(function(f) {
-                return f.toLowerCase().endsWith('.jpg') || f.toLowerCase().endsWith('.jpeg');
+                var ext = f.toLowerCase().split('.').pop();
+                return ['jpg', 'jpeg', 'png', 'gif', 'webp'].indexOf(ext) >= 0;
             });
             usbPhotoIndex = usbPhotoList.indexOf(filePath.split('/').pop());
             if (usbPhotoIndex < 0) usbPhotoIndex = 0;
@@ -3486,6 +3498,33 @@
             document.getElementById('usbPhotoViewer').classList.add('hidden');
             document.getElementById('photoViewerImg').src = '';
             usbPhotoList = [];
+        }
+
+        function usbOpenVideoPlayer(filePath, content) {
+            usbVideoPlayerOpen = true;
+            var url = content && content.startsWith('http') ? content : null;
+            var video = document.getElementById('usbVideo');
+            if (url) {
+                video.src = url;
+                video.load();
+                video.play().then(function() {
+                    showToast('Playing: ' + filePath.split('/').pop(), '<i class="fa-solid fa-film"></i>', 'success');
+                }).catch(function() {
+                    showToast('Video playback failed', '<i class="fa-solid fa-circle-exclamation"></i>', 'error');
+                });
+            } else {
+                video.src = '';
+                showToast('No video URL found', '<i class="fa-solid fa-circle-exclamation"></i>', 'error');
+            }
+            document.getElementById('usbVideoPlayer').classList.remove('hidden');
+        }
+
+        function usbCloseVideoPlayer() {
+            usbVideoPlayerOpen = false;
+            var video = document.getElementById('usbVideo');
+            video.pause();
+            video.src = '';
+            document.getElementById('usbVideoPlayer').classList.add('hidden');
         }
 
         function usbNewFile() {
@@ -5411,6 +5450,7 @@
         addSafeListener('photoViewerClose', 'click', usbClosePhotoViewer);
         addSafeListener('photoViewerPrev', 'click', function() { usbNavigatePhoto('prev'); });
         addSafeListener('photoViewerNext', 'click', function() { usbNavigatePhoto('next'); });
+        addSafeListener('usbVideoClose', 'click', usbCloseVideoPlayer);
 
         // Click delegation on usbBrowserList
         document.getElementById('usbBrowserList')?.addEventListener('click', (e) => {
@@ -5458,14 +5498,14 @@
         document.addEventListener('keydown', (e) => {
             if (usbFileBrowserOpen) {
                 if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
-                    if (usbMediaPlayerOpen || usbPhotoViewerOpen) {
+                    if (usbMediaPlayerOpen || usbPhotoViewerOpen || usbVideoPlayerOpen) {
                         e.preventDefault();
                         return;
                     }
                     e.preventDefault();
                     usbNavigateBrowser(e.key === 'ArrowUp' ? 'up' : 'down');
                 } else if (e.key === 'Enter') {
-                    if (usbMediaPlayerOpen || usbPhotoViewerOpen) {
+                    if (usbMediaPlayerOpen || usbPhotoViewerOpen || usbVideoPlayerOpen) {
                         e.preventDefault();
                         return;
                     }
@@ -5480,6 +5520,8 @@
                         usbCloseMediaPlayer();
                     } else if (usbPhotoViewerOpen) {
                         usbClosePhotoViewer();
+                    } else if (usbVideoPlayerOpen) {
+                        usbCloseVideoPlayer();
                     } else {
                         var wasUsbSource = activeInputSource === 6;
                         usbCloseBrowser();
@@ -5644,6 +5686,7 @@
                     if (tvDialogResolve) { closeTVDialog(); }
                     if (usbMediaPlayerOpen) { usbCloseMediaPlayer(); }
                     if (usbPhotoViewerOpen) { usbClosePhotoViewer(); }
+                    if (usbVideoPlayerOpen) { usbCloseVideoPlayer(); }
                     document.getElementById('broadcastReadyOverlay').style.display = 'none';
                     document.getElementById('soundTestModal').classList.add('hidden');
                     document.getElementById('shortcutOverlay').classList.add('hidden');
