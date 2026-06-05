@@ -1592,26 +1592,22 @@
             if (video._hls) { video._hls.destroy(); delete video._hls; }
             if (typeof updateChannelBug === 'function') updateChannelBug();
             if (src.endsWith('.m3u8') && Hls.isSupported()) {
+                delete video._hlsTimer;
                 const hls = new Hls({ enableWorker: false, lowLatencyMode: false, backbufferLength: 30 });
-                video._hlsRetry = video._hlsRetry || 0;
-                const MAX_RETRIES = 20;
                 hls.loadSource(src);
                 hls.attachMedia(video);
                 video._hls = hls;
                 hls.on(Hls.Events.MANIFEST_PARSED, () => {
-                    video._hlsRetry = 0;
                     if (seekTime > 0) video.currentTime = seekTime;
                     video.play().catch(() => {});
                 });
                 hls.on(Hls.Events.ERROR, (event, data) => {
-                    if (data.fatal) {
-                        if (video._hlsRetry < MAX_RETRIES) {
-                            video._hlsRetry++;
-                            setTimeout(() => {
-                                hls.destroy();
-                                loadDishVideo(video, src, seekTime);
-                            }, Math.min(1000 * video._hlsRetry, 10000));
-                        }
+                    if (data.fatal && !video._hlsTimer) {
+                        video._hlsTimer = setTimeout(() => {
+                            delete video._hlsTimer;
+                            hls.destroy();
+                            loadDishVideo(video, src, seekTime);
+                        }, 4000);
                     } else if (data.type === Hls.ErrorTypes.MEDIA_ERROR) {
                         hls.recoverMediaError();
                     }
