@@ -3825,9 +3825,15 @@
 
         function timeLabelFromMinutes(mins) {
           var hh = Math.floor(mins / 60) % 24, mm = mins % 60;
-          var ampm = hh >= 12 ? 'PM' : 'AM';
-          var h12 = hh % 12 || 12;
-          return h12 + ':' + (mm < 10 ? '0' : '') + mm + ' ' + ampm;
+          var pad = function(n) { return n < 10 ? '0' + n : '' + n; };
+          return pad(hh) + ':' + pad(mm);
+        }
+
+        function formatDate24(d) {
+          var pad = function(n) { return n < 10 ? '0' + n : '' + n; };
+          var days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+          var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+          return days[d.getDay()] + ' ' + pad(d.getDate()) + ' ' + months[d.getMonth()] + ' ' + d.getFullYear() + ' — ' + pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds());
         }
 
         function getEpgChannelsForGrid() {
@@ -3877,7 +3883,7 @@
           var bodyEl = document.getElementById('epgGridBody');
           var dateEl = document.getElementById('epgDateNow');
           if (!headerEl || !bodyEl) return;
-          dateEl.textContent = grid.now.toLocaleString('en-IN', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+          dateEl.textContent = formatDate24(grid.now);
           var theadHtml = '<tr><th class="text-left py-2 px-2 text-zinc-500 text-[9px] uppercase tracking-wider w-16 bg-zinc-950">Channel</th>';
           for (var si = 0; si < grid.slots.length; si++) {
             var label = timeLabelFromMinutes(grid.slots[si]);
@@ -3937,6 +3943,8 @@
             }
           }, 50);
           if (tvSynth && tvSynth.playFMNote) tvSynth.playFMNote(660, 0.15, 0.2);
+          if (epgClockInterval) clearInterval(epgClockInterval);
+          epgClockInterval = setInterval(updateEpgClock, 1000);
         }
 
         function closeEPG() {
@@ -3945,9 +3953,17 @@
             overlay.classList.add('hidden');
             overlay.style.display = 'none';
           }
+          if (epgClockInterval) { clearInterval(epgClockInterval); epgClockInterval = null; }
         }
 
+        var epgClockInterval = null;
         var infoBannerTimer = null;
+        var bannerClockInterval = null;
+
+        function updateEpgClock() {
+          var el = document.getElementById('epgDateNow');
+          if (el) el.textContent = formatDate24(new Date());
+        }
 
         function showDishInfoBanner() {
           if (activeInputSource !== 4) return;
@@ -3958,17 +3974,25 @@
           var name = ch.name || '';
           var lcnMatch = name.match(/Channel\s+(\d+)/);
           var lcn = lcnMatch ? lcnMatch[1] : '—';
-          var now = new Date();
           var schKey = lcnMatch ? parseInt(lcnMatch[1]) : null;
           var sch = schKey ? EPG_SCHEDULE[schKey] : null;
-          var curr = getEpgProgram(sch, now);
-          var next = getEpgNextProgram(sch, now);
-          document.getElementById('infoBannerLcn').textContent = lcn;
-          document.getElementById('infoBannerName').textContent = name.replace(/Channel\s+\d+:\s+/, '');
-          document.getElementById('infoBannerTime').textContent = now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
-          document.getElementById('infoBannerNow').textContent = 'Now: ' + (curr ? curr.title : sch && sch.live ? 'Live' : '—');
-          document.getElementById('infoBannerNext').textContent = 'Next: ' + (next ? next.title : '—');
+
+          function updateBannerContent() {
+            var now = new Date();
+            var pad = function(n) { return n < 10 ? '0' + n : '' + n; };
+            var curr = getEpgProgram(sch, now);
+            var next = getEpgNextProgram(sch, now);
+            document.getElementById('infoBannerLcn').textContent = lcn;
+            document.getElementById('infoBannerName').textContent = name.replace(/Channel\s+\d+:\s+/, '');
+            document.getElementById('infoBannerTime').textContent = pad(now.getHours()) + ':' + pad(now.getMinutes()) + ':' + pad(now.getSeconds());
+            document.getElementById('infoBannerNow').textContent = 'Now: ' + (curr ? curr.title : sch && sch.live ? 'Live' : '—');
+            document.getElementById('infoBannerNext').textContent = 'Next: ' + (next ? next.title : '—');
+          }
+
+          updateBannerContent();
           banner.style.display = '';
+          if (bannerClockInterval) clearInterval(bannerClockInterval);
+          bannerClockInterval = setInterval(updateBannerContent, 1000);
           if (infoBannerTimer) clearTimeout(infoBannerTimer);
           infoBannerTimer = setTimeout(hideDishInfoBanner, 8000);
         }
@@ -3977,6 +4001,7 @@
           var banner = document.getElementById('dishInfoBanner');
           if (banner) banner.style.display = 'none';
           if (infoBannerTimer) { clearTimeout(infoBannerTimer); infoBannerTimer = null; }
+          if (bannerClockInterval) { clearInterval(bannerClockInterval); bannerClockInterval = null; }
         }
 
         var epgSelectedRow = 0;
