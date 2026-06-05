@@ -1578,7 +1578,8 @@
             { name: "Channel 225: Chikoo Aur Bunty — Adventure 1", src: GH11 + "chikoo_bunty_1.mp4" },
             { name: "Channel 226: Chikoo Aur Bunty — Adventure 2", src: GH11 + "chikoo_bunty_2.mp4" },
             { name: "Channel 227: Motu Patlu — Episode 1", src: GH11 + "motu_patlu_1.mp4" },
-            { name: "Channel 228: Motu Patlu — Episode 2", src: GH11 + "motu_patlu_2.mp4" }
+            { name: "Channel 228: Motu Patlu — Episode 2", src: GH11 + "motu_patlu_2.mp4" },
+            { name: "Channel 321: 9XM — Music Television", src: "https://9xjio.wiseplayout.com/9XM/master.m3u8" }
         ];
         function loadDishVideo(video, src, seekTime) {
             if (video._hls) { video._hls.destroy(); delete video._hls; }
@@ -3785,7 +3786,8 @@
           225: { n: "Chikoo Aur Bunty — Adventure 1", p: [[0,0,6,0,"Off Air"],[6,0,8,0,"Paw Patrol Block"],[8,0,8,30,"Chikoo Bunty 1"],[8,30,9,0,"Chikoo Bunty 2"],[9,0,9,30,"Motu Patlu 1"],[9,30,10,0,"Motu Patlu 2"],[10,0,12,0,"Nick Block"],[12,0,18,0,"Repeat Block"],[18,0,0,0,"Off Air"]] },
           226: { n: "Chikoo Aur Bunty — Adventure 2", p: [[0,0,6,0,"Off Air"],[6,0,8,0,"Paw Patrol Block"],[8,0,8,30,"Chikoo Bunty 2"],[8,30,9,0,"Chikoo Bunty 1"],[9,0,9,30,"Motu Patlu 2"],[9,30,10,0,"Motu Patlu 1"],[10,0,12,0,"Nick Block"],[12,0,18,0,"Repeat Block"],[18,0,0,0,"Off Air"]] },
           227: { n: "Motu Patlu — Episode 1", p: [[0,0,6,0,"Off Air"],[6,0,8,0,"Paw Patrol Block"],[8,0,8,30,"Motu Patlu 1"],[8,30,9,0,"Motu Patlu 2"],[9,0,9,30,"Chikoo Bunty 1"],[9,30,10,0,"Chikoo Bunty 2"],[10,0,12,0,"Nick Block"],[12,0,18,0,"Repeat Block"],[18,0,0,0,"Off Air"]] },
-          228: { n: "Motu Patlu — Episode 2", p: [[0,0,6,0,"Off Air"],[6,0,8,0,"Paw Patrol Block"],[8,0,8,30,"Motu Patlu 2"],[8,30,9,0,"Motu Patlu 1"],[9,0,9,30,"Chikoo Bunty 2"],[9,30,10,0,"Chikoo Bunty 1"],[10,0,12,0,"Nick Block"],[12,0,18,0,"Repeat Block"],[18,0,0,0,"Off Air"]] }
+          228: { n: "Motu Patlu — Episode 2", p: [[0,0,6,0,"Off Air"],[6,0,8,0,"Paw Patrol Block"],[8,0,8,30,"Motu Patlu 2"],[8,30,9,0,"Motu Patlu 1"],[9,0,9,30,"Chikoo Bunty 2"],[9,30,10,0,"Chikoo Bunty 1"],[10,0,12,0,"Nick Block"],[12,0,18,0,"Repeat Block"],[18,0,0,0,"Off Air"]] },
+          321: { n: "9XM — Music Television", p: [[0,0,0,0,"Live Music"]], live: true }
         };
 
         function getEpgProgram(schedule, now) {
@@ -3844,7 +3846,7 @@
             var slotM = currentSlotStart + si * 30;
             slots.push(slotM);
           }
-          var lcns = [121,122,123,124,125,126,127,128,129,130,131,132,133,134,135,136,137,138,139,140,221,222,223,224,225,226,227,228];
+          var lcns = [121,122,123,124,125,126,127,128,129,130,131,132,133,134,135,136,137,138,139,140,221,222,223,224,225,226,227,228,321];
           var rows = [];
           for (var ci = 0; ci < lcns.length; ci++) {
             var lcn = lcns[ci];
@@ -5708,6 +5710,8 @@
                 bug.innerHTML = '<div style="background:linear-gradient(135deg,#FF6B00,#FFAA00);padding:6px 12px;border-radius:4px;color:white;font-weight:900;font-size:11px;box-shadow:0 2px 8px rgba(0,0,0,0.5);">NICK JR.</div>';
             } else if (channelName.indexOf('Chikoo') !== -1 || channelName.indexOf('Motu Patlu') !== -1) {
                 bug.innerHTML = '<div style="background:linear-gradient(135deg,#FF6B00,#FFAA00);padding:6px 12px;border-radius:4px;color:white;font-weight:900;font-size:11px;box-shadow:0 2px 8px rgba(0,0,0,0.5);">NICK</div>';
+            } else if (channelName.indexOf('9XM') !== -1) {
+                bug.innerHTML = '<div style="background:linear-gradient(135deg,#EC4899,#F59E0B);padding:6px 12px;border-radius:4px;color:white;font-weight:900;font-size:11px;box-shadow:0 2px 8px rgba(0,0,0,0.5);">9XM</div>';
             } else {
                 bug.innerHTML = '';
             }

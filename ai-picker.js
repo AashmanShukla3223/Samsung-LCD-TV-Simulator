@@ -285,7 +285,7 @@
         tags: ["motu patlu", "nick", "kids", "cartoon", "children", "comedy", "animated", "hindi", "motu", "patlu"],
         description: "Nick Motu Patlu Episode 1 — the famous duo Motu and Patlu's first hilarious adventure."
       },
-       228: {
+        228: {
         category: "kids",
         network: "Nick",
         show: "Motu Patlu",
@@ -293,6 +293,15 @@
         disambiguator: "motu patlu episode 2 kids cartoon comedy",
         tags: ["motu patlu", "nick", "kids", "cartoon", "children", "comedy", "animated", "hindi", "motu", "patlu"],
         description: "Nick Motu Patlu Episode 2 — another round of laughs with Motu Patlu."
+      },
+        321: {
+        category: "music",
+        network: "9XM",
+        show: "Music Television",
+        edition: "Live",
+        disambiguator: "9xm music television live hindi songs 24x7",
+        tags: ["9xm", "music", "television", "live", "hindi", "songs", "bollywood", "24x7", "hls"],
+        description: "9XM — Music Television. 24x7 live Hindi music videos and Bollywood songs."
       },
     };
     window.AI_CHANNEL_META = META;
