@@ -5984,23 +5984,24 @@
 
     <script>
     // Show touch remote only on touch devices
+    var touchRemote = document.getElementById('touchRemote');
+    var touchDispatch = function(key) {
+        // Dispatch on body so event bubbles through document → window
+        document.body.dispatchEvent(new KeyboardEvent('keydown', { key: key, bubbles: true, cancelable: true }));
+    };
     if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
-        document.getElementById('touchRemote').style.display = 'block';
-        // Use touchstart for instant response (avoids 300ms click delay + duplicate fires)
-        document.getElementById('touchRemote').addEventListener('touchstart', function(e) {
+        touchRemote.style.display = 'block';
+        touchRemote.addEventListener('touchstart', function(e) {
             var btn = e.target.closest('[data-tkey]');
             if (!btn) return;
             e.preventDefault();
-            var key = btn.dataset.tkey;
-            document.dispatchEvent(new KeyboardEvent('keydown', { key: key, bubbles: true }));
+            touchDispatch(btn.dataset.tkey);
         }, { passive: false });
     } else {
-        // Fallback for non-touch devices using click
-        document.getElementById('touchRemote').addEventListener('click', function(e) {
+        touchRemote.addEventListener('click', function(e) {
             var btn = e.target.closest('[data-tkey]');
             if (!btn) return;
-            var key = btn.dataset.tkey;
-            document.dispatchEvent(new KeyboardEvent('keydown', { key: key, bubbles: true }));
+            touchDispatch(btn.dataset.tkey);
         });
     }
     </script>
