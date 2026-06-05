@@ -303,6 +303,33 @@
         tags: ["9xm", "music", "television", "live", "hindi", "songs", "bollywood", "24x7", "hls"],
         description: "9XM — Music Television. 24x7 live Hindi music videos and Bollywood songs."
       },
+        141: {
+        category: "live news",
+        network: "India TV",
+        show: "Live Stream",
+        edition: "24x7",
+        disambiguator: "india tv live news stream 24x7 breaking hindi",
+        tags: ["live", "india tv", "24x7", "streaming", "breaking news", "hindi", "hls"],
+        description: "India TV [24x7 Live Stream] — round-the-clock Hindi news from India TV."
+      },
+        142: {
+        category: "live news",
+        network: "Republic Bharat",
+        show: "Live Stream",
+        edition: "24x7",
+        disambiguator: "republic bharat live news stream 24x7 breaking hindi",
+        tags: ["live", "republic bharat", "24x7", "streaming", "breaking news", "hindi", "hls"],
+        description: "Republic Bharat [24x7 Live Stream] — 24x7 Hindi news from Republic Bharat."
+      },
+        322: {
+        category: "entertainment",
+        network: "Sony",
+        show: "Sony Kal HD",
+        edition: "Live",
+        disambiguator: "sony kal hd live entertainment hindi shows 24x7",
+        tags: ["sony kal", "entertainment", "live", "hindi", "shows", "24x7", "hls", "sony"],
+        description: "Sony Kal HD [24x7 Live] — 24x7 Hindi entertainment from Sony Pictures Network."
+      },
     };
     window.AI_CHANNEL_META = META;
 

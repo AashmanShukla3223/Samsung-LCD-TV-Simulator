@@ -1357,7 +1357,7 @@
         const NDTV = 'https://ndtvindiaelemarchana.akamaized.net/hls/live/2003679/ndtvindia/master.m3u8';
         const INDIA_TODAY_LIVE = 'https://indiatodaylive.akamaized.net/hls/live/2014320/indiatoday/indiatodaylive/playlist.m3u8';
         const NDTV24X7 = 'https://ndtv24x7elemarchana.akamaized.net/hls/live/2003678/ndtv24x7/master.m3u8';
-        let APP_VERSION = '1.0.30';
+        let APP_VERSION = '1.0.31';
         const VERCEL_URL = 'https://samsung-lcd-tv.vercel.app';
         const audioStartup = new Audio(GH + 'startup.mp3');
         const audioShutdown = new Audio(GH + 'shutdown.mp3');
@@ -1571,6 +1571,8 @@
             { name: "Channel 138: India Today Live", src: INDIA_TODAY_LIVE },
             { name: "Channel 139: NDTV India [24x7 Live Stream]", src: NDTV },
             { name: "Channel 140: NDTV 24x7 [24x7 Live Stream]", src: NDTV24X7 },
+            { name: "Channel 141: India TV [24x7 Live Stream]", src: "https://pl-indiatvnews.akamaized.net/out/v1/db79179b608641ceaa5a4d0dd0dca8da/index.m3u8" },
+            { name: "Channel 142: Republic Bharat [24x7 Live Stream]", src: "https://raw.githubusercontent.com/amazeyourself/adaptive-streams/refs/heads/main/streams/in/YuppTV/RepublicBharat.m3u8" },
             { name: "Channel 221: Paw Patrol — Mission 1", src: GH10 + "pawpatrol_1.mp4" },
             { name: "Channel 222: Paw Patrol — Mission 2", src: GH10 + "pawpatrol_2.mp4" },
             { name: "Channel 223: Peppa Pig — Samundar Yatra", src: GH10 + "peppa_samundar.mp4" },
@@ -1579,7 +1581,8 @@
             { name: "Channel 226: Chikoo Aur Bunty — Adventure 2", src: GH11 + "chikoo_bunty_2.mp4" },
             { name: "Channel 227: Motu Patlu — Episode 1", src: GH11 + "motu_patlu_1.mp4" },
             { name: "Channel 228: Motu Patlu — Episode 2", src: GH11 + "motu_patlu_2.mp4" },
-            { name: "Channel 321: 9XM — Music Television", src: "https://9xjio.wiseplayout.com/9XM/master.m3u8" }
+            { name: "Channel 321: 9XM — Music Television", src: "https://9xjio.wiseplayout.com/9XM/master.m3u8" },
+            { name: "Channel 322: Sony Kal HD [24x7 Live Stream]", src: "https://e77bef9b.wurl.com/master/f36d25e7e52f1ba8d7e56eb859c636563214f541/TEctY2FfU29ueUtBTF9ITFM/playlist.m3u8" }
         ];
         function loadDishVideo(video, src, seekTime) {
             if (video._hls) { video._hls.destroy(); delete video._hls; }
@@ -3778,17 +3781,20 @@
           137: { n: "AajTak Live", p: [[0,0,0,0,"Live Streaming"]], live: true },
           138: { n: "India Today Live", p: [[0,0,0,0,"Live Streaming"]], live: true },
           139: { n: "NDTV India [24x7 Live]", p: [[0,0,0,0,"Live Streaming"]], live: true },
-          140: { n: "NDTV 24x7 [24x7 Live]", p: [[0,0,0,0,"Live Streaming"]], live: true },
-          221: { n: "Paw Patrol — Mission 1", p: [[0,0,6,0,"Off Air"],[6,0,6,30,"Paw Patrol M1"],[6,30,7,0,"Paw Patrol M2"],[7,0,7,30,"Peppa Samundar"],[7,30,8,0,"Peppa Shopping"],[8,0,8,30,"Chikoo Bunty 1"],[8,30,9,0,"Chikoo Bunty 2"],[9,0,9,30,"Motu Patlu 1"],[9,30,10,0,"Motu Patlu 2"],[10,0,18,0,"Repeat Block"],[18,0,0,0,"Off Air"]] },
-          222: { n: "Paw Patrol — Mission 2", p: [[0,0,6,0,"Off Air"],[6,0,6,30,"Paw Patrol M2"],[6,30,7,0,"Paw Patrol M1"],[7,0,7,30,"Peppa Shopping"],[7,30,8,0,"Peppa Samundar"],[8,0,8,30,"Motu Patlu 1"],[8,30,9,0,"Motu Patlu 2"],[9,0,9,30,"Chikoo Bunty 1"],[9,30,10,0,"Chikoo Bunty 2"],[10,0,18,0,"Repeat Block"],[18,0,0,0,"Off Air"]] },
-          223: { n: "Peppa Pig — Samundar Yatra", p: [[0,0,6,0,"Off Air"],[6,0,6,30,"Peppa Samundar"],[6,30,7,0,"Peppa Shopping"],[7,0,7,30,"Paw Patrol M1"],[7,30,8,0,"Paw Patrol M2"],[8,0,8,30,"Chikoo Bunty 1"],[8,30,9,0,"Chikoo Bunty 2"],[9,0,9,30,"Motu Patlu 1"],[9,30,10,0,"Motu Patlu 2"],[10,0,18,0,"Repeat Block"],[18,0,0,0,"Off Air"]] },
-          224: { n: "Peppa Pig — Shopping Spree", p: [[0,0,6,0,"Off Air"],[6,0,6,30,"Peppa Shopping"],[6,30,7,0,"Peppa Samundar"],[7,0,7,30,"Paw Patrol M1"],[7,30,8,0,"Paw Patrol M2"],[8,0,8,30,"Paw Patrol repeat"],[8,30,10,0,"Peppa Block"],[10,0,18,0,"Repeat Block"],[18,0,0,0,"Off Air"]] },
-          225: { n: "Chikoo Aur Bunty — Adventure 1", p: [[0,0,6,0,"Off Air"],[6,0,8,0,"Paw Patrol Block"],[8,0,8,30,"Chikoo Bunty 1"],[8,30,9,0,"Chikoo Bunty 2"],[9,0,9,30,"Motu Patlu 1"],[9,30,10,0,"Motu Patlu 2"],[10,0,12,0,"Nick Block"],[12,0,18,0,"Repeat Block"],[18,0,0,0,"Off Air"]] },
-          226: { n: "Chikoo Aur Bunty — Adventure 2", p: [[0,0,6,0,"Off Air"],[6,0,8,0,"Paw Patrol Block"],[8,0,8,30,"Chikoo Bunty 2"],[8,30,9,0,"Chikoo Bunty 1"],[9,0,9,30,"Motu Patlu 2"],[9,30,10,0,"Motu Patlu 1"],[10,0,12,0,"Nick Block"],[12,0,18,0,"Repeat Block"],[18,0,0,0,"Off Air"]] },
-          227: { n: "Motu Patlu — Episode 1", p: [[0,0,6,0,"Off Air"],[6,0,8,0,"Paw Patrol Block"],[8,0,8,30,"Motu Patlu 1"],[8,30,9,0,"Motu Patlu 2"],[9,0,9,30,"Chikoo Bunty 1"],[9,30,10,0,"Chikoo Bunty 2"],[10,0,12,0,"Nick Block"],[12,0,18,0,"Repeat Block"],[18,0,0,0,"Off Air"]] },
-          228: { n: "Motu Patlu — Episode 2", p: [[0,0,6,0,"Off Air"],[6,0,8,0,"Paw Patrol Block"],[8,0,8,30,"Motu Patlu 2"],[8,30,9,0,"Motu Patlu 1"],[9,0,9,30,"Chikoo Bunty 2"],[9,30,10,0,"Chikoo Bunty 1"],[10,0,12,0,"Nick Block"],[12,0,18,0,"Repeat Block"],[18,0,0,0,"Off Air"]] },
-          321: { n: "9XM — Music Television", p: [[0,0,0,0,"Live Music"]], live: true }
-        };
+           140: { n: "NDTV 24x7 [24x7 Live]", p: [[0,0,0,0,"Live Streaming"]], live: true },
+           141: { n: "India TV [24x7 Live]", p: [[0,0,0,0,"Live Streaming"]], live: true },
+           142: { n: "Republic Bharat [24x7 Live]", p: [[0,0,0,0,"Live Streaming"]], live: true },
+           221: { n: "Paw Patrol — Mission 1", p: [[0,0,6,0,"Off Air"],[6,0,6,30,"Paw Patrol M1"],[6,30,7,0,"Paw Patrol M2"],[7,0,7,30,"Peppa Samundar"],[7,30,8,0,"Peppa Shopping"],[8,0,8,30,"Chikoo Bunty 1"],[8,30,9,0,"Chikoo Bunty 2"],[9,0,9,30,"Motu Patlu 1"],[9,30,10,0,"Motu Patlu 2"],[10,0,18,0,"Repeat Block"],[18,0,0,0,"Off Air"]] },
+           222: { n: "Paw Patrol — Mission 2", p: [[0,0,6,0,"Off Air"],[6,0,6,30,"Paw Patrol M2"],[6,30,7,0,"Paw Patrol M1"],[7,0,7,30,"Peppa Shopping"],[7,30,8,0,"Peppa Samundar"],[8,0,8,30,"Motu Patlu 1"],[8,30,9,0,"Motu Patlu 2"],[9,0,9,30,"Chikoo Bunty 1"],[9,30,10,0,"Chikoo Bunty 2"],[10,0,18,0,"Repeat Block"],[18,0,0,0,"Off Air"]] },
+           223: { n: "Peppa Pig — Samundar Yatra", p: [[0,0,6,0,"Off Air"],[6,0,6,30,"Peppa Samundar"],[6,30,7,0,"Peppa Shopping"],[7,0,7,30,"Paw Patrol M1"],[7,30,8,0,"Paw Patrol M2"],[8,0,8,30,"Chikoo Bunty 1"],[8,30,9,0,"Chikoo Bunty 2"],[9,0,9,30,"Motu Patlu 1"],[9,30,10,0,"Motu Patlu 2"],[10,0,18,0,"Repeat Block"],[18,0,0,0,"Off Air"]] },
+           224: { n: "Peppa Pig — Shopping Spree", p: [[0,0,6,0,"Off Air"],[6,0,6,30,"Peppa Shopping"],[6,30,7,0,"Peppa Samundar"],[7,0,7,30,"Paw Patrol M1"],[7,30,8,0,"Paw Patrol M2"],[8,0,8,30,"Paw Patrol repeat"],[8,30,10,0,"Peppa Block"],[10,0,18,0,"Repeat Block"],[18,0,0,0,"Off Air"]] },
+           225: { n: "Chikoo Aur Bunty — Adventure 1", p: [[0,0,6,0,"Off Air"],[6,0,8,0,"Paw Patrol Block"],[8,0,8,30,"Chikoo Bunty 1"],[8,30,9,0,"Chikoo Bunty 2"],[9,0,9,30,"Motu Patlu 1"],[9,30,10,0,"Motu Patlu 2"],[10,0,12,0,"Nick Block"],[12,0,18,0,"Repeat Block"],[18,0,0,0,"Off Air"]] },
+           226: { n: "Chikoo Aur Bunty — Adventure 2", p: [[0,0,6,0,"Off Air"],[6,0,8,0,"Paw Patrol Block"],[8,0,8,30,"Chikoo Bunty 2"],[8,30,9,0,"Chikoo Bunty 1"],[9,0,9,30,"Motu Patlu 2"],[9,30,10,0,"Motu Patlu 1"],[10,0,12,0,"Nick Block"],[12,0,18,0,"Repeat Block"],[18,0,0,0,"Off Air"]] },
+           227: { n: "Motu Patlu — Episode 1", p: [[0,0,6,0,"Off Air"],[6,0,8,0,"Paw Patrol Block"],[8,0,8,30,"Motu Patlu 1"],[8,30,9,0,"Motu Patlu 2"],[9,0,9,30,"Chikoo Bunty 1"],[9,30,10,0,"Chikoo Bunty 2"],[10,0,12,0,"Nick Block"],[12,0,18,0,"Repeat Block"],[18,0,0,0,"Off Air"]] },
+           228: { n: "Motu Patlu — Episode 2", p: [[0,0,6,0,"Off Air"],[6,0,8,0,"Paw Patrol Block"],[8,0,8,30,"Motu Patlu 2"],[8,30,9,0,"Motu Patlu 1"],[9,0,9,30,"Chikoo Bunty 2"],[9,30,10,0,"Chikoo Bunty 1"],[10,0,12,0,"Nick Block"],[12,0,18,0,"Repeat Block"],[18,0,0,0,"Off Air"]] },
+           321: { n: "9XM — Music Television", p: [[0,0,0,0,"Live Music"]], live: true },
+           322: { n: "Sony Kal HD [24x7 Live]", p: [[0,0,0,0,"Live Streaming"]], live: true }
+         };
 
         function getEpgProgram(schedule, now) {
           if (!schedule) return null;
@@ -3846,7 +3852,7 @@
             var slotM = currentSlotStart + si * 30;
             slots.push(slotM);
           }
-          var lcns = [121,122,123,124,125,126,127,128,129,130,131,132,133,134,135,136,137,138,139,140,221,222,223,224,225,226,227,228,321];
+          var lcns = [121,122,123,124,125,126,127,128,129,130,131,132,133,134,135,136,137,138,139,140,141,142,221,222,223,224,225,226,227,228,321,322];
           var rows = [];
           for (var ci = 0; ci < lcns.length; ci++) {
             var lcn = lcns[ci];
@@ -5710,9 +5716,15 @@
                 bug.innerHTML = '<div style="background:linear-gradient(135deg,#FF6B00,#FFAA00);padding:6px 12px;border-radius:4px;color:white;font-weight:900;font-size:11px;box-shadow:0 2px 8px rgba(0,0,0,0.5);">NICK JR.</div>';
             } else if (channelName.indexOf('Chikoo') !== -1 || channelName.indexOf('Motu Patlu') !== -1) {
                 bug.innerHTML = '<div style="background:linear-gradient(135deg,#FF6B00,#FFAA00);padding:6px 12px;border-radius:4px;color:white;font-weight:900;font-size:11px;box-shadow:0 2px 8px rgba(0,0,0,0.5);">NICK</div>';
-            } else if (channelName.indexOf('9XM') !== -1) {
-                bug.innerHTML = '<div style="background:linear-gradient(135deg,#EC4899,#F59E0B);padding:6px 12px;border-radius:4px;color:white;font-weight:900;font-size:11px;box-shadow:0 2px 8px rgba(0,0,0,0.5);">9XM</div>';
-            } else {
+    } else if (channelName.indexOf('9XM') !== -1) {
+        bug.innerHTML = '<div style="background:linear-gradient(135deg,#EC4899,#F59E0B);padding:6px 12px;border-radius:4px;color:white;font-weight:900;font-size:11px;box-shadow:0 2px 8px rgba(0,0,0,0.5);">9XM</div>';
+    } else if (channelName.indexOf('India TV') !== -1) {
+        bug.innerHTML = '<div style="background:linear-gradient(135deg,#DC2626,#2563EB);padding:6px 12px;border-radius:4px;color:white;font-weight:900;font-size:11px;box-shadow:0 2px 8px rgba(0,0,0,0.5);">INDIA TV</div>';
+    } else if (channelName.indexOf('Republic Bharat') !== -1) {
+        bug.innerHTML = '<div style="background:linear-gradient(135deg,#FF6B35,#E53935);padding:6px 12px;border-radius:4px;color:white;font-weight:900;font-size:11px;box-shadow:0 2px 8px rgba(0,0,0,0.5);">REPUBLIC BHARAT</div>';
+    } else if (channelName.indexOf('Sony Kal') !== -1) {
+        bug.innerHTML = '<div style="background:linear-gradient(135deg,#1E88E5,#7C3AED);padding:6px 12px;border-radius:4px;color:white;font-weight:900;font-size:11px;box-shadow:0 2px 8px rgba(0,0,0,0.5);">SONY KAL</div>';
+    } else {
                 bug.innerHTML = '';
             }
         }
