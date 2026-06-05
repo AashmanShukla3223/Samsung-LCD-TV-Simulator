@@ -4,6 +4,9 @@
   "functions": {
     "api/ai-pick.js": {
       "regions": ["bom1"]
+    },
+    "api/proxy-media.js": {
+      "regions": ["bom1"]
     }
   }
 }

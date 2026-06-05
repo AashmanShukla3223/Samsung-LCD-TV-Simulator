@@ -1362,31 +1362,18 @@
     <script>
         // High Quality Audio Tracks embedded from direct local uploads
         const GH = 'https://github.com/AashmanShukla3223/Antigravity-and-OpenCode-CLI-Prompts-and-Skills/releases/download/v1.0/';
-        const GH2 = 'https://github.com/AashmanShukla3223/Antigravity-and-OpenCode-CLI-Prompts-and-Skills/releases/download/v1.0.1/';
-        const GH3 = 'https://github.com/AashmanShukla3223/Antigravity-and-OpenCode-CLI-Prompts-and-Skills/releases/download/v1.0.2/';
-        const GH4 = 'https://github.com/AashmanShukla3223/Antigravity-and-OpenCode-CLI-Prompts-and-Skills/releases/download/v1.0.3/';
-        const GH5 = 'https://github.com/AashmanShukla3223/Antigravity-and-OpenCode-CLI-Prompts-and-Skills/releases/download/v1.0.4/';
-        const GH6 = 'https://github.com/AashmanShukla3223/Antigravity-and-OpenCode-CLI-Prompts-and-Skills/releases/download/v1.0.5/';
-        const GH7 = 'https://github.com/AashmanShukla3223/Antigravity-and-OpenCode-CLI-Prompts-and-Skills/releases/download/v1.0.6/';
-        const GH8 = 'https://github.com/AashmanShukla3223/Antigravity-and-OpenCode-CLI-Prompts-and-Skills/releases/download/v1.0.7/';
-        const GH9 = 'https://github.com/AashmanShukla3223/Antigravity-and-OpenCode-CLI-Prompts-and-Skills/releases/download/v1.0.8/';
-        const GH10 = 'https://github.com/AashmanShukla3223/Antigravity-and-OpenCode-CLI-Prompts-and-Skills/releases/download/v1.1.11/';
-        const GH11 = 'https://github.com/AashmanShukla3223/Antigravity-and-OpenCode-CLI-Prompts-and-Skills/releases/download/v1.1.12/';
-        const GH12 = 'https://github.com/AashmanShukla3223/Antigravity-and-OpenCode-CLI-Prompts-and-Skills/releases/download/v1.1.13/';
-        const LIVE = 'https://feeds.intoday.in/aajtak/api/aajtakhd/master.m3u8';
-        const NDTV = 'https://ndtvindiaelemarchana.akamaized.net/hls/live/2003679/ndtvindia/master.m3u8';
-        const INDIA_TODAY_LIVE = 'https://indiatodaylive.akamaized.net/hls/live/2014320/indiatoday/indiatodaylive/playlist.m3u8';
-        const NDTV24X7 = 'https://ndtv24x7elemarchana.akamaized.net/hls/live/2003678/ndtv24x7/master.m3u8';
-        const INDIATV = 'https://pl-indiatvnews.akamaized.net/out/v1/db79179b608641ceaa5a4d0dd0dca8da/index.m3u8';
-        const REPUBLIC = 'https://d1rc86nwwc9fag.cloudfront.net/out/v1/vglive-sk-561573/534f6684a9824ef894260909ab46b4f1/main_2.m3u8'
-        const MUSIC = 'https://epiconvh.akamaized.net/live/9XM/master.m3u8'
-        const KAL = 'https://e77bef9b.wurl.com/master/f36d25e7e52f1ba8d7e56eb859c636563214f541/TEctY2FfU29ueUtBTF9ITFM/playlist.m3u8'
-        let APP_VERSION = '1.0.31';
-        const VERCEL_URL = 'https://samsung-lcd-tv.vercel.app';
-        const audioStartup = new Audio(GH + 'startup.mp3');
-        audioStartup.crossOrigin = 'anonymous';
-        const audioShutdown = new Audio(GH + 'shutdown.mp3');
-        audioShutdown.crossOrigin = 'anonymous';
+
+        // Same-origin proxy for Safari: GitHub release assets serve application/octet-stream
+        // with no CORS headers, which Safari blocks. Proxy returns proper Content-Type + CORS.
+        function mediaProxy(url) {
+            if (typeof url === 'string' && url.indexOf('//github.com/') > -1 && url.indexOf('/releases/download/') > -1) {
+                return '/api/proxy-media?url=' + encodeURIComponent(url);
+            }
+            return url;
+        }
+
+        const audioStartup = new Audio(mediaProxy(GH + 'startup.mp3'));
+        const audioShutdown = new Audio(mediaProxy(GH + 'shutdown.mp3'));
         const soundTestAudio = new Audio();
         soundTestAudio.crossOrigin = 'anonymous';
         soundTestAudio.loop = true;
@@ -1428,16 +1415,18 @@
                 try {
                     this.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
                     
-                    // Safari/iOS: AudioContext starts suspended — resume on next user gesture
+                    // Safari/iOS: AudioContext starts suspended — resume on every user gesture
                     if (this.audioCtx.state === 'suspended') {
                         var resumeHandler = function() {
                             if (tvSynth && tvSynth.audioCtx && tvSynth.audioCtx.state === 'suspended') {
                                 tvSynth.audioCtx.resume();
                             }
                         };
-                        document.addEventListener('click', resumeHandler, { once: true });
-                        document.addEventListener('keydown', resumeHandler, { once: true });
-                        document.addEventListener('touchstart', resumeHandler, { once: true });
+                        // Persistent handler (not once) so AudioContext resumes even if first interaction misses
+                        document.addEventListener('click', resumeHandler);
+                        document.addEventListener('keydown', resumeHandler);
+                        document.addEventListener('touchstart', resumeHandler);
+                        document.addEventListener('pointerdown', resumeHandler);
                     }
                     
                     // Master compressor
@@ -1640,7 +1629,7 @@
                     }
                 });
             } else {
-                video.src = src;
+                video.src = mediaProxy(src);
                 if (seekTime > 0) video.currentTime = seekTime;
                 video.load();
                 video.play().catch(() => {});
@@ -3455,7 +3444,7 @@
             document.getElementById('mediaPlayerTitle').innerText = filePath.split('/').pop();
             const audio = document.getElementById('mediaPlayerAudio');
             if (url) {
-                audio.src = url;
+                audio.src = mediaProxy(url);
                 audio.load();
                 audio.play().then(function() {
                     showToast('Now playing: ' + filePath.split('/').pop(), '<i class="fa-solid fa-music"></i>', 'success');
@@ -3524,7 +3513,7 @@
             var url = content && content.startsWith('http') ? content : null;
             var video = document.getElementById('usbVideo');
             if (url) {
-                video.src = url;
+                video.src = mediaProxy(url);
                 video.load();
                 video.play().then(function() {
                     showToast('Playing: ' + filePath.split('/').pop(), '<i class="fa-solid fa-film"></i>', 'success');
