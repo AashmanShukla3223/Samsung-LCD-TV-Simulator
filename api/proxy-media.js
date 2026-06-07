@@ -42,15 +42,17 @@ export default async function handler(req, res) {
       return res.status(upstream.status).json({ error: 'Upstream ' + upstream.status });
     }
 
-    const buffer = Buffer.from(await upstream.arrayBuffer());
     const contentType = MIME_MAP[ext] || upstream.headers.get('content-type') || 'application/octet-stream';
 
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Content-Type', contentType);
-    res.setHeader('Content-Length', buffer.length);
     res.setHeader('Cache-Control', 'public, max-age=86400, immutable');
     res.setHeader('X-Proxy-Type', ext);
-    res.status(200).end(buffer);
+    res.status(200);
+    // Stream — don't buffer. Browser can start playback immediately.
+    await new Promise((resolve, reject) => {
+      upstream.body.pipe(res).on('finish', resolve).on('error', reject);
+    });
   } catch (err) {
     res.status(502).json({ error: err.message });
   }
