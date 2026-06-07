@@ -1362,6 +1362,27 @@
     <script>
         // High Quality Audio Tracks embedded from direct local uploads
         const GH = 'https://github.com/AashmanShukla3223/Antigravity-and-OpenCode-CLI-Prompts-and-Skills/releases/download/v1.0/';
+        const GH2 = 'https://github.com/AashmanShukla3223/Antigravity-and-OpenCode-CLI-Prompts-and-Skills/releases/download/v1.0.1/';
+        const GH3 = 'https://github.com/AashmanShukla3223/Antigravity-and-OpenCode-CLI-Prompts-and-Skills/releases/download/v1.0.2/';
+        const GH4 = 'https://github.com/AashmanShukla3223/Antigravity-and-OpenCode-CLI-Prompts-and-Skills/releases/download/v1.0.3/';
+        const GH5 = 'https://github.com/AashmanShukla3223/Antigravity-and-OpenCode-CLI-Prompts-and-Skills/releases/download/v1.0.4/';
+        const GH6 = 'https://github.com/AashmanShukla3223/Antigravity-and-OpenCode-CLI-Prompts-and-Skills/releases/download/v1.0.5/';
+        const GH7 = 'https://github.com/AashmanShukla3223/Antigravity-and-OpenCode-CLI-Prompts-and-Skills/releases/download/v1.0.6/';
+        const GH8 = 'https://github.com/AashmanShukla3223/Antigravity-and-OpenCode-CLI-Prompts-and-Skills/releases/download/v1.0.7/';
+        const GH9 = 'https://github.com/AashmanShukla3223/Antigravity-and-OpenCode-CLI-Prompts-and-Skills/releases/download/v1.0.8/';
+        const GH10 = 'https://github.com/AashmanShukla3223/Antigravity-and-OpenCode-CLI-Prompts-and-Skills/releases/download/v1.1.11/';
+        const GH11 = 'https://github.com/AashmanShukla3223/Antigravity-and-OpenCode-CLI-Prompts-and-Skills/releases/download/v1.1.12/';
+        const GH12 = 'https://github.com/AashmanShukla3223/Antigravity-and-OpenCode-CLI-Prompts-and-Skills/releases/download/v1.1.13/';
+        const LIVE = 'https://feeds.intoday.in/aajtak/api/aajtakhd/master.m3u8';
+        const NDTV = 'https://ndtvindiaelemarchana.akamaized.net/hls/live/2003679/ndtvindia/master.m3u8';
+        const INDIA_TODAY_LIVE = 'https://indiatodaylive.akamaized.net/hls/live/2014320/indiatoday/indiatodaylive/playlist.m3u8';
+        const NDTV24X7 = 'https://ndtv24x7elemarchana.akamaized.net/hls/live/2003678/ndtv24x7/master.m3u8';
+        const INDIATV = 'https://pl-indiatvnews.akamaized.net/out/v1/db79179b608641ceaa5a4d0dd0dca8da/index.m3u8';
+        const REPUBLIC = 'https://d1rc86nwwc9fag.cloudfront.net/out/v1/vglive-sk-561573/534f6684a9824ef894260909ab46b4f1/main_2.m3u8'
+        const MUSIC = 'https://epiconvh.akamaized.net/live/9XM/master.m3u8'
+        const KAL = 'https://e77bef9b.wurl.com/master/f36d25e7e52f1ba8d7e56eb859c636563214f541/TEctY2FfU29ueUtBTF9ITFM/playlist.m3u8'
+        let APP_VERSION = '1.0.31';
+        const VERCEL_URL = 'https://samsung-lcd-tv.vercel.app';
 
         // Same-origin proxy for Safari: GitHub release assets serve application/octet-stream
         // with no CORS headers, which Safari blocks. Proxy returns proper Content-Type + CORS.
@@ -1374,8 +1395,15 @@
 
         const audioStartup = new Audio(mediaProxy(GH + 'startup.mp3'));
         const audioShutdown = new Audio(mediaProxy(GH + 'shutdown.mp3'));
+        const soundTestTracks = [
+            { name: "2010 Soundtest", src: GH + "soundtest.mp3" },
+            { name: "AajTak", src: GH6 + "aajtak.sound.test.mp3" },
+            { name: "Batidao", src: GH6 + "Batidao.da.Madrugada.Speed.mp3" },
+            { name: "Halla Bol", src: GH7 + "halla.bol.mp3" },
+            { name: "Luz Roja", src: GH9 + "LUZ.ROJA.-.Sped.Up.-.bxkq.mp3" },
+        ];
+        let currentSoundTestTrack = 0;
         const soundTestAudio = new Audio();
-        soundTestAudio.crossOrigin = 'anonymous';
         soundTestAudio.loop = true;
 
         // Phase 6 — Bonus feature globals
@@ -2518,7 +2546,7 @@
             const barRight = document.getElementById('soundBarRight');
 
             // Play the selected sound test track
-            soundTestAudio.src = soundTestTracks[currentSoundTestTrack].src;
+            soundTestAudio.src = mediaProxy(soundTestTracks[currentSoundTestTrack].src);
             soundTestAudio.currentTime = 0;
             updateAudioVolumes();
             soundTestAudio.play().catch(() => {});
@@ -2594,7 +2622,7 @@
         function selectSoundTestTrack(index) {
             if (index === currentSoundTestTrack) return;
             currentSoundTestTrack = index;
-            soundTestAudio.src = soundTestTracks[currentSoundTestTrack].src;
+            soundTestAudio.src = mediaProxy(soundTestTracks[currentSoundTestTrack].src);
             soundTestAudio.currentTime = 0;
             updateAudioVolumes();
             soundTestAudio.play().catch(() => {});
