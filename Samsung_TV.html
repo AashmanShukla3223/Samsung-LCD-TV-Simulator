@@ -294,12 +294,7 @@
         #infoBannerLcn { text-shadow: 0 0 20px rgba(245,158,11,0.4); }
         #dishInfoBanner { animation: infoBannerSlideUp 0.3s ease-out; }
         @keyframes infoBannerSlideUp { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        .touch-key { -webkit-tap-highlight-color: transparent; touch-action: manipulation; user-select: none; }
-        .touch-key:active { background: rgba(14,165,233,0.5) !important; transform: scale(0.92); }
         .smooth-scroll { -webkit-overflow-scrolling: touch; }
-        @media (hover: none) and (pointer: coarse) {
-            #touchRemote { display: flex !important; }
-        }
     </style>
 </head>
 <body class="h-full flex flex-col justify-between overflow-x-hidden text-slate-200">
@@ -5977,50 +5972,7 @@
         };
 
     </script>
-    <!-- Touch Remote for iPad/iPhone — shown only on touch-capable devices -->
-    <div id="touchRemote" class="fixed bottom-0 left-0 right-0 z-50 bg-zinc-900/95 border-t border-sky-400/30 px-2 py-1.5 gap-1 select-none" style="display:none;">
-        <div class="flex items-center justify-center gap-1 max-w-lg mx-auto">
-            <button data-tkey="p" class="touch-key bg-zinc-800 text-white rounded w-9 h-8 text-[10px] font-bold">⏻</button>
-            <button data-tkey="m" class="touch-key bg-zinc-800 text-white rounded w-9 h-8 text-[9px] font-bold">MENU</button>
-            <button data-tkey="s" class="touch-key bg-zinc-800 text-white rounded w-9 h-8 text-[9px] font-bold">SRC</button>
-            <div class="w-px h-6 bg-zinc-700 mx-1"></div>
-            <button data-tkey="ArrowUp" class="touch-key bg-zinc-800 text-white rounded w-8 h-8 text-xs">▲</button>
-            <div class="flex flex-col gap-0.5">
-                <button data-tkey="ArrowLeft" class="touch-key bg-zinc-800 text-white rounded w-8 h-8 text-xs">◀</button>
-                <button data-tkey="ArrowRight" class="touch-key bg-zinc-800 text-white rounded w-8 h-8 text-xs">▶</button>
-            </div>
-            <button data-tkey="ArrowDown" class="touch-key bg-zinc-800 text-white rounded w-8 h-8 text-xs">▼</button>
-            <button data-tkey="Enter" class="touch-key bg-sky-700 text-white rounded w-9 h-8 text-[9px] font-bold">OK</button>
-            <button data-tkey="Backspace" class="touch-key bg-zinc-800 text-white rounded w-8 h-8 text-[9px]">←</button>
-            <div class="w-px h-6 bg-zinc-700 mx-1"></div>
-            <button data-tkey="g" class="touch-key bg-zinc-800 text-white rounded w-8 h-8 text-[8px] font-bold">EPG</button>
-            <button data-tkey="i" class="touch-key bg-zinc-800 text-white rounded w-8 h-8 text-[10px] font-bold">i</button>
-        </div>
-    </div>
 
-    <script>
-    // Show touch remote only on touch devices
-    var touchRemote = document.getElementById('touchRemote');
-    var touchDispatch = function(key) {
-        // Dispatch on body so event bubbles through document → window
-        document.body.dispatchEvent(new KeyboardEvent('keydown', { key: key, bubbles: true, cancelable: true }));
-    };
-    if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
-        touchRemote.style.display = 'block';
-        touchRemote.addEventListener('touchstart', function(e) {
-            var btn = e.target.closest('[data-tkey]');
-            if (!btn) return;
-            e.preventDefault();
-            touchDispatch(btn.dataset.tkey);
-        }, { passive: false });
-    } else {
-        touchRemote.addEventListener('click', function(e) {
-            var btn = e.target.closest('[data-tkey]');
-            if (!btn) return;
-            touchDispatch(btn.dataset.tkey);
-        });
-    }
-    </script>
 
     <script src="ai-picker.js" defer></script></body>
 </html>
