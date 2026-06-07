@@ -49,10 +49,13 @@ export default async function handler(req, res) {
     res.setHeader('Cache-Control', 'public, max-age=86400, immutable');
     res.setHeader('X-Proxy-Type', ext);
     res.status(200);
-    // Stream — don't buffer. Browser can start playback immediately.
-    await new Promise((resolve, reject) => {
-      upstream.body.pipe(res).on('finish', resolve).on('error', reject);
-    });
+    // Stream via Web ReadableStream reader — don't buffer.
+    const reader = upstream.body.getReader();
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) { res.end(); break; }
+      res.write(value);
+    }
   } catch (err) {
     res.status(502).json({ error: err.message });
   }
