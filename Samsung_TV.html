@@ -497,7 +497,7 @@
                                 <div class="text-xs text-zinc-400 mb-1">Now Playing</div>
                                 <div id="mediaPlayerTitle" class="text-sm text-white font-bold"></div>
                             </div>
-                            <audio id="mediaPlayerAudio" controls crossorigin="anonymous" class="w-full mb-2"></audio>
+                            <audio id="mediaPlayerAudio" controls class="w-full mb-2"></audio>
                             <div id="mediaPlayerTime" class="text-[10px] text-zinc-500 font-mono text-center mb-3"></div>
                             <button id="mediaPlayerClose" class="w-full bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-bold py-2 rounded text-[10px] uppercase tracking-wider">Close</button>
                         </div>
@@ -516,7 +516,7 @@
 
                     <!-- USB VIDEO PLAYER -->
                     <div id="usbVideoPlayer" class="absolute inset-0 bg-black z-60 hidden flex-col items-center justify-center">
-                        <video id="usbVideo" class="w-full h-full" controls playsinline crossorigin="anonymous" style="object-fit:contain;"></video>
+                        <video id="usbVideo" class="w-full h-full" controls playsinline style="object-fit:contain;"></video>
                         <div class="absolute bottom-6 left-0 right-0 flex justify-center">
                             <button id="usbVideoClose" class="bg-red-700 hover:bg-red-600 text-white font-bold px-6 py-2 rounded text-[10px] uppercase tracking-wider transition-all">Close (Esc)</button>
                         </div>
@@ -657,7 +657,7 @@
                         <div id="dishNoSignal" class="absolute inset-0 flex items-center justify-center text-sky-400/60 text-sm font-mono hidden">
                             No Signal
                         </div>
-                        <video id="dishVideo" class="w-full h-full object-cover" loop playsinline muted crossorigin="anonymous" preload="auto"></video>
+                        <video id="dishVideo" class="w-full h-full object-cover" loop playsinline muted preload="auto"></video>
                            <div id="dishContent" class="absolute bottom-4 right-4 text-white p-2 bg-black/50 rounded z-20 watermark">
                                  <div class="text-sm font-bold">DishTV</div>
                               </div>
@@ -1379,10 +1379,11 @@
         let APP_VERSION = '1.0.31';
         const VERCEL_URL = 'https://samsung-lcd-tv.vercel.app';
 
-        // Same-origin proxy for Safari: GitHub release assets serve application/octet-stream
-        // with no CORS headers, which Safari blocks. Proxy returns proper Content-Type + CORS.
+        // Safari needs same-origin proxy (GitHub release assets lack CORS headers);
+        // other browsers load directly from GitHub — no Vercel 10s timeout limit.
+        var isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent) || /iPad|iPhone|iPod/.test(navigator.userAgent);
         function mediaProxy(url) {
-            if (typeof url === 'string' && url.indexOf('//github.com/') > -1 && url.indexOf('/releases/download/') > -1) {
+            if (isSafari && typeof url === 'string' && url.indexOf('//github.com/') > -1 && url.indexOf('/releases/download/') > -1) {
                 return '/api/proxy-media?url=' + encodeURIComponent(url);
             }
             return url;
