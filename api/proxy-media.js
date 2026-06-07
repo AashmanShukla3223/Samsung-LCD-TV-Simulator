@@ -1,15 +1,3 @@
-/**
- * /api/proxy-media.js — Same-origin media proxy for Safari CORS/Content-Type fix
- * Samsung C5000 LCD TV Simulator
- * ────────────────────────────────────────────────────────────────────────────
- *  GitHub release assets (release-assets.githubusercontent.com) return
- *  Content-Type: application/octet-stream with no CORS headers. Safari
- *  refuses to play media with unknown content-type from cross-origin requests.
- *
- *  This proxy fetches the media from GitHub and returns it with proper
- *  Content-Type and Access-Control-Allow-Origin headers from the same origin.
- * ────────────────────────────────────────────────────────────────────────── */
-
 export default async function handler(req, res) {
   if (req.method === 'OPTIONS') {
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -17,7 +5,6 @@ export default async function handler(req, res) {
     res.setHeader('Access-Control-Max-Age', '86400');
     return res.status(204).end();
   }
-
   if (req.method !== 'GET') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
@@ -37,20 +24,31 @@ export default async function handler(req, res) {
   };
 
   try {
-    const upstream = await fetch(url);
-    if (!upstream.ok) {
-      return res.status(upstream.status).json({ error: 'Upstream ' + upstream.status });
+    const range = req.headers['range'] || '';
+    const upstreamRes = await fetch(url, {
+      headers: range ? { Range: range } : {},
+    });
+    if (!upstreamRes.ok && upstreamRes.status !== 206) {
+      return res.status(upstreamRes.status).json({ error: 'Upstream ' + upstreamRes.status });
     }
 
-    const contentType = MIME_MAP[ext] || upstream.headers.get('content-type') || 'application/octet-stream';
+    const contentType = MIME_MAP[ext] || upstreamRes.headers.get('content-type') || 'application/octet-stream';
+    const contentLength = upstreamRes.headers.get('content-length');
+    const contentRange = upstreamRes.headers.get('content-range');
 
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Content-Type', contentType);
-    res.setHeader('Cache-Control', 'public, max-age=86400, immutable');
-    res.setHeader('X-Proxy-Type', ext);
-    res.status(200);
-    // Stream via Web ReadableStream reader — don't buffer.
-    const reader = upstream.body.getReader();
+    const responseHeaders = {
+      'Access-Control-Allow-Origin': '*',
+      'Content-Type': contentType,
+      'Cache-Control': 'public, max-age=86400, immutable',
+      'X-Proxy-Type': ext,
+    };
+    if (contentLength) responseHeaders['Content-Length'] = contentLength;
+    if (contentRange) responseHeaders['Content-Range'] = contentRange;
+
+    const statusCode = range ? 206 : 200;
+    res.writeHead(statusCode, responseHeaders);
+
+    const reader = upstreamRes.body.getReader();
     while (true) {
       const { done, value } = await reader.read();
       if (done) { res.end(); break; }
