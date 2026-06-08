@@ -1134,10 +1134,10 @@
 
                     <!-- Colored buttons row (R/G/B/Y) -->
                     <div class="flex justify-center gap-1 w-full px-1 mt-1">
-                        <button class="remote-btn w-5 h-5 rounded-full bg-red-500 border border-red-400 shadow-sm" title="Red"></button>
-                        <button class="remote-btn w-5 h-5 rounded-full bg-green-600 border border-green-500 shadow-sm" title="Green"></button>
-                        <button class="remote-btn w-5 h-5 rounded-full bg-blue-600 border border-blue-500 shadow-sm" title="Blue" onclick="cycleSubtitleMode()"></button>
-                        <button class="remote-btn w-5 h-5 rounded-full bg-yellow-500 border border-yellow-400 shadow-sm" title="Yellow"></button>
+                        <button class="remote-btn w-5 h-5 rounded-full bg-red-500 border border-red-400 shadow-sm" title="Red: Record" onclick="dishRecord()"></button>
+                        <button class="remote-btn w-5 h-5 rounded-full bg-green-600 border border-green-500 shadow-sm" title="Green: Guide" onclick="openEPG()"></button>
+                        <button class="remote-btn w-5 h-5 rounded-full bg-blue-600 border border-blue-500 shadow-sm" title="Blue: Language" onclick="cycleSubtitleMode()"></button>
+                        <button class="remote-btn w-5 h-5 rounded-full bg-yellow-500 border border-yellow-400 shadow-sm" title="Yellow: Mailbox" onclick="dishMailbox()"></button>
                     </div>
 
                     <!-- Number pad (0-9) -->
@@ -1301,38 +1301,47 @@
                     
                     <!-- BOX STATE E: DISHTV REMOTE -->
                     <div id="deckDishRemote" class="hidden w-full h-full flex-col items-center">
-                        <div class="text-[8px] font-bold text-zinc-400 tracking-wider font-mono uppercase text-center pb-1 border-b border-zinc-800 w-full mb-2">DishTV Remote</div>
-                        <div class="bg-zinc-800 w-28 rounded-2xl p-2 flex flex-col items-center gap-1">
-                             <button id="dishPower" onclick="toggleDevicePower('dish')" class="remote-btn w-8 h-8 rounded-full bg-red-700 hover:bg-red-600 border border-red-500/40 text-white text-[9px] font-bold">Power</button>
-                             <!-- Colored buttons row -->
-                             <div class="flex justify-center gap-1 w-full">
-                                 <button class="remote-btn w-4 h-4 rounded-full bg-red-500 border border-red-400" title="Red"></button>
-                                 <button class="remote-btn w-4 h-4 rounded-full bg-green-600 border border-green-500" title="Green"></button>
-                                 <button class="remote-btn w-4 h-4 rounded-full bg-blue-600 border border-blue-500" title="Blue" onclick="cycleSubtitleMode()"></button>
-                                 <button class="remote-btn w-4 h-4 rounded-full bg-yellow-500 border border-yellow-400" title="Yellow"></button>
-                             </div>
-                             <!-- Number pad -->
-                             <div class="grid grid-cols-3 gap-0.5 w-full">
-                                 <button class="dish-num-btn remote-btn py-0.5 bg-zinc-700 hover:bg-zinc-600 rounded text-[9px] font-bold text-zinc-200" data-digit="1">1</button>
-                                 <button class="dish-num-btn remote-btn py-0.5 bg-zinc-700 hover:bg-zinc-600 rounded text-[9px] font-bold text-zinc-200" data-digit="2">2</button>
-                                 <button class="dish-num-btn remote-btn py-0.5 bg-zinc-700 hover:bg-zinc-600 rounded text-[9px] font-bold text-zinc-200" data-digit="3">3</button>
-                                 <button class="dish-num-btn remote-btn py-0.5 bg-zinc-700 hover:bg-zinc-600 rounded text-[9px] font-bold text-zinc-200" data-digit="4">4</button>
-                                 <button class="dish-num-btn remote-btn py-0.5 bg-zinc-700 hover:bg-zinc-600 rounded text-[9px] font-bold text-zinc-200" data-digit="5">5</button>
-                                 <button class="dish-num-btn remote-btn py-0.5 bg-zinc-700 hover:bg-zinc-600 rounded text-[9px] font-bold text-zinc-200" data-digit="6">6</button>
-                                 <button class="dish-num-btn remote-btn py-0.5 bg-zinc-700 hover:bg-zinc-600 rounded text-[9px] font-bold text-zinc-200" data-digit="7">7</button>
-                                 <button class="dish-num-btn remote-btn py-0.5 bg-zinc-700 hover:bg-zinc-600 rounded text-[9px] font-bold text-zinc-200" data-digit="8">8</button>
-                                 <button class="dish-num-btn remote-btn py-0.5 bg-zinc-700 hover:bg-zinc-600 rounded text-[9px] font-bold text-zinc-200" data-digit="9">9</button>
-                                 <button class="dish-num-btn remote-btn col-span-3 py-0.5 bg-zinc-700 hover:bg-zinc-600 rounded text-[9px] font-bold text-zinc-200" data-digit="0">0</button>
-                             </div>
-                             <!-- Channel/Volume controls -->
-                             <div class="grid grid-cols-3 gap-0.5 w-full">
-                                 <button id="dishChUp" onclick="dishChangeChannel('up')" class="remote-btn py-0.5 bg-zinc-700 hover:bg-zinc-600 rounded text-[8px] font-bold text-zinc-300 border border-zinc-600/30">CH+</button>
-                                 <button onclick="toggleDishMute()" class="remote-btn py-0.5 bg-zinc-700 hover:bg-zinc-600 rounded text-[8px] font-bold text-zinc-300 border border-zinc-600/30">MUTE</button>
-                                 <button id="dishChDown" onclick="dishChangeChannel('down')" class="remote-btn py-0.5 bg-zinc-700 hover:bg-zinc-600 rounded text-[8px] font-bold text-zinc-300 border border-zinc-600/30">CH-</button>
-                                 <button onclick="adjustDishVolume(5)" class="remote-btn py-0.5 bg-zinc-700 hover:bg-zinc-600 rounded text-[8px] font-bold text-zinc-300 border border-zinc-600/30">VOL+</button>
-                                 <button onclick="adjustDishVolume(-5)" class="remote-btn py-0.5 bg-zinc-700 hover:bg-zinc-600 rounded text-[8px] font-bold text-zinc-300 border border-zinc-600/30">VOL-</button>
-                                 <button class="remote-btn py-0.5 bg-zinc-700 hover:bg-zinc-600 rounded text-[8px] font-bold text-zinc-300 border border-zinc-600/30" onclick="dishClearInput()">CLR</button>
-                             </div>
+                        <div class="text-[8px] font-bold text-zinc-400 tracking-wider font-mono uppercase text-center pb-1 border-b border-zinc-800 w-full mb-1">DishTV Remote</div>
+                        <div class="bg-zinc-800/90 w-[132px] rounded-2xl py-2 px-2 flex flex-col items-center gap-1.5 shadow-lg border border-zinc-700/30" style="background: linear-gradient(145deg, #27272a, #3f3f46);">
+                            <!-- Power -->
+                            <button id="dishPower" onclick="toggleDevicePower('dish')" class="remote-btn w-7 h-7 rounded-full bg-red-600 hover:bg-red-500 border border-red-400/50 text-white text-[8px] font-bold shadow-md flex items-center justify-center">⏻</button>
+                            <!-- D-Pad + OK -->
+                            <div class="relative w-20 h-20 rounded-full bg-zinc-900 border border-zinc-600/40 shadow-inner flex items-center justify-center">
+                                <button onclick="dishDpad('up')" class="remote-btn absolute top-0.5 w-5 h-4 bg-zinc-700 hover:bg-zinc-600 rounded-t text-zinc-200 flex items-center justify-center text-[7px]">▲</button>
+                                <button onclick="dishDpad('left')" class="remote-btn absolute left-0.5 w-4 h-5 bg-zinc-700 hover:bg-zinc-600 rounded-l text-zinc-200 flex items-center justify-center text-[7px]">◀</button>
+                                <button onclick="dishEnter()" class="remote-btn w-8 h-8 rounded-full bg-zinc-600 hover:bg-zinc-500 border border-zinc-500/40 text-white flex items-center justify-center font-bold text-[7px] shadow">OK</button>
+                                <button onclick="dishDpad('right')" class="remote-btn absolute right-0.5 w-4 h-5 bg-zinc-700 hover:bg-zinc-600 rounded-r text-zinc-200 flex items-center justify-center text-[7px]">▶</button>
+                                <button onclick="dishDpad('down')" class="remote-btn absolute bottom-0.5 w-5 h-4 bg-zinc-700 hover:bg-zinc-600 rounded-b text-zinc-200 flex items-center justify-center text-[7px]">▼</button>
+                            </div>
+                            <!-- Colored buttons row -->
+                            <div class="flex justify-center gap-1.5 w-full">
+                                <button onclick="dishRecord()" class="remote-btn w-4 h-4 rounded-full bg-red-500 border border-red-400 shadow-sm hover:brightness-110" title="Red: Record"></button>
+                                <button onclick="openEPG()" class="remote-btn w-4 h-4 rounded-full bg-green-600 border border-green-500 shadow-sm hover:brightness-110" title="Green: Guide"></button>
+                                <button onclick="cycleSubtitleMode()" class="remote-btn w-4 h-4 rounded-full bg-blue-600 border border-blue-500 shadow-sm hover:brightness-110" title="Blue: Language"></button>
+                                <button onclick="dishMailbox()" class="remote-btn w-4 h-4 rounded-full bg-yellow-500 border border-yellow-400 shadow-sm hover:brightness-110" title="Yellow: Mailbox"></button>
+                            </div>
+                            <!-- Number pad -->
+                            <div class="grid grid-cols-3 gap-0.5 w-full">
+                                <button class="dish-num-btn remote-btn py-0.5 bg-zinc-700 hover:bg-zinc-600 rounded text-[9px] font-bold text-zinc-200" data-digit="1">1</button>
+                                <button class="dish-num-btn remote-btn py-0.5 bg-zinc-700 hover:bg-zinc-600 rounded text-[9px] font-bold text-zinc-200" data-digit="2">2</button>
+                                <button class="dish-num-btn remote-btn py-0.5 bg-zinc-700 hover:bg-zinc-600 rounded text-[9px] font-bold text-zinc-200" data-digit="3">3</button>
+                                <button class="dish-num-btn remote-btn py-0.5 bg-zinc-700 hover:bg-zinc-600 rounded text-[9px] font-bold text-zinc-200" data-digit="4">4</button>
+                                <button class="dish-num-btn remote-btn py-0.5 bg-zinc-700 hover:bg-zinc-600 rounded text-[9px] font-bold text-zinc-200" data-digit="5">5</button>
+                                <button class="dish-num-btn remote-btn py-0.5 bg-zinc-700 hover:bg-zinc-600 rounded text-[9px] font-bold text-zinc-200" data-digit="6">6</button>
+                                <button class="dish-num-btn remote-btn py-0.5 bg-zinc-700 hover:bg-zinc-600 rounded text-[9px] font-bold text-zinc-200" data-digit="7">7</button>
+                                <button class="dish-num-btn remote-btn py-0.5 bg-zinc-700 hover:bg-zinc-600 rounded text-[9px] font-bold text-zinc-200" data-digit="8">8</button>
+                                <button class="dish-num-btn remote-btn py-0.5 bg-zinc-700 hover:bg-zinc-600 rounded text-[9px] font-bold text-zinc-200" data-digit="9">9</button>
+                                <button class="dish-num-btn remote-btn col-span-3 py-0.5 bg-zinc-700 hover:bg-zinc-600 rounded text-[9px] font-bold text-zinc-200" data-digit="0">0</button>
+                            </div>
+                            <!-- Channel/Volume + action buttons -->
+                            <div class="grid grid-cols-3 gap-0.5 w-full">
+                                <button onclick="dishChangeChannel('up')" class="remote-btn py-[3px] bg-zinc-700 hover:bg-zinc-600 rounded text-[7px] font-bold text-zinc-300 border border-zinc-600/30">CH+</button>
+                                <button onclick="toggleDishMute()" class="remote-btn py-[3px] bg-zinc-700 hover:bg-zinc-600 rounded text-[7px] font-bold text-zinc-300 border border-zinc-600/30">MUTE</button>
+                                <button onclick="dishChangeChannel('down')" class="remote-btn py-[3px] bg-zinc-700 hover:bg-zinc-600 rounded text-[7px] font-bold text-zinc-300 border border-zinc-600/30">CH-</button>
+                                <button onclick="adjustDishVolume(5)" class="remote-btn py-[3px] bg-zinc-700 hover:bg-zinc-600 rounded text-[7px] font-bold text-zinc-300 border border-zinc-600/30">VOL+</button>
+                                <button onclick="adjustDishVolume(-5)" class="remote-btn py-[3px] bg-zinc-700 hover:bg-zinc-600 rounded text-[7px] font-bold text-zinc-300 border border-zinc-600/30">VOL-</button>
+                                <button class="remote-btn py-[3px] bg-zinc-700 hover:bg-zinc-600 rounded text-[7px] font-bold text-zinc-300 border border-zinc-600/30" onclick="dishClearInput()">CLR</button>
+                            </div>
                         </div>
                     </div>
 
@@ -1977,6 +1986,70 @@
         function dishClearInput() {
             dishInputBuffer = '';
             showToast("Input cleared", '<i class="fa-solid fa-eraser"></i>', "info");
+        }
+
+        var dishRecording = false;
+        function dishRecord() {
+            if (!dishPower) return;
+            if (!virtualUSB.connected) {
+                showToast('No USB drive — recording denied', '<i class="fa-solid fa-ban"></i>', 'error');
+                return;
+            }
+            dishRecording = !dishRecording;
+            if (dishRecording) {
+                var fn = 'DVR_Recording_' + new Date().toISOString().slice(0, 19).replace(/[:-]/g, '') + '.ts';
+                usbWriteFile(fn, 'DishTV DVR Recording\nChannel: ' + dishChannels[dishChannel].name + '\nStarted: ' + new Date().toLocaleString('en-IN'));
+                showToast('Recording started → ' + virtualUSB.label + '/' + fn, '<i class="fa-solid fa-circle-dot"></i>', 'success');
+            } else {
+                showToast('Recording stopped. Saved to ' + virtualUSB.label, '<i class="fa-solid fa-circle-check"></i>', 'success');
+            }
+        }
+
+        function dishDpad(dir) {
+            if (!dishPower) return;
+            var epg = document.getElementById('epgOverlay');
+            if (epg && !epg.classList.contains('hidden')) {
+                epgNavigate(dir);
+            } else if (document.getElementById('usbBrowser') && !document.getElementById('usbBrowser').classList.contains('hidden')) {
+                var kb = new KeyboardEvent('keydown', { key: 'Arrow' + dir.charAt(0).toUpperCase() + dir.slice(1), bubbles: true });
+                document.dispatchEvent(kb);
+            } else if (menuOpen) {
+                if (dir === 'up') navigateUp();
+                else if (dir === 'down') navigateDown();
+                else if (dir === 'left') navigateLeftAdjustment();
+                else if (dir === 'right') navigateRightOrEnter();
+            }
+        }
+
+        function dishEnter() {
+            if (!dishPower) return;
+            var epg = document.getElementById('epgOverlay');
+            if (epg && !epg.classList.contains('hidden')) {
+                epgWatchChannel();
+            } else if (menuOpen) {
+                navigateRightOrEnter();
+            }
+        }
+
+        var dishMailMessages = [
+            { from: 'DishTV Care', subject: 'Welcome to DishTV!', body: 'Thank you for choosing DishTV India. Enjoy 300+ channels with crystal-clear quality.' },
+            { from: 'AajTak Desk', subject: 'Breaking News Alert', body: 'Watch AajTak Special Report at 8:30 PM for exclusive coverage.' },
+            { from: 'DishTV Billing', subject: 'Your Subscription', body: 'Your current pack is valid until ' + new Date(new Date().setMonth(new Date().getMonth() + 1)).toLocaleDateString('en-IN') + '. Recharge online for uninterrupted service.' },
+        ];
+        var dishMailOpen = false;
+        var dishMailIdx = 0;
+        function dishMailbox() {
+            if (!dishPower) return;
+            dishMailOpen = !dishMailOpen;
+            if (dishMailOpen) {
+                var msg = dishMailMessages[0];
+                showToast(
+                    '📬 ' + msg.subject + ' — ' + msg.body.slice(0, 60) + '… (' + dishMailMessages.length + ' messages)',
+                    '<i class="fa-solid fa-envelope"></i>', 'info'
+                );
+            } else {
+                showToast('Mailbox closed', '<i class="fa-solid fa-envelope-open"></i>', 'info');
+            }
         }
 
         /* Power Sequence Logic */
