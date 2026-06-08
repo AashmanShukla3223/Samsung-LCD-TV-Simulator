@@ -320,7 +320,7 @@
                 <div class="absolute inset-0 pointer-events-none z-30 opacity-40" style="background: linear-gradient(to bottom, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.02) 50%, rgba(0, 0, 0, 0) 50.1%, rgba(0, 0, 0, 0.08) 100%);"></div>
                 
                 <!-- Screen Area Wrapper (Aspect Ratio 16:9) with uniform bezel spacing -->
-                <div class="m-5 md:m-6 relative bg-black overflow-hidden shadow-2xl aspect-video" style="border: 1px solid #1a0a0a; border-radius: 4px;">
+                <div class="m-5 md:m-6 relative bg-black overflow-hidden shadow-2xl aspect-video pixel-shift-target" style="border: 1px solid #1a0a0a; border-radius: 4px;">
 
                     
                     <!-- Scanlines overlay for CRT/LCD display grids -->
@@ -570,6 +570,44 @@
                         <span><span class="text-zinc-400 font-bold">I</span> Info</span>
                         <span><span class="text-zinc-400 font-bold">G</span> Guide</span>
                         <span><span class="text-red-400 font-bold">Back</span> Close</span>
+                      </div>
+                    </div>
+
+                    <!-- TELETEXT OVERLAY -->
+                    <div id="teletextOverlay" class="absolute inset-0 bg-black z-50 hidden flex flex-col" style="display:none;">
+                      <div class="flex-1 overflow-auto p-4 font-mono text-[11px] leading-relaxed">
+                        <div class="text-center text-amber-400 font-bold text-sm tracking-widest mb-3">TELETEXT</div>
+                        <div class="grid grid-cols-6 gap-2 text-center text-[10px] mb-4" id="teletextPages">
+                          <div class="bg-zinc-900 p-2 rounded border border-zinc-700 teletext-page" data-page="100">100</div>
+                          <div class="bg-zinc-900 p-2 rounded border border-zinc-700 teletext-page" data-page="200">200</div>
+                          <div class="bg-zinc-900 p-2 rounded border border-zinc-700 teletext-page" data-page="300">300</div>
+                          <div class="bg-zinc-900 p-2 rounded border border-zinc-700 teletext-page" data-page="400">400</div>
+                          <div class="bg-zinc-900 p-2 rounded border border-zinc-700 teletext-page" data-page="500">500</div>
+                          <div class="bg-zinc-900 p-2 rounded border border-zinc-700 teletext-page" data-page="600">600</div>
+                        </div>
+                        <div id="teletextContent" class="bg-zinc-950 border border-zinc-800 rounded-lg p-4 min-h-[200px] whitespace-pre-wrap text-green-400/80 text-[10px] leading-relaxed">
+                          <div class="text-zinc-500 text-center py-10">Select a page number or type it on the remote</div>
+                        </div>
+                      </div>
+                      <div class="bg-zinc-900/90 border-t border-zinc-800 px-4 py-2 flex items-center gap-3 text-[9px] text-zinc-500 shrink-0">
+                        <span><span class="text-amber-400 font-bold">0-9</span> Enter page</span>
+                        <span><span class="text-zinc-400 font-bold">▲▼</span> Sub-page</span>
+                        <span><span class="text-red-400 font-bold">Back</span> Close</span>
+                      </div>
+                    </div>
+
+                    <!-- TV INFO BANNER -->
+                    <div id="tvInfoOverlay" class="absolute bottom-0 left-0 right-0 z-50 hidden" style="display:none;">
+                      <div class="bg-gradient-to-t from-black/95 via-black/85 to-transparent p-4 pt-8">
+                        <div class="flex items-center gap-4">
+                          <div id="tvInfoChannel" class="text-3xl font-extrabold text-amber-400 aero-font drop-shadow-lg">CH 01</div>
+                          <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-3 mt-1">
+                              <span id="tvInfoTime" class="text-[10px] font-mono text-zinc-400">--:--</span>
+                              <span id="tvInfoRes" class="text-[10px] font-mono text-emerald-400">1920x1080 @ 60Hz</span>
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     </div>
 
@@ -1951,7 +1989,7 @@
                 name: "Picture",
                 icon: "fa-sliders",
                 options: [
-                    { name: "Picture Mode", type: "select", values: ["Dynamic", "Standard", "Movie"], current: 1 },
+                    { name: "Picture Mode", type: "select", values: ["Dynamic", "Standard", "Natural", "Movie"], current: 1 },
                     { name: "Backlight", type: "range", min: 0, max: 20, current: 0 },
                     { name: "Contrast", type: "range", min: 0, max: 100, current: 95 },
                     { name: "Brightness", type: "range", min: 0, max: 100, current: 100 },
@@ -1966,7 +2004,7 @@
                 name: "Sound",
                 icon: "fa-volume-high",
                 options: [
-                    { name: "Sound Mode", type: "select", values: ["Standard", "Music", "Movie", "Clear Voice"], current: 0 },
+                    { name: "Sound Mode", type: "select", values: ["Standard", "Music", "Movie", "Clear Voice", "Custom"], current: 0 },
                     { name: "Auto Volume", type: "toggle", current: false },
                     { name: "Speaker Select", type: "select", values: ["TV Speaker", "External Speaker", "Optical"], current: 0 },
                     { name: "Dolby Digital", type: "select", values: ["PCM", "Dolby Digital", "DTS Neo"], current: 0 },
@@ -2864,7 +2902,10 @@
                     if (opt.name === "Melody Level") {
                         tvSynth.playFMNote(659.25, 0.8, 0.35); 
                     }
-                if (opt.name === "Sound Mode") {
+                    if (opt.name === "Picture Mode") {
+                        applyPictureMode(opt.current);
+                    }
+                    if (opt.name === "Sound Mode") {
                         applySoundMode(opt.current);
                     }
                     if (opt.name === "Energy Saving") {
@@ -4508,6 +4549,120 @@
           if (epgClockInterval) { clearInterval(epgClockInterval); epgClockInterval = null; }
         }
 
+        // --- TELETEXT ---
+        var teletextInputBuffer = '';
+
+        function openTeletext() {
+          var el = document.getElementById('teletextOverlay');
+          if (!el) return;
+          el.style.display = 'flex';
+          el.classList.remove('hidden');
+          teletextInputBuffer = '';
+          var tag = (document.activeElement && document.activeElement.tagName) || '';
+          if (tag !== 'INPUT' && tag !== 'TEXTAREA') loadTeletextPage(100);
+          if (tvSynth && tvSynth.playFMNote) tvSynth.playFMNote(880, 0.08, 0.15);
+        }
+
+        function closeTeletext() {
+          var el = document.getElementById('teletextOverlay');
+          if (el) { el.style.display = 'none'; el.classList.add('hidden'); }
+          teletextInputBuffer = '';
+        }
+
+        var TELETEXT_PAGES = {
+          100: 'News Headlines\n\n1. Monsoon to hit Kerala early this year\n2. Railway Budget focuses on safety\n3. Sensex closes 350 points up\n4. India wins U-19 Cricket Championship\n\nPage 100 — News',
+          200: 'Sports\n\nCricket: India vs Australia — Day 2\nFootball: Premier League updates\nTennis: Roland Garros quarter-finals\n\nPage 200 — Sports',
+          300: 'Entertainment\n\nBollywood: New releases this Friday\nTV: Prime time ratings this week\nMusic: Top 10 chartbusters\n\nPage 300 — Entertainment',
+          400: 'Business\n\nNIFTY at 22,450 — up 0.8%\nGold prices steady at ₹71,200/10g\nCrude oil trades at $82/barrel\n\nPage 400 — Business',
+          500: 'Weather\n\nDelhi: 38°C, Partly cloudy\nMumbai: 32°C, Humid\nChennai: 35°C, Rain expected\nKolkata: 34°C, Clear skies\nBengaluru: 27°C, Pleasant\n\nPage 500 — Weather',
+          600: 'AajTak Schedule\n\n10:00 AM — Aaj Subah\n05:00 PM — Dangal\n06:00 PM — Halla Bol\n08:30 PM — Special Report\n09:00 PM — Khabardar\n10:00 PM — Das Tak\n\nPage 600 — TV Guide'
+        };
+
+        function loadTeletextPage(num) {
+          var content = document.getElementById('teletextContent');
+          if (!content) return;
+          document.querySelectorAll('.teletext-page').forEach(function(el) {
+            el.classList.remove('bg-amber-900/40', 'border-amber-500');
+            if (parseInt(el.dataset.page) === num) el.classList.add('bg-amber-900/40', 'border-amber-500');
+          });
+          var text = TELETEXT_PAGES[num];
+          if (text) {
+            content.innerHTML = '<div class="text-green-400/90 whitespace-pre-wrap text-[10px] leading-relaxed font-mono">' + text.replace(/\n/g, '<br>') + '</div><div class="text-zinc-600 text-[9px] mt-4 text-center">TELETEXT PAGE ' + num + ' — Press Back to exit</div>';
+          } else {
+            content.innerHTML = '<div class="text-zinc-500 text-center py-10">No content for page ' + num + '<br><span class="text-[9px]">Try 100, 200, 300, 400, 500, or 600</span></div>';
+          }
+        }
+
+        function teletextInputDigit(d) {
+          teletextInputBuffer += d;
+          if (teletextInputBuffer.length >= 3) {
+            var page = parseInt(teletextInputBuffer, 10);
+            if (!isNaN(page)) loadTeletextPage(page);
+            teletextInputBuffer = '';
+          }
+        }
+
+        // Wire teletext page clicks
+        document.addEventListener('click', function(e) {
+          var pageEl = e.target.closest('.teletext-page');
+          if (!pageEl) return;
+          var overlay = document.getElementById('teletextOverlay');
+          if (!overlay || overlay.classList.contains('hidden') || overlay.style.display === 'none') return;
+          loadTeletextPage(parseInt(pageEl.dataset.page, 10));
+        });
+
+        // --- SCREEN BURN PROTECTION / PIXEL SHIFT ---
+        var pixelShiftInterval = null;
+        var pixelShiftX = 0, pixelShiftY = 0;
+        var PIXEL_SHIFT_MAX = 2;
+
+        function startPixelShift() {
+          if (pixelShiftInterval) clearInterval(pixelShiftInterval);
+          pixelShiftInterval = setInterval(function() {
+            if (powerState !== 'active') return;
+            // Random shift within ±2px
+            var newX = Math.floor(Math.random() * (PIXEL_SHIFT_MAX * 2 + 1)) - PIXEL_SHIFT_MAX;
+            var newY = Math.floor(Math.random() * (PIXEL_SHIFT_MAX * 2 + 1)) - PIXEL_SHIFT_MAX;
+            pixelShiftX = newX;
+            pixelShiftY = newY;
+            document.querySelectorAll('.pixel-shift-target').forEach(function(el) {
+              el.style.transform = 'translate(' + pixelShiftX + 'px, ' + pixelShiftY + 'px)';
+              el.style.transition = 'transform 2s ease-in-out';
+            });
+          }, 2 * 60 * 1000);
+        }
+
+        // --- TV INPUT INFO BANNER ---
+        function openTvInfoBanner() {
+          var overlay = document.getElementById('tvInfoOverlay');
+          if (!overlay) return;
+          var now = new Date();
+          var timeStr = now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+          var channel = document.querySelector('#inputTV .text-amber-400\\/70');
+          var chText = channel ? channel.textContent : 'CH 01';
+          var res = '1920x1080 @ 60Hz';
+          document.getElementById('tvInfoChannel').textContent = chText;
+          document.getElementById('tvInfoTime').textContent = timeStr;
+          document.getElementById('tvInfoRes').textContent = res;
+          overlay.classList.remove('hidden');
+          overlay.style.display = 'flex';
+          if (tvSynth && tvSynth.playFMNote) tvSynth.playFMNote(660, 0.08, 0.15);
+          if (infoBannerTimer) clearTimeout(infoBannerTimer);
+          infoBannerTimer = setTimeout(closeTvInfoBanner, 4000);
+          if (bannerClockInterval) clearInterval(bannerClockInterval);
+          bannerClockInterval = setInterval(function() {
+            var el = document.getElementById('tvInfoTime');
+            if (el) el.textContent = new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+          }, 1000);
+        }
+
+        function closeTvInfoBanner() {
+          var overlay = document.getElementById('tvInfoOverlay');
+          if (overlay) { overlay.classList.add('hidden'); overlay.style.display = 'none'; }
+          if (infoBannerTimer) { clearTimeout(infoBannerTimer); infoBannerTimer = null; }
+          if (bannerClockInterval) { clearInterval(bannerClockInterval); bannerClockInterval = null; }
+        }
+
         var epgClockInterval = null;
         var infoBannerTimer = null;
         var bannerClockInterval = null;
@@ -5167,6 +5322,28 @@
             }
         }
 
+        // --- PICTURE MODE PRESETS ---
+        var PICTURE_MODE_PRESETS = {
+            'dynamic':  { backlight: 20, contrast: 100, brightness: 60,  color: 60, sharpness: 70 },
+            'standard': { backlight: 10, contrast: 95,  brightness: 45,  color: 50, sharpness: 50 },
+            'natural':  { backlight: 5,  contrast: 80,  brightness: 40,  color: 40, sharpness: 30 },
+            'movie':    { backlight: 0,  contrast: 95,  brightness: 100, color: 50, sharpness: 20 }
+        };
+        function applyPictureMode(modeIndex) {
+            var pic = menuConfig[0].options;
+            var modeName = pic[0].values[modeIndex].toLowerCase();
+            var preset = PICTURE_MODE_PRESETS[modeName];
+            if (!preset) return;
+            pic[1].current = preset.backlight;
+            pic[2].current = preset.contrast;
+            pic[3].current = preset.brightness;
+            pic[4].current = preset.color;
+            pic[5].current = preset.sharpness;
+            applyPictureSettings();
+            showToast('Picture Mode: ' + pic[0].values[modeIndex], '<i class="fa-solid fa-sliders"></i>', 'info');
+            localStorage.setItem('samsung_picture_mode', modeIndex);
+        }
+
         // --- PICTURE SETTINGS APPLIER ---
         function applyPictureSettings() {
             const pic = menuConfig[0].options;
@@ -5234,6 +5411,14 @@
                     soundModeFilterNode.frequency.setValueAtTime(2000, ctx.currentTime);
                     soundModeFilterNode.gain.setValueAtTime(5, ctx.currentTime);
                     break;
+                case 4: // Custom - bypass, no filter
+                    if (synth.synthGain && synth.mainAnalyser) {
+                        try {
+                            synth.synthGain.disconnect();
+                            synth.synthGain.connect(synth.mainAnalyser);
+                        } catch(e) {}
+                    }
+                    return;
             }
             if (synth.synthGain && synth.mainAnalyser) {
                 try {
@@ -5836,6 +6021,8 @@
           if (apo && apo !== 'Off') applyAutoPowerOff(apo);
           var mt = localStorage.getItem('samsung_menu_transparency');
           if (mt) { var mti = ['Opaque', 'Translucent', 'Transparent'].indexOf(mt); if (mti !== -1) { menuConfig[3].options[2].current = mti; applyMenuTransparency(mt); } }
+          var pm = localStorage.getItem('samsung_picture_mode');
+          if (pm !== null) { var pmIdx = parseInt(pm, 10); if (!isNaN(pmIdx) && pmIdx >= 0 && pmIdx < menuConfig[0].options[0].values.length) { menuConfig[0].options[0].current = pmIdx; applyPictureMode(pmIdx); } }
         }
 
 
@@ -5912,8 +6099,8 @@
             if (!dialog || !title || !msg || !btnContainer) return;
             if (input) input.style.display = 'none';
             title.innerText = 'Sleep Timer';
-            var options = ['Off', '30 min', '60 min', '90 min', '120 min'];
-            var values = [0, 30, 60, 90, 120];
+            var options = ['Off', '30 min', '60 min', '90 min', '120 min', '180 min'];
+            var values = [0, 30, 60, 90, 120, 180];
             var currentVal = sleepTimerMinutes;
             var currentIdx = values.indexOf(currentVal);
             if (currentIdx < 0) currentIdx = 0;
@@ -6594,7 +6781,7 @@
                 }
                 return;
             }
-            // Route digit keys to PIN prompt or DishTV number input
+            // Route digit keys to PIN prompt, Teletext, or DishTV number input
             if (/^[0-9]$/.test(e.key)) {
                 var pinOverlay = document.getElementById('pinPromptOverlay');
                 if (pinOverlay && !pinOverlay.classList.contains('hidden')) {
@@ -6606,6 +6793,12 @@
                     if (pinPromptBuffer.length === 4) {
                         pinPromptSubmit();
                     }
+                    return;
+                }
+                var telOverlay = document.getElementById('teletextOverlay');
+                if (telOverlay && !telOverlay.classList.contains('hidden') && telOverlay.style.display !== 'none') {
+                    e.preventDefault();
+                    teletextInputDigit(e.key);
                     return;
                 }
                 if (activeInputSource === 4) {
@@ -6644,6 +6837,29 @@
                         openChannelManager();
                     }
                     return;
+                }
+            }
+            if (e.key && e.key.toLowerCase() === 't' && !e.ctrlKey && !e.metaKey && !e.altKey) {
+                var tag = (e.target && e.target.tagName) || '';
+                if (tag !== 'INPUT' && tag !== 'TEXTAREA' && !(e.target && e.target.isContentEditable)) {
+                    e.preventDefault();
+                    var tt = document.getElementById('teletextOverlay');
+                    if (tt && !tt.classList.contains('hidden') && tt.style.display !== 'none') {
+                        closeTeletext();
+                    } else {
+                        openTeletext();
+                    }
+                    return;
+                }
+            }
+            if (e.key && e.key.toLowerCase() === 'i' && !e.ctrlKey && !e.metaKey && !e.altKey) {
+                var tag = (e.target && e.target.tagName) || '';
+                if (tag !== 'INPUT' && tag !== 'TEXTAREA' && !(e.target && e.target.isContentEditable)) {
+                    if (activeInputSource === 0) {
+                        e.preventDefault();
+                        openTvInfoBanner();
+                        return;
+                    }
                 }
             }
 
@@ -6735,6 +6951,10 @@
                         closePlugPlay();
                     } else if (document.getElementById('channelManagerOverlay') && !document.getElementById('channelManagerOverlay').classList.contains('hidden')) {
                         closeChannelManager();
+                    } else if (document.getElementById('teletextOverlay') && !document.getElementById('teletextOverlay').classList.contains('hidden') && document.getElementById('teletextOverlay').style.display !== 'none') {
+                        closeTeletext();
+                    } else if (document.getElementById('tvInfoOverlay') && !document.getElementById('tvInfoOverlay').classList.contains('hidden') && document.getElementById('tvInfoOverlay').style.display !== 'none') {
+                        closeTvInfoBanner();
                     } else if (document.getElementById('pinPromptOverlay') && !document.getElementById('pinPromptOverlay').classList.contains('hidden')) {
                         document.getElementById('pinPromptOverlay').style.display = 'none';
                         document.getElementById('pinPromptOverlay').classList.add('hidden');
@@ -7037,6 +7257,8 @@
             updateSubtitleOverlay();
             // Phase 6 — Channel bug init
             updateChannelBug();
+            // Phase 6 — Screen Burn Protection / Pixel Shift
+            startPixelShift();
 
             window.addEventListener('resize', resizeMacFrame);
         };
