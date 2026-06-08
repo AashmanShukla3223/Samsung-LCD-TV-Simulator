@@ -5296,6 +5296,7 @@
         var bdWiseOn = false;
         var autoPowerOffTimer = null;
         var autoPowerOffValue = 'Off';
+        var powerOffTimerToastMuted = false;
 
         function applyGameMode(enabled) {
           gameModeOn = enabled;
@@ -5318,11 +5319,11 @@
           showToast('BD Wise: ' + (enabled ? 'On — optimised picture' : 'Off'), '<i class="fa-solid fa-compact-disc"></i>', 'info');
         }
 
-        function applyAutoPowerOff(value) {
+        function applyAutoPowerOff(value, silent) {
           autoPowerOffValue = value;
           if (autoPowerOffTimer) { clearTimeout(autoPowerOffTimer); autoPowerOffTimer = null; }
           if (value === 'Off') {
-            showToast('Auto Power Off: Disabled', '<i class="fa-solid fa-clock"></i>', 'info');
+            if (!silent) showToast('Auto Power Off: Disabled', '<i class="fa-solid fa-clock"></i>', 'info');
             return;
           }
           var hours = parseInt(value, 10);
@@ -5333,7 +5334,7 @@
               togglePower();
             }
           }, hours * 3600 * 1000);
-          showToast('Auto Power Off: ' + hours + 'h — TV will turn off after inactivity', '<i class="fa-solid fa-clock"></i>', 'info');
+          if (!silent) showToast('Auto Power Off: ' + hours + 'h — TV will turn off after inactivity', '<i class="fa-solid fa-clock"></i>', 'info');
           localStorage.setItem('samsung_auto_power_off', value);
         }
 
@@ -5816,7 +5817,7 @@
         function resetAutoPowerOffTimer() {
           if (autoPowerOffValue === 'Off') return;
           if (autoPowerOffTimer) { clearTimeout(autoPowerOffTimer); autoPowerOffTimer = null; }
-          applyAutoPowerOff(autoPowerOffValue);
+          applyAutoPowerOff(autoPowerOffValue, true);
         }
 
         // Restore settings on boot
