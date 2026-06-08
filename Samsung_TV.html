@@ -1188,7 +1188,32 @@
                       </div>
                     </div>
 
-                    <!-- PIN SETUP OVERLAY -->
+                    <!-- PIN PROMPT OVERLAY (for locked channels) -->
+                    <div id="pinPromptOverlay" class="absolute inset-0 bg-black/75 backdrop-blur-sm z-50 hidden flex items-center justify-center" style="display:none;">
+                      <div class="bg-zinc-900 border border-amber-400/30 rounded-xl p-5 max-w-xs w-full shadow-2xl text-center">
+                        <div class="text-[11px] font-bold text-amber-400 uppercase tracking-widest mb-2">Channel Locked</div>
+                        <div class="text-[10px] text-zinc-300 mb-3">Enter PIN to access this channel</div>
+                        <div class="flex justify-center gap-2 mb-3">
+                          <input id="pinPromptDisplay" type="password" class="w-24 bg-zinc-800 text-white border border-zinc-700 rounded px-2 py-1 text-[16px] font-mono text-center tracking-[0.3em]" readonly placeholder="····" maxlength="4">
+                        </div>
+                        <div class="grid grid-cols-3 gap-1.5 max-w-[160px] mx-auto mb-3">
+                          <button class="pin-key bg-zinc-700 hover:bg-zinc-600 text-white w-10 h-8 rounded text-[11px] font-bold" data-pin="1">1</button>
+                          <button class="pin-key bg-zinc-700 hover:bg-zinc-600 text-white w-10 h-8 rounded text-[11px] font-bold" data-pin="2">2</button>
+                          <button class="pin-key bg-zinc-700 hover:bg-zinc-600 text-white w-10 h-8 rounded text-[11px] font-bold" data-pin="3">3</button>
+                          <button class="pin-key bg-zinc-700 hover:bg-zinc-600 text-white w-10 h-8 rounded text-[11px] font-bold" data-pin="4">4</button>
+                          <button class="pin-key bg-zinc-700 hover:bg-zinc-600 text-white w-10 h-8 rounded text-[11px] font-bold" data-pin="5">5</button>
+                          <button class="pin-key bg-zinc-700 hover:bg-zinc-600 text-white w-10 h-8 rounded text-[11px] font-bold" data-pin="6">6</button>
+                          <button class="pin-key bg-zinc-700 hover:bg-zinc-600 text-white w-10 h-8 rounded text-[11px] font-bold" data-pin="7">7</button>
+                          <button class="pin-key bg-zinc-700 hover:bg-zinc-600 text-white w-10 h-8 rounded text-[11px] font-bold" data-pin="8">8</button>
+                          <button class="pin-key bg-zinc-700 hover:bg-zinc-600 text-white w-10 h-8 rounded text-[11px] font-bold" data-pin="9">9</button>
+                        </div>
+                        <div class="grid grid-cols-2 gap-1.5 max-w-[160px] mx-auto mb-3">
+                          <button onclick="pinPromptClear()" class="bg-zinc-700 hover:bg-zinc-600 text-zinc-300 px-3 py-1.5 rounded text-[9px] uppercase">Clear</button>
+                          <button onclick="pinPromptSubmit()" class="bg-amber-600 hover:bg-amber-500 text-white font-bold px-3 py-1.5 rounded text-[9px] uppercase">OK</button>
+                        </div>
+                        <div id="pinPromptError" class="text-[10px] text-red-400 hidden">Incorrect PIN</div>
+                      </div>
+                    </div>
                     <div id="pinSetupOverlay" class="absolute inset-0 bg-black/75 backdrop-blur-sm z-50 hidden flex items-center justify-center" style="display:none;">
                       <div class="bg-zinc-900 border border-sky-400/30 rounded-xl p-5 max-w-xs w-full shadow-2xl">
                         <div class="text-[11px] font-bold text-amber-400 uppercase tracking-widest mb-3">PIN Security</div>
@@ -2152,10 +2177,19 @@
         function dishChangeChannel(direction) {
             if (!dishPower) return;
             const max = dishChannels.length;
-            if (direction === "up") {
-                dishChannel = (dishChannel + 1) % max;
-            } else {
-                dishChannel = (dishChannel - 1 + max) % max;
+            var start = dishChannel;
+            for (var attempt = 0; attempt < max; attempt++) {
+                if (direction === "up") {
+                    dishChannel = (dishChannel + 1) % max;
+                } else {
+                    dishChannel = (dishChannel - 1 + max) % max;
+                }
+                if (!isChannelLocked(dishChannel)) break;
+            }
+            if (isChannelLocked(dishChannel)) {
+                dishChannel = start;
+                showToast('All channels locked — enter PIN in Channel Manager', '<i class="fa-solid fa-lock"></i>', 'warning');
+                return;
             }
             const video = document.getElementById('dishVideo');
             dishVideoTime = 0;
@@ -2179,6 +2213,12 @@
                     if (match) {
                         const chNum = parseInt(match[1], 10);
                         if (chNum === targetNum) {
+                            if (isChannelLocked(i)) {
+                                showToast('Channel ' + targetNum + ' is locked', '<i class="fa-solid fa-lock"></i>', 'warning');
+                                showPinPrompt(i);
+                                dishInputBuffer = '';
+                                return;
+                            }
                             dishChannel = i;
                             const video = document.getElementById('dishVideo');
                             dishVideoTime = 0;
@@ -2403,6 +2443,11 @@
                 // Transition to active screen
                 powerState = "active";
                 renderActiveScreen();
+
+                // Trigger Plug & Play on first boot (when localStorage is fresh)
+                if (localStorage.getItem('samsung_plug_play_done') !== 'true') {
+                    setTimeout(openPlugAndPlay, 500);
+                }
 
             } else {
                 // Power Off sequence
@@ -5546,6 +5591,67 @@
         }
 
         var tvPin = localStorage.getItem('samsung_tv_pin') || '0000';
+        var pinPromptChannel = -1;
+        var pinPromptBuffer = '';
+
+        function isChannelLocked(idx) {
+          return localStorage.getItem('samsung_lock_channel_' + idx) === 'true';
+        }
+
+        function showPinPrompt(channelIdx) {
+          pinPromptChannel = channelIdx;
+          pinPromptBuffer = '';
+          document.getElementById('pinPromptDisplay').value = '';
+          document.getElementById('pinPromptError').classList.add('hidden');
+          var el = document.getElementById('pinPromptOverlay');
+          if (el) { el.style.display = 'flex'; el.classList.remove('hidden'); }
+        }
+
+        // Wire PIN keypad buttons
+        document.addEventListener('click', function(e) {
+          var btn = e.target.closest('.pin-key');
+          if (!btn) return;
+          var d = btn.getAttribute('data-pin');
+          if (!d) return;
+          var el = document.getElementById('pinPromptOverlay');
+          if (!el || el.style.display === 'none' || el.classList.contains('hidden')) return;
+          if (pinPromptBuffer.length < 4) {
+            pinPromptBuffer += d;
+            document.getElementById('pinPromptDisplay').value = pinPromptBuffer.replace(/./g, '•');
+          }
+          if (pinPromptBuffer.length === 4) {
+            pinPromptSubmit();
+          }
+        });
+
+        function pinPromptClear() {
+          pinPromptBuffer = '';
+          document.getElementById('pinPromptDisplay').value = '';
+          document.getElementById('pinPromptError').classList.add('hidden');
+        }
+
+        function pinPromptSubmit() {
+          if (pinPromptBuffer.length !== 4) return;
+          if (pinPromptBuffer === tvPin) {
+            document.getElementById('pinPromptOverlay').style.display = 'none';
+            document.getElementById('pinPromptOverlay').classList.add('hidden');
+            if (pinPromptChannel >= 0 && pinPromptChannel < dishChannels.length) {
+              dishChannel = pinPromptChannel;
+              var video = document.getElementById('dishVideo');
+              dishVideoTime = 0;
+              loadDishVideo(video, dishChannels[dishChannel].src, 0);
+              updateAudioVolumes();
+              saveSettings();
+              refreshDishInfoBanner();
+              showToast('Channel ' + dishChannels[dishChannel].name.replace(/Channel\s+\d+:\s+/, ''), '<i class="fa-solid fa-lock-open"></i>', 'success');
+            }
+            pinPromptChannel = -1;
+          } else {
+            document.getElementById('pinPromptError').classList.remove('hidden');
+            pinPromptBuffer = '';
+            document.getElementById('pinPromptDisplay').value = '';
+          }
+        }
 
         function openPinSetup() {
           var el = document.getElementById('pinSetupOverlay');
@@ -6481,11 +6587,25 @@
                 }
                 return;
             }
-            // Route digit keys to DishTV number input when Dish input is active
-            if (activeInputSource === 4 && /^[0-9]$/.test(e.key)) {
-                e.preventDefault();
-                dishNumInput(parseInt(e.key, 10));
-                return;
+            // Route digit keys to PIN prompt or DishTV number input
+            if (/^[0-9]$/.test(e.key)) {
+                var pinOverlay = document.getElementById('pinPromptOverlay');
+                if (pinOverlay && !pinOverlay.classList.contains('hidden')) {
+                    e.preventDefault();
+                    if (pinPromptBuffer.length < 4) {
+                        pinPromptBuffer += e.key;
+                        document.getElementById('pinPromptDisplay').value = pinPromptBuffer.replace(/./g, '•');
+                    }
+                    if (pinPromptBuffer.length === 4) {
+                        pinPromptSubmit();
+                    }
+                    return;
+                }
+                if (activeInputSource === 4) {
+                    e.preventDefault();
+                    dishNumInput(parseInt(e.key, 10));
+                    return;
+                }
             }
 
             if (e.key === 'F1') {
@@ -6564,7 +6684,9 @@
                     break;
                 case 'Enter':
                     e.preventDefault();
-                    if (epgOverlay && !epgOverlay.classList.contains('hidden')) {
+                    if (document.getElementById('pinPromptOverlay') && !document.getElementById('pinPromptOverlay').classList.contains('hidden')) {
+                        pinPromptSubmit();
+                    } else if (epgOverlay && !epgOverlay.classList.contains('hidden')) {
                         epgWatchChannel();
                     } else if (document.getElementById('ccSettingsOverlay') && !document.getElementById('ccSettingsOverlay').classList.contains('hidden')) {
                         navigateCCSettings('enter');
@@ -6581,7 +6703,10 @@
                 case 'Escape':
                     if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable) return;
                     e.preventDefault();
-                    if (document.getElementById('ccSettingsOverlay') && !document.getElementById('ccSettingsOverlay').classList.contains('hidden')) {
+                    if (document.getElementById('pinPromptOverlay') && !document.getElementById('pinPromptOverlay').classList.contains('hidden')) {
+                        document.getElementById('pinPromptOverlay').style.display = 'none';
+                        document.getElementById('pinPromptOverlay').classList.add('hidden');
+                    } else if (document.getElementById('ccSettingsOverlay') && !document.getElementById('ccSettingsOverlay').classList.contains('hidden')) {
                         closeCCSettings();
                     } else if (usbMediaPlayerOpen) usbCloseMediaPlayer();
                     else if (usbPhotoViewerOpen) usbClosePhotoViewer();
