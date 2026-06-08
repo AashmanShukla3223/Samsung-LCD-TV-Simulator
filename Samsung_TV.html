@@ -1985,6 +1985,7 @@
             loadDishVideo(video, dishChannels[dishChannel].src, 0);
             updateAudioVolumes();
             saveSettings();
+            refreshDishInfoBanner();
         }
 
         function dishNumInput(digit) {
@@ -2007,6 +2008,7 @@
                             loadDishVideo(video, dishChannels[dishChannel].src, 0);
                             updateAudioVolumes();
                             saveSettings();
+                            refreshDishInfoBanner();
                             dishInputBuffer = '';
                             showToast("Channel " + targetNum, '<i class="fa-solid fa-satellite-dish"></i>', "success");
                             return;
@@ -4252,6 +4254,29 @@
         function updateEpgClock() {
           var el = document.getElementById('epgDateNow');
           if (el) el.textContent = formatDate24(new Date());
+        }
+
+        function refreshDishInfoBanner() {
+            var banner = document.getElementById('dishInfoBanner');
+            if (!banner || banner.style.display === 'none' || banner.classList.contains('hidden')) return;
+            var ch = dishChannels[dishChannel];
+            if (!ch) return;
+            var name = ch.name || '';
+            var lcnMatch = name.match(/Channel\s+(\d+)/);
+            var lcn = lcnMatch ? lcnMatch[1] : '—';
+            var schKey = lcnMatch ? parseInt(lcnMatch[1]) : null;
+            var sch = schKey ? EPG_SCHEDULE[schKey] : null;
+            var now = new Date();
+            var pad = function(n) { return n < 10 ? '0' + n : '' + n; };
+            var curr = getEpgProgram(sch, now);
+            var next = getEpgNextProgram(sch, now);
+            document.getElementById('infoBannerLcn').textContent = lcn;
+            document.getElementById('infoBannerName').textContent = name.replace(/Channel\s+\d+:\s+/, '');
+            document.getElementById('infoBannerTime').textContent = pad(now.getHours()) + ':' + pad(now.getMinutes()) + ':' + pad(now.getSeconds());
+            document.getElementById('infoBannerNow').textContent = 'Now: ' + (curr ? curr.title : sch && sch.live ? 'Live' : '—');
+            document.getElementById('infoBannerNext').textContent = 'Next: ' + (next ? next.title : '—');
+            if (infoBannerTimer) clearTimeout(infoBannerTimer);
+            infoBannerTimer = setTimeout(hideDishInfoBanner, 8000);
         }
 
         function showDishInfoBanner() {
