@@ -1229,7 +1229,7 @@
                       </div>
                     </div>
 
-                    <!-- PLUG & PLAY OVERLAY -->
+                    <!-- PLUG & PLAY OVERLAY (outside OSD menu so it renders on boot) -->
                     <div id="plugPlayOverlay" class="absolute inset-0 bg-black/75 backdrop-blur-sm z-50 hidden flex items-center justify-center" style="display:none;">
                       <div class="bg-zinc-900 border border-amber-400/30 rounded-xl p-5 max-w-sm w-full shadow-2xl">
                         <div class="text-[11px] font-bold text-amber-400 uppercase tracking-widest mb-1">Plug &amp; Play</div>
@@ -1952,13 +1952,13 @@
                 icon: "fa-sliders",
                 options: [
                     { name: "Picture Mode", type: "select", values: ["Dynamic", "Standard", "Movie"], current: 1 },
-                    { name: "Backlight", type: "range", min: 0, max: 20, current: 15 },
+                    { name: "Backlight", type: "range", min: 0, max: 20, current: 0 },
                     { name: "Contrast", type: "range", min: 0, max: 100, current: 95 },
-                    { name: "Brightness", type: "range", min: 0, max: 100, current: 45 },
+                    { name: "Brightness", type: "range", min: 0, max: 100, current: 100 },
                     { name: "Color", type: "range", min: 0, max: 100, current: 50 },
                     { name: "Sharpness", type: "range", min: 0, max: 100, current: 50 },
                     { name: "Watermark", type: "toggle", current: true },
-                    { name: "Energy Saving", type: "select", values: ["Off", "Low", "Medium", "High", "Auto"], current: 0 },
+                    { name: "Energy Saving", type: "select", values: ["Off", "Low", "Medium", "High", "Auto"], current: 3 },
                     { name: "Game Mode", type: "toggle", current: false }
                 ]
             },
@@ -2525,9 +2525,9 @@
             const so = document.getElementById('screenOff');
             so.style.opacity = "0";
             so.classList.add('pointer-events-none');
+            setupEnergySaving();
             applyPictureSettings();
             applySoundMode(menuConfig[1].options[0].current);
-            setupEnergySaving();
             restorePiP();
             restoreSleepTimer();
 
@@ -5272,14 +5272,15 @@
         }
         function setupEnergySaving() {
             var savedMode = localStorage.getItem('samsung_energy_mode');
-            if (!savedMode) savedMode = 'off';
             var picOpts = menuConfig[0].options;
             var esOpt = picOpts[picOpts.length - 1];
             if (esOpt && esOpt.name === 'Energy Saving') {
-                var idx = esOpt.values.map(function(v) { return v.toLowerCase(); }).indexOf(savedMode);
-                if (idx >= 0) esOpt.current = idx;
+                if (savedMode) {
+                    var idx = esOpt.values.map(function(v) { return v.toLowerCase(); }).indexOf(savedMode);
+                    if (idx >= 0) esOpt.current = idx;
+                }
+                applyEnergySaving(esOpt.values[esOpt.current].toLowerCase());
             }
-            applyEnergySaving(savedMode);
         }
         function resetEnergySaving() {
             // no-op: repurposed for v1.0.26, handled by applyEnergySaving
@@ -6633,7 +6634,10 @@
             switch(e.key) {
                 case 'ArrowUp':
                     e.preventDefault();
-                    if (epgOverlay && !epgOverlay.classList.contains('hidden')) {
+                    if (document.getElementById('plugPlayOverlay') && !document.getElementById('plugPlayOverlay').classList.contains('hidden')) {
+                        var ppSelect = document.getElementById('ppSelect');
+                        if (ppSelect) { ppSelect.selectedIndex = Math.max(0, ppSelect.selectedIndex - 1); }
+                    } else if (epgOverlay && !epgOverlay.classList.contains('hidden')) {
                         epgNavigate('up');
                     } else if (document.getElementById('ccSettingsOverlay') && !document.getElementById('ccSettingsOverlay').classList.contains('hidden')) {
                         navigateCCSettings('up');
@@ -6647,7 +6651,10 @@
                     break;
                 case 'ArrowDown':
                     e.preventDefault();
-                    if (epgOverlay && !epgOverlay.classList.contains('hidden')) {
+                    if (document.getElementById('plugPlayOverlay') && !document.getElementById('plugPlayOverlay').classList.contains('hidden')) {
+                        var ppSelect = document.getElementById('ppSelect');
+                        if (ppSelect) { ppSelect.selectedIndex = Math.min(ppSelect.options.length - 1, ppSelect.selectedIndex + 1); }
+                    } else if (epgOverlay && !epgOverlay.classList.contains('hidden')) {
                         epgNavigate('down');
                     } else if (document.getElementById('ccSettingsOverlay') && !document.getElementById('ccSettingsOverlay').classList.contains('hidden')) {
                         navigateCCSettings('down');
@@ -6685,7 +6692,9 @@
                     break;
                 case 'Enter':
                     e.preventDefault();
-                    if (document.getElementById('pinPromptOverlay') && !document.getElementById('pinPromptOverlay').classList.contains('hidden')) {
+                    if (document.getElementById('plugPlayOverlay') && !document.getElementById('plugPlayOverlay').classList.contains('hidden')) {
+                        nextPlugPlayStep();
+                    } else if (document.getElementById('pinPromptOverlay') && !document.getElementById('pinPromptOverlay').classList.contains('hidden')) {
                         pinPromptSubmit();
                     } else if (epgOverlay && !epgOverlay.classList.contains('hidden')) {
                         epgWatchChannel();
@@ -6704,7 +6713,9 @@
                 case 'Escape':
                     if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable) return;
                     e.preventDefault();
-                    if (document.getElementById('pinPromptOverlay') && !document.getElementById('pinPromptOverlay').classList.contains('hidden')) {
+                    if (document.getElementById('plugPlayOverlay') && !document.getElementById('plugPlayOverlay').classList.contains('hidden')) {
+                        closePlugPlay();
+                    } else if (document.getElementById('pinPromptOverlay') && !document.getElementById('pinPromptOverlay').classList.contains('hidden')) {
                         document.getElementById('pinPromptOverlay').style.display = 'none';
                         document.getElementById('pinPromptOverlay').classList.add('hidden');
                     } else if (document.getElementById('ccSettingsOverlay') && !document.getElementById('ccSettingsOverlay').classList.contains('hidden')) {
