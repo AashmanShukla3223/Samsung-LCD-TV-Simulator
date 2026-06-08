@@ -5259,6 +5259,11 @@
                 multiplier = (hour >= 18 || hour < 6) ? 0.65 : 0.95;
             }
             currentEnergyMultiplier = multiplier;
+            // Hardware overlay dimming — works even without video elements
+            var energyOverlay = document.getElementById('energyOverlay');
+            if (energyOverlay) {
+                energyOverlay.style.opacity = 1 - multiplier;
+            }
             applyPictureCombinedFilters();
             var indicator = document.getElementById('energySavingIndicator');
             if (!indicator) indicator = createEnergyIndicator();
@@ -6628,6 +6633,19 @@
                     return;
                 }
             }
+            if (e.key && e.key.toLowerCase() === 'c' && !e.ctrlKey && !e.metaKey && !e.altKey) {
+                var tag = (e.target && e.target.tagName) || '';
+                if (tag !== 'INPUT' && tag !== 'TEXTAREA' && !(e.target && e.target.isContentEditable)) {
+                    e.preventDefault();
+                    var cm = document.getElementById('channelManagerOverlay');
+                    if (cm && !cm.classList.contains('hidden')) {
+                        closeChannelManager();
+                    } else {
+                        openChannelManager();
+                    }
+                    return;
+                }
+            }
 
             var epgOverlay = document.getElementById('epgOverlay');
 
@@ -6715,6 +6733,8 @@
                     e.preventDefault();
                     if (document.getElementById('plugPlayOverlay') && !document.getElementById('plugPlayOverlay').classList.contains('hidden')) {
                         closePlugPlay();
+                    } else if (document.getElementById('channelManagerOverlay') && !document.getElementById('channelManagerOverlay').classList.contains('hidden')) {
+                        closeChannelManager();
                     } else if (document.getElementById('pinPromptOverlay') && !document.getElementById('pinPromptOverlay').classList.contains('hidden')) {
                         document.getElementById('pinPromptOverlay').style.display = 'none';
                         document.getElementById('pinPromptOverlay').classList.add('hidden');
