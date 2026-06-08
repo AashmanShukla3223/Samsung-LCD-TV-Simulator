@@ -2027,7 +2027,10 @@
 
         var dishRecording = false;
         function dishRecord() {
-            if (!dishPower) return;
+            if (!dishPower) {
+                showToast('DishTV is off — power on to record', '<i class="fa-solid fa-power-off"></i>', 'info');
+                return;
+            }
             if (!virtualUSB.connected) {
                 showToast('No USB drive — recording denied', '<i class="fa-solid fa-ban"></i>', 'error');
                 return;
@@ -2077,7 +2080,10 @@
         ];
         var dishMailOpen = false;
         function dishMailbox() {
-            if (!dishPower) return;
+            if (!dishPower) {
+                showToast('DishTV is off — power on to access mailbox', '<i class="fa-solid fa-power-off"></i>', 'info');
+                return;
+            }
             dishMailOpen = !dishMailOpen;
             var overlay = document.getElementById('mailboxOverlay');
             if (!overlay) return;
@@ -5909,6 +5915,20 @@
                     e.preventDefault();
                     if (activeInputSource === 4) {
                         cycleSubtitleMode();
+                    }
+                    break;
+                case 'r':
+                case 'R':
+                    e.preventDefault();
+                    if (activeInputSource === 4) {
+                        dishRecord();
+                    }
+                    break;
+                case 'y':
+                case 'Y':
+                    e.preventDefault();
+                    if (activeInputSource === 4) {
+                        dishMailbox();
                     }
                     break;
             }
