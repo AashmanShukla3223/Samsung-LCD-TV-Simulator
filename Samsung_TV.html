@@ -585,7 +585,27 @@
                       <div class="flex-1 overflow-auto px-3 py-2" id="mailboxList"></div>
                       <div class="bg-zinc-900/90 border-t border-zinc-800 px-4 py-2 flex items-center gap-3 text-[9px] text-zinc-500 shrink-0">
                         <span><span class="text-sky-400 font-bold">▲▼</span> Scroll</span>
-                        <span><span class="text-zinc-400 font-bold">Yellow</span> Mailbox</span>
+                        <span><span class="text-zinc-400 font-bold">Click</span> Read message</span>
+                        <span><span class="text-red-400 font-bold">Back</span> Close</span>
+                      </div>
+                    </div>
+
+                    <!-- MAIL DETAIL OVERLAY -->
+                    <div id="mailDetailOverlay" class="absolute inset-0 bg-black/93 z-50 hidden flex flex-col overflow-hidden" style="display:none;">
+                      <div class="bg-gradient-to-r from-indigo-900/30 to-zinc-900 border-b border-indigo-500/20 px-4 py-3 flex items-center justify-between shrink-0">
+                        <div class="flex items-center gap-3">
+                          <button onclick="closeMailDetail()" class="text-zinc-400 hover:text-white bg-zinc-800 hover:bg-zinc-700 px-2 py-1 rounded font-bold text-[10px] transition-colors">← Back</button>
+                          <h2 class="text-sm font-extrabold text-indigo-400 uppercase tracking-widest aero-font" id="mailDetailSubject">Subject</h2>
+                        </div>
+                        <span class="text-[10px] text-zinc-400 font-mono" id="mailDetailFrom">—</span>
+                      </div>
+                      <div class="flex-1 overflow-auto px-5 py-4">
+                        <div class="bg-zinc-800/40 rounded-xl p-4 border border-zinc-700/30 min-h-[120px]">
+                          <p class="text-xs text-zinc-200 leading-relaxed whitespace-pre-line" id="mailDetailBody"></p>
+                        </div>
+                      </div>
+                      <div class="bg-zinc-900/90 border-t border-zinc-800 px-4 py-2 flex items-center gap-3 text-[9px] text-zinc-500 shrink-0">
+                        <span><span class="text-indigo-400 font-bold">← Back</span> Return to list</span>
                         <span><span class="text-red-400 font-bold">Back</span> Close</span>
                       </div>
                     </div>
@@ -2083,7 +2103,16 @@
         function showMailDetail(idx) {
             var m = dishMailMessages[idx];
             if (!m) return;
-            showToast(m.subject + ' — ' + m.body, '<i class="fa-solid fa-envelope-open-text"></i>', 'info');
+            document.getElementById('mailDetailSubject').textContent = m.subject;
+            document.getElementById('mailDetailFrom').textContent = m.from;
+            document.getElementById('mailDetailBody').textContent = m.body;
+            document.getElementById('mailDetailOverlay').style.display = 'flex';
+            document.getElementById('mailDetailOverlay').classList.remove('hidden');
+        }
+
+        function closeMailDetail() {
+            document.getElementById('mailDetailOverlay').style.display = 'none';
+            document.getElementById('mailDetailOverlay').classList.add('hidden');
         }
 
         /* Power Sequence Logic */
@@ -5800,6 +5829,7 @@
                     else if (usbPhotoViewerOpen) usbClosePhotoViewer();
                     else if (pictureTestOpen) closePictureTest();
                     else if (aboutTVOpen) closeAboutTV();
+                    else if (document.getElementById('mailDetailOverlay') && !document.getElementById('mailDetailOverlay').classList.contains('hidden')) closeMailDetail();
                     else if (document.getElementById('epgOverlay') && !document.getElementById('epgOverlay').classList.contains('hidden')) closeEPG();
                     else if (document.getElementById('mailboxOverlay') && !document.getElementById('mailboxOverlay').classList.contains('hidden')) { if (dishMailOpen) dishMailbox(); }
                     else if (document.getElementById('screenConflictPicker') && !document.getElementById('screenConflictPicker').classList.contains('hidden')) {
