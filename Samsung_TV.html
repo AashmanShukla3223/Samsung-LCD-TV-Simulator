@@ -4283,23 +4283,30 @@
           if (activeInputSource !== 4) return;
           var banner = document.getElementById('dishInfoBanner');
           if (!banner) return;
-          var ch = dishChannels[dishChannel];
-          if (!ch) return;
-          var name = ch.name || '';
-          var lcnMatch = name.match(/Channel\s+(\d+)/);
-          var lcn = lcnMatch ? lcnMatch[1] : '—';
-          var schKey = lcnMatch ? parseInt(lcnMatch[1]) : null;
-          var sch = schKey ? EPG_SCHEDULE[schKey] : null;
+
+          function readChannel() {
+            var ch = dishChannels[dishChannel];
+            if (!ch) return null;
+            var name = ch.name || '';
+            var lcnMatch = name.match(/Channel\s+(\d+)/);
+            return {
+              lcn: lcnMatch ? lcnMatch[1] : '—',
+              display: name.replace(/Channel\s+\d+:\s+/, ''),
+              sch: lcnMatch ? (EPG_SCHEDULE[parseInt(lcnMatch[1])] || null) : null
+            };
+          }
 
           function updateBannerContent() {
+            var info = readChannel();
+            if (!info) return;
             var now = new Date();
             var pad = function(n) { return n < 10 ? '0' + n : '' + n; };
-            var curr = getEpgProgram(sch, now);
-            var next = getEpgNextProgram(sch, now);
-            document.getElementById('infoBannerLcn').textContent = lcn;
-            document.getElementById('infoBannerName').textContent = name.replace(/Channel\s+\d+:\s+/, '');
+            var curr = getEpgProgram(info.sch, now);
+            var next = getEpgNextProgram(info.sch, now);
+            document.getElementById('infoBannerLcn').textContent = info.lcn;
+            document.getElementById('infoBannerName').textContent = info.display;
             document.getElementById('infoBannerTime').textContent = pad(now.getHours()) + ':' + pad(now.getMinutes()) + ':' + pad(now.getSeconds());
-            document.getElementById('infoBannerNow').textContent = 'Now: ' + (curr ? curr.title : sch && sch.live ? 'Live' : '—');
+            document.getElementById('infoBannerNow').textContent = 'Now: ' + (curr ? curr.title : info.sch && info.sch.live ? 'Live' : '—');
             document.getElementById('infoBannerNext').textContent = 'Next: ' + (next ? next.title : '—');
           }
 
