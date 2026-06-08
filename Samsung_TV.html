@@ -983,6 +983,9 @@
                                 <div id="cat-4" class="px-4 py-2 flex items-center gap-3 samsung-osd-unselected-glow border-l-4 border-transparent text-zinc-400 font-medium transition-all cursor-pointer">
                                     <i class="fa-solid fa-circle-info text-sky-400 w-4"></i> Support
                                 </div>
+                                <div id="cat-5" class="px-4 py-2 flex items-center gap-3 samsung-osd-unselected-glow border-l-4 border-transparent text-zinc-400 font-medium transition-all cursor-pointer">
+                                    <i class="fa-solid fa-broadcast-tower text-sky-400 w-4"></i> Channel
+                                </div>
                             </div>
 
                             <!-- Right Options Panel: Dynamically Rendered based on Category -->
@@ -1073,6 +1076,149 @@
                     
                     <!-- ENERGY SAVING DIMMING OVERLAY -->
                     <div id="energyOverlay" class="absolute inset-0 bg-black pointer-events-none z-15 opacity-0" style="z-index:15"></div>
+
+                    <!-- CLOCK SET OVERLAY -->
+                    <div id="clockSetOverlay" class="absolute inset-0 bg-black/75 backdrop-blur-sm z-50 hidden flex items-center justify-center" style="display:none;">
+                      <div class="bg-zinc-900 border border-sky-400/30 rounded-xl p-5 max-w-xs w-full shadow-2xl">
+                        <div class="text-[11px] font-bold text-sky-400 uppercase tracking-widest mb-3">Clock Set</div>
+                        <div class="flex gap-2 items-center mb-2 text-[11px] text-zinc-300">
+                          <label>HH:</label>
+                          <input id="clockSetHours" class="w-12 bg-zinc-800 text-white border border-zinc-700 rounded px-1 py-0.5 text-center font-mono text-[12px]" maxlength="2">
+                          <label>MM:</label>
+                          <input id="clockSetMinutes" class="w-12 bg-zinc-800 text-white border border-zinc-700 rounded px-1 py-0.5 text-center font-mono text-[12px]" maxlength="2">
+                        </div>
+                        <div class="mb-2 text-[11px] text-zinc-300">
+                          <label>Date:</label>
+                          <input id="clockSetDate" type="date" class="w-full bg-zinc-800 text-white border border-zinc-700 rounded px-1 py-0.5 text-[11px] font-mono mt-1">
+                        </div>
+                        <div class="mb-3 flex items-center gap-2 text-[11px] text-zinc-300">
+                          <input id="clockSetDst" type="checkbox" class="accent-sky-400">
+                          <label>Daylight Saving Time</label>
+                        </div>
+                        <div class="flex gap-2">
+                          <button onclick="saveClockSet()" class="bg-sky-600 hover:bg-sky-500 text-white font-bold px-4 py-1.5 rounded text-[10px] uppercase">Save</button>
+                          <button onclick="cancelClockSet()" class="bg-zinc-700 hover:bg-zinc-600 text-zinc-300 px-4 py-1.5 rounded text-[10px] uppercase">Cancel</button>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- CHANNEL MANAGER OVERLAY -->
+                    <div id="channelManagerOverlay" class="absolute inset-0 bg-black/75 backdrop-blur-sm z-50 hidden flex items-center justify-center" style="display:none;">
+                      <div class="bg-zinc-900 border border-sky-400/30 rounded-xl p-4 max-w-md w-full shadow-2xl max-h-[80vh] flex flex-col">
+                        <div class="text-[11px] font-bold text-sky-400 uppercase tracking-widest mb-2">Channel Manager</div>
+                        <div id="channelManagerList" class="flex-1 overflow-y-auto text-[10px] space-y-0.5"></div>
+                        <button onclick="closeChannelManager()" class="mt-3 bg-zinc-700 hover:bg-zinc-600 text-zinc-300 font-bold px-4 py-1.5 rounded text-[10px] uppercase self-end">Close</button>
+                      </div>
+                    </div>
+
+                    <!-- AUTO TUNING OVERLAY -->
+                    <div id="autoTuningOverlay" class="absolute inset-0 bg-black/75 backdrop-blur-sm z-50 hidden flex items-center justify-center" style="display:none;">
+                      <div class="bg-zinc-900 border border-sky-400/30 rounded-xl p-5 max-w-sm w-full shadow-2xl text-center">
+                        <div class="text-[11px] font-bold text-amber-400 uppercase tracking-widest mb-3">Auto Tuning</div>
+                        <div class="w-full h-3 bg-zinc-800 rounded-full overflow-hidden mb-2">
+                          <div id="autoTuningBar" class="h-full bg-gradient-to-r from-sky-500 to-amber-400 transition-all" style="width:0%"></div>
+                        </div>
+                        <div id="autoTuningStatus" class="text-[10px] text-zinc-400">Initialising...</div>
+                        <button onclick="cancelAutoTuning()" class="mt-3 bg-zinc-700 hover:bg-zinc-600 text-zinc-300 px-4 py-1.5 rounded text-[10px] uppercase">Cancel</button>
+                      </div>
+                    </div>
+
+                    <!-- SIGNAL METER OVERLAY -->
+                    <div id="signalMeterOverlay" class="absolute inset-0 bg-black/75 backdrop-blur-sm z-50 hidden flex items-center justify-center" style="display:none;">
+                      <div class="bg-zinc-900 border border-sky-400/30 rounded-xl p-5 max-w-sm w-full shadow-2xl">
+                        <div class="text-[11px] font-bold text-amber-400 uppercase tracking-widest mb-3">DTV Signal</div>
+                        <div class="flex items-center gap-3 mb-2">
+                          <div class="w-full h-6 bg-zinc-800 rounded-full overflow-hidden">
+                            <div id="signalMeterBar" class="h-full bg-gradient-to-r from-red-500 via-amber-400 to-green-400 transition-all" style="width:0%"></div>
+                          </div>
+                          <span id="signalMeterPct" class="text-[13px] font-mono font-bold text-white min-w-[40px] text-right">0%</span>
+                        </div>
+                        <div class="text-[10px] text-zinc-400">Quality: <span id="signalMeterQuality">—</span></div>
+                        <button onclick="closeSignalMeter()" class="mt-3 bg-zinc-700 hover:bg-zinc-600 text-zinc-300 px-4 py-1.5 rounded text-[10px] uppercase">Close</button>
+                      </div>
+                    </div>
+
+                    <!-- CI INFORMATION OVERLAY -->
+                    <div id="ciInfoOverlay" class="absolute inset-0 bg-black/75 backdrop-blur-sm z-50 hidden flex items-center justify-center" style="display:none;">
+                      <div class="bg-zinc-900 border border-sky-400/30 rounded-xl p-5 max-w-sm w-full shadow-2xl">
+                        <div class="text-[11px] font-bold text-sky-400 uppercase tracking-widest mb-3">CI Information</div>
+                        <table class="w-full text-[10px] font-mono">
+                          <tr class="border-b border-zinc-800"><td class="py-1 text-zinc-400">CI Slot</td><td class="py-1 text-zinc-200 text-right">Slot 1</td></tr>
+                          <tr class="border-b border-zinc-800"><td class="py-1 text-zinc-400">Module</td><td class="py-1 text-zinc-200 text-right">Samsung CI+ 1.0</td></tr>
+                          <tr class="border-b border-zinc-800"><td class="py-1 text-zinc-400">CA System ID</td><td class="py-1 text-zinc-200 text-right">0x4A3F</td></tr>
+                          <tr class="border-b border-zinc-800"><td class="py-1 text-zinc-400">Manufacturer</td><td class="py-1 text-zinc-200 text-right">SMIT</td></tr>
+                          <tr class="border-b border-zinc-800"><td class="py-1 text-zinc-400">Status</td><td class="py-1 text-green-400 text-right">Inserted</td></tr>
+                          <tr class="border-b border-zinc-800"><td class="py-1 text-zinc-400">Firmware</td><td class="py-1 text-zinc-200 text-right">v2.1.4</td></tr>
+                          <tr><td class="py-1 text-zinc-400">Expiry</td><td class="py-1 text-zinc-200 text-right">31 Dec 2027</td></tr>
+                        </table>
+                        <button onclick="closeCIInfo()" class="mt-3 bg-zinc-700 hover:bg-zinc-600 text-zinc-300 px-4 py-1.5 rounded text-[10px] uppercase">Close</button>
+                      </div>
+                    </div>
+
+                    <!-- SIGNAL INFORMATION OVERLAY -->
+                    <div id="signalInfoOverlay" class="absolute inset-0 bg-black/75 backdrop-blur-sm z-50 hidden flex items-center justify-center" style="display:none;">
+                      <div class="bg-zinc-900 border border-sky-400/30 rounded-xl p-5 max-w-sm w-full shadow-2xl">
+                        <div class="text-[11px] font-bold text-sky-400 uppercase tracking-widest mb-3">Signal Information</div>
+                        <table class="w-full text-[10px] font-mono">
+                          <tr class="border-b border-zinc-800"><td class="py-1 text-zinc-400">Channel</td><td id="signalInfoChName" class="py-1 text-zinc-200 text-right">—</td></tr>
+                          <tr class="border-b border-zinc-800"><td class="py-1 text-zinc-400">Frequency</td><td id="signalInfoFreq" class="py-1 text-zinc-200 text-right">—</td></tr>
+                          <tr class="border-b border-zinc-800"><td class="py-1 text-zinc-400">Signal Strength</td><td id="signalInfoSsi" class="py-1 text-zinc-200 text-right">—</td></tr>
+                          <tr class="border-b border-zinc-800"><td class="py-1 text-zinc-400">BER</td><td id="signalInfoBer" class="py-1 text-zinc-200 text-right">—</td></tr>
+                          <tr><td class="py-1 text-zinc-400">Bandwidth</td><td class="py-1 text-zinc-200 text-right">8 MHz</td></tr>
+                        </table>
+                        <button onclick="closeSignalInfo()" class="mt-3 bg-zinc-700 hover:bg-zinc-600 text-zinc-300 px-4 py-1.5 rounded text-[10px] uppercase">Close</button>
+                      </div>
+                    </div>
+
+                    <!-- PRODUCT GUIDE OVERLAY -->
+                    <div id="productGuideOverlay" class="absolute inset-0 bg-black/75 backdrop-blur-sm z-50 hidden flex items-center justify-center" style="display:none;">
+                      <div class="bg-zinc-900 border border-sky-400/30 rounded-xl p-5 max-w-md w-full shadow-2xl max-h-[70vh] overflow-y-auto">
+                        <div class="text-[11px] font-bold text-amber-400 uppercase tracking-widest mb-3">Product Guide</div>
+                        <div class="text-[10px] text-zinc-300 space-y-2 leading-relaxed">
+                          <p><b class="text-sky-400">Connections</b><br>Connect HDMI, USB, or AV devices to the corresponding ports on the back of the TV.</p>
+                          <p><b class="text-sky-400">Channel Setup</b><br>Go to Channel → Auto Tuning to scan for available channels in your area.</p>
+                          <p><b class="text-sky-400">Picture Settings</b><br>Adjust Picture Mode, Backlight, Contrast, Brightness, and Color to your preference.</p>
+                          <p><b class="text-sky-400">Sound Settings</b><br>Select Sound Mode and adjust volume settings. Use External Speaker for better audio.</p>
+                          <p><b class="text-sky-400">Energy Saving</b><br>Reduce power consumption with Energy Saving modes. Auto mode dims the screen at night.</p>
+                          <p><b class="text-sky-400">USB Playback</b><br>Connect a USB drive to play music, photos, and videos. Supports MP3, JPEG, and MP4.</p>
+                          <p><b class="text-sky-400">Software Upgrade</b><br>Keep your TV up to date via USB or OTA broadcast for the latest features.</p>
+                          <p><b class="text-sky-400">Support</b><br>Contact Samsung at 1-800-SAMSUNG for assistance. Visit samsung.com/in/support.</p>
+                        </div>
+                        <button onclick="closeProductGuide()" class="mt-3 bg-zinc-700 hover:bg-zinc-600 text-zinc-300 px-4 py-1.5 rounded text-[10px] uppercase">Close</button>
+                      </div>
+                    </div>
+
+                    <!-- PIN SETUP OVERLAY -->
+                    <div id="pinSetupOverlay" class="absolute inset-0 bg-black/75 backdrop-blur-sm z-50 hidden flex items-center justify-center" style="display:none;">
+                      <div class="bg-zinc-900 border border-sky-400/30 rounded-xl p-5 max-w-xs w-full shadow-2xl">
+                        <div class="text-[11px] font-bold text-amber-400 uppercase tracking-widest mb-3">PIN Security</div>
+                        <div class="mb-2 text-[11px] text-zinc-300">Current PIN:</div>
+                        <input id="pinSetupCurrentPin" type="password" maxlength="4" class="w-full bg-zinc-800 text-white border border-zinc-700 rounded px-2 py-1 text-[12px] font-mono text-center mb-2" placeholder="0000">
+                        <div class="mb-2 text-[11px] text-zinc-300">New PIN:</div>
+                        <input id="pinSetupInput" type="password" maxlength="4" class="w-full bg-zinc-800 text-white border border-zinc-700 rounded px-2 py-1 text-[12px] font-mono text-center mb-1" placeholder="0000">
+                        <div id="pinSetupStatus" class="text-[11px] text-zinc-400 mt-1"></div>
+                        <div class="flex gap-2 mt-3">
+                          <button onclick="confirmPinSetup()" class="bg-amber-600 hover:bg-amber-500 text-white font-bold px-4 py-1.5 rounded text-[10px] uppercase">Save</button>
+                          <button onclick="cancelPinSetup()" class="bg-zinc-700 hover:bg-zinc-600 text-zinc-300 px-4 py-1.5 rounded text-[10px] uppercase">Cancel</button>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- PLUG & PLAY OVERLAY -->
+                    <div id="plugPlayOverlay" class="absolute inset-0 bg-black/75 backdrop-blur-sm z-50 hidden flex items-center justify-center" style="display:none;">
+                      <div class="bg-zinc-900 border border-amber-400/30 rounded-xl p-5 max-w-sm w-full shadow-2xl">
+                        <div class="text-[11px] font-bold text-amber-400 uppercase tracking-widest mb-1">Plug &amp; Play</div>
+                        <div id="plugPlayStep" class="text-[9px] text-zinc-500 font-mono mb-2">1 / 5</div>
+                        <div class="text-[13px] font-bold text-white mb-1" id="plugPlayTitle">Welcome</div>
+                        <div class="text-[10px] text-zinc-300 mb-2" id="plugPlayText">Select your OSD language and press OK to continue.</div>
+                        <div id="plugPlayBody" class="min-h-[40px]"></div>
+                        <div class="flex gap-2 mt-3">
+                          <button onclick="prevPlugPlayStep()" class="bg-zinc-700 hover:bg-zinc-600 text-zinc-300 px-3 py-1.5 rounded text-[10px] uppercase">Back</button>
+                          <button onclick="nextPlugPlayStep()" class="bg-amber-600 hover:bg-amber-500 text-white font-bold px-3 py-1.5 rounded text-[10px] uppercase">Next</button>
+                          <button onclick="closePlugPlay()" class="bg-zinc-700 hover:bg-zinc-600 text-zinc-300 px-3 py-1.5 rounded text-[10px] uppercase ml-auto">Exit</button>
+                        </div>
+                      </div>
+                    </div>
 
                 </div>
 
@@ -1787,7 +1933,8 @@
                     { name: "Color", type: "range", min: 0, max: 100, current: 50 },
                     { name: "Sharpness", type: "range", min: 0, max: 100, current: 50 },
                     { name: "Watermark", type: "toggle", current: true },
-                    { name: "Energy Saving", type: "select", values: ["Off", "Low", "Medium", "High", "Auto"], current: 0 }
+                    { name: "Energy Saving", type: "select", values: ["Off", "Low", "Medium", "High", "Auto"], current: 0 },
+                    { name: "Game Mode", type: "toggle", current: false }
                 ]
             },
             {
@@ -1795,8 +1942,15 @@
                 icon: "fa-volume-high",
                 options: [
                     { name: "Sound Mode", type: "select", values: ["Standard", "Music", "Movie", "Clear Voice"], current: 0 },
-                    { name: "SRS TheaterSound", type: "toggle", current: true },
+                    { name: "Auto Volume", type: "toggle", current: false },
+                    { name: "Speaker Select", type: "select", values: ["TV Speaker", "External Speaker", "Optical"], current: 0 },
+                    { name: "Dolby Digital", type: "select", values: ["PCM", "Dolby Digital", "DTS Neo"], current: 0 },
+                    { name: "HDMI Audio", type: "select", values: ["PCM", "Bitstream"], current: 0 },
                     { name: "Melody Level", type: "select", values: ["Off", "Low", "Medium", "High"], current: 3 },
+                    { name: "SRS TheaterSound", type: "toggle", current: true },
+                    { name: "Power On Melody", type: "toggle", current: true },
+                    { name: "Power Off Melody", type: "toggle", current: false },
+                    { name: "Keypress Sound", type: "toggle", current: true },
                     { name: "Execute Sound Test", type: "action", action: triggerSoundTest }
                 ]
             },
@@ -1805,21 +1959,28 @@
                 icon: "fa-arrow-right-to-bracket",
                 options: [
                     { name: "Input List", type: "select", values: ["HDMI 3", "TV", "AV", "HDMI 1", "HDMI 2", "HDMI 4"], current: 0 },
-                    { name: "Anynet+ (HDMI-CEC)", type: "toggle", current: true }
+                    { name: "Anynet+ (HDMI-CEC)", type: "toggle", current: true },
+                    { name: "BD Wise", type: "toggle", current: false }
                 ]
             },
             {
                 name: "Setup",
                 icon: "fa-gear",
                 options: [
+                    { name: "Plug & Play", type: "action", action: openPlugAndPlay },
                     { name: "Language", type: "select", values: ["English", "Español", "Français"], current: 0 },
+                    { name: "Menu Transparency", type: "select", values: ["Opaque", "Translucent", "Transparent"], current: 0 },
+                    { name: "Clock Set", type: "action", action: openClockSet },
+                    { name: "Sleep Timer", type: "action", action: openSleepTimerSettings },
                     { name: "On/Off Timer", type: "toggle", current: false },
+                    { name: "Auto Power Off", type: "select", values: ["Off", "1 Hour", "2 Hours", "4 Hours", "8 Hours"], current: 0 },
+                    { name: "Caption Position", type: "select", values: ["Default", "Top", "Middle", "Bottom"], current: 0 },
+                    { name: "Closed Captions", type: "action", action: openCCSettings },
                     { name: "AI Tune Channel Shortcuts", type: "toggle", current: true },
                     { name: "Lock Keyboard Shortcuts", type: "toggle", current: false },
-                    { name: "Closed Captions", type: "action", action: openCCSettings },
+                    { name: "PIN Security", type: "action", action: openPinSetup },
                     { name: "Retail Demo Mode", type: "action", action: toggleDemoMode },
-                    { name: "AajTak Exhale Schedule", type: "select", values: ["Every Hour", "Once Daily", "Off"], current: 0 },
-                    { name: "Sleep Timer", type: "action", action: openSleepTimerSettings }
+                    { name: "AajTak Exhale Schedule", type: "select", values: ["Every Hour", "Once Daily", "Off"], current: 0 }
                 ]
             },
             {
@@ -1828,10 +1989,26 @@
                 options: [
                     { name: "Self Diagnosis: Audio Test", type: "action", action: triggerSoundTest },
                     { name: "Self Diagnosis: Picture Test", type: "action", action: triggerPictureTest },
+                    { name: "Signal Information", type: "action", action: openSignalInfo },
                     { name: "Software Upgrade", type: "action", action: openUpdateMethodMenu },
+                    { name: "Software Version", type: "action", action: showSoftwareVersion },
+                    { name: "Warranty Info", type: "action", action: showWarrantyInfo },
+                    { name: "Product Guide", type: "action", action: openProductGuide },
                     { name: "Contact Samsung", type: "action", action: () => showToast("Samsung Support: 1-800-SAMSUNG", '<i class="fa-solid fa-phone"></i>', "info") },
                     { name: "Auto Broadcast Update", type: "toggle", current: false },
                     { name: "About This TV", type: "action", action: openAboutTV }
+                ]
+            },
+            {
+                name: "Channel",
+                icon: "fa-broadcast-tower",
+                options: [
+                    { name: "Channel Manager", type: "action", action: openChannelManager },
+                    { name: "Auto Tuning", type: "action", action: startAutoTuning },
+                    { name: "Country", type: "select", values: ["India", "Pakistan", "Nepal", "Bangladesh", "Sri Lanka"], current: 0 },
+                    { name: "Band", type: "select", values: ["All", "Air", "Cable"], current: 0 },
+                    { name: "DTV Signal", type: "action", action: openSignalMeter },
+                    { name: "CI Information", type: "action", action: openCIInfo }
                 ]
             }
         ];
@@ -2618,6 +2795,24 @@
                         localStorage.setItem('samsung_tv_kb_lock_v1', opt.current ? 'true' : 'false');
                         if (window.AI_PICKER && window.AI_PICKER.setKbLocked) window.AI_PICKER.setKbLocked(opt.current);
                     }
+                    if (opt.name === "Game Mode") {
+                        applyGameMode(opt.current);
+                    }
+                    if (opt.name === "BD Wise") {
+                        applyBDWise(opt.current);
+                    }
+                    if (opt.name === "Power On Melody") {
+                        applyPowerMelody('on', opt.current);
+                    }
+                    if (opt.name === "Power Off Melody") {
+                        applyPowerMelody('off', opt.current);
+                    }
+                    if (opt.name === "Keypress Sound") {
+                        localStorage.setItem('samsung_keypress_sound', opt.current ? 'true' : 'false');
+                    }
+                    if (opt.name === "Menu Transparency") {
+                        applyMenuTransparency(opt.values[opt.current]);
+                    }
                 } else if (opt.type === "select") {
                     opt.current = (opt.current + 1) % opt.values.length;
                     renderCategoryOptions();
@@ -2636,6 +2831,15 @@
                         if (exhaleVal === "Every Hour") setExhaleMode('hourly');
                         else if (exhaleVal === "Once Daily") setExhaleMode('daily');
                         else setExhaleMode('off');
+                    }
+                    if (opt.name === "Auto Power Off") {
+                        applyAutoPowerOff(opt.values[opt.current]);
+                    }
+                    if (opt.name === "Auto Volume") {
+                        applyAutoVolume(opt.current);
+                    }
+                    if (opt.name === "Speaker Select") {
+                        applySpeakerSelect(opt.values[opt.current]);
                     }
                 } else if (opt.type === "range") {
                     opt.current = Math.min(opt.max, opt.current + 1);
@@ -2684,6 +2888,18 @@
                     if (exhaleVal === "Every Hour") setExhaleMode('hourly');
                     else if (exhaleVal === "Once Daily") setExhaleMode('daily');
                     else setExhaleMode('off');
+                }
+                if (opt.name === "Auto Power Off") {
+                    applyAutoPowerOff(opt.values[opt.current]);
+                }
+                if (opt.name === "Auto Volume") {
+                    applyAutoVolume(opt.current);
+                }
+                if (opt.name === "Speaker Select") {
+                    applySpeakerSelect(opt.values[opt.current]);
+                }
+                if (opt.name === "Menu Transparency") {
+                    applyMenuTransparency(opt.values[opt.current]);
                 }
             } else if (opt.type === "range") {
                 opt.current = Math.max(opt.min, opt.current - 1);
@@ -5024,12 +5240,491 @@
             // no-op: repurposed for v1.0.26, handled by applyEnergySaving
         }
         function createEnergyIndicator() {
-            var ind = document.createElement('div');
-            ind.id = 'energySavingIndicator';
-            ind.style.cssText = 'position: fixed; top: 12px; right: 12px; background: rgba(34, 197, 94, 0.85); color: white; padding: 4px 10px; border-radius: 4px; font-size: 10px; font-weight: bold; z-index: 60; display: none;';
-            document.body.appendChild(ind);
-            return ind;
+          var ind = document.createElement('div');
+          ind.id = 'energySavingIndicator';
+          ind.style.cssText = 'position: fixed; top: 12px; right: 12px; background: rgba(34, 197, 94, 0.85); color: white; padding: 4px 10px; border-radius: 4px; font-size: 10px; font-weight: bold; z-index: 60; display: none;';
+          document.body.appendChild(ind);
+          return ind;
         }
+
+        var gameModeOn = false;
+        var bdWiseOn = false;
+        var autoPowerOffTimer = null;
+        var autoPowerOffValue = 'Off';
+
+        function applyGameMode(enabled) {
+          gameModeOn = enabled;
+          var badge = document.getElementById('gameModeBadge') || (function(){
+            var b = document.createElement('div');
+            b.id = 'gameModeBadge';
+            b.style.cssText = 'position: fixed; top: 36px; right: 12px; background: rgba(220, 38, 38, 0.85); color: white; padding: 2px 8px; border-radius: 3px; font-size: 9px; font-weight: bold; z-index: 60; display: none; letter-spacing: 1px;';
+            b.textContent = 'GAME MODE';
+            document.body.appendChild(b);
+            return b;
+          })();
+          badge.style.display = enabled ? 'block' : 'none';
+          localStorage.setItem('samsung_game_mode', enabled ? 'true' : 'false');
+          showToast('Game Mode: ' + (enabled ? 'On — reduces input lag' : 'Off'), '<i class="fa-solid fa-gamepad"></i>', 'info');
+        }
+
+        function applyBDWise(enabled) {
+          bdWiseOn = enabled;
+          localStorage.setItem('samsung_bd_wise', enabled ? 'true' : 'false');
+          showToast('BD Wise: ' + (enabled ? 'On — optimised picture' : 'Off'), '<i class="fa-solid fa-compact-disc"></i>', 'info');
+        }
+
+        function applyAutoPowerOff(value) {
+          autoPowerOffValue = value;
+          if (autoPowerOffTimer) { clearTimeout(autoPowerOffTimer); autoPowerOffTimer = null; }
+          if (value === 'Off') {
+            showToast('Auto Power Off: Disabled', '<i class="fa-solid fa-clock"></i>', 'info');
+            return;
+          }
+          var hours = parseInt(value, 10);
+          if (isNaN(hours)) return;
+          autoPowerOffTimer = setTimeout(function() {
+            if (powerState === 'active') {
+              showToast('Auto Power Off: TV turning off (no activity for ' + hours + 'h)', '<i class="fa-solid fa-power-off"></i>', 'warning');
+              togglePower();
+            }
+          }, hours * 3600 * 1000);
+          showToast('Auto Power Off: ' + hours + 'h — TV will turn off after inactivity', '<i class="fa-solid fa-clock"></i>', 'info');
+          localStorage.setItem('samsung_auto_power_off', value);
+        }
+
+        function applyAutoVolume(enabled) {
+          localStorage.setItem('samsung_auto_volume', enabled ? 'true' : 'false');
+          showToast('Auto Volume: ' + (enabled ? 'On — volume levels equalised' : 'Off'), '<i class="fa-solid fa-volume-equalizer"></i>', 'info');
+        }
+
+        function applySpeakerSelect(value) {
+          if (value === 'External Speaker') {
+            document.querySelectorAll('#dishVideo, #wiiVideo, #appleVideo, #ps3Video, #tvVideo').forEach(function(v) {
+              if (v) v.muted = true;
+            });
+          } else {
+            document.querySelectorAll('#dishVideo, #wiiVideo, #appleVideo, #ps3Video, #tvVideo').forEach(function(v) {
+              if (v) v.muted = false;
+            });
+          }
+          localStorage.setItem('samsung_speaker_select', value);
+          showToast('Speaker: ' + value, '<i class="fa-solid fa-speaker"></i>', 'info');
+        }
+
+        function applyPowerMelody(type, enabled) {
+          var key = type === 'on' ? 'samsung_power_on_melody' : 'samsung_power_off_melody';
+          localStorage.setItem(key, enabled ? 'true' : 'false');
+          showToast('Power ' + (type === 'on' ? 'On' : 'Off') + ' Melody: ' + (enabled ? 'On' : 'Off'), '<i class="fa-solid fa-music"></i>', 'info');
+        }
+
+        function applyMenuTransparency(value) {
+          var osd = document.getElementById('samsungOSD');
+          if (!osd) return;
+          if (value === 'Opaque') osd.style.opacity = '1';
+          else if (value === 'Translucent') osd.style.opacity = '0.85';
+          else osd.style.opacity = '0.7';
+          localStorage.setItem('samsung_menu_transparency', value);
+        }
+
+        function openClockSet() {
+          var now = new Date();
+          var h = now.getHours();
+          var m = now.getMinutes();
+          var el = document.getElementById('clockSetOverlay');
+          if (!el) return;
+          document.getElementById('clockSetHours').value = h < 10 ? '0' + h : '' + h;
+          document.getElementById('clockSetMinutes').value = m < 10 ? '0' + m : '' + m;
+          document.getElementById('clockSetDate').value = now.toISOString().split('T')[0];
+          document.getElementById('clockSetDst'). checked = localStorage.getItem('samsung_dst') === 'true';
+          el.style.display = 'flex';
+          el.classList.remove('hidden');
+          closeMenu();
+        }
+
+        function saveClockSet() {
+          var h = parseInt(document.getElementById('clockSetHours').value, 10) || 0;
+          var m = parseInt(document.getElementById('clockSetMinutes').value, 10) || 0;
+          var dateStr = document.getElementById('clockSetDate').value;
+          var dst = document.getElementById('clockSetDst').checked;
+          localStorage.setItem('samsung_manual_hours', h);
+          localStorage.setItem('samsung_manual_minutes', m);
+          localStorage.setItem('samsung_manual_date', dateStr);
+          localStorage.setItem('samsung_dst', dst ? 'true' : 'false');
+          document.getElementById('clockSetOverlay').style.display = 'none';
+          document.getElementById('clockSetOverlay').classList.add('hidden');
+          showToast('Clock set to ' + (h < 10 ? '0' + h : '' + h) + ':' + (m < 10 ? '0' + m : '' + m), '<i class="fa-solid fa-clock"></i>', 'success');
+        }
+
+        function cancelClockSet() {
+          document.getElementById('clockSetOverlay').style.display = 'none';
+          document.getElementById('clockSetOverlay').classList.add('hidden');
+        }
+
+        function openChannelManager() {
+          var el = document.getElementById('channelManagerOverlay');
+          if (!el) return;
+          var list = document.getElementById('channelManagerList');
+          if (!list) return;
+          var html = '';
+          for (var i = 0; i < dishChannels.length; i++) {
+            var ch = dishChannels[i];
+            var name = ch.name || 'Channel ' + i;
+            var display = name.replace(/Channel\s+\d+:\s+/, '');
+            html += '<div class="flex items-center justify-between py-1 px-2 border-b border-zinc-800 text-[10px]">';
+            html += '<span class="text-zinc-300">' + display + '</span>';
+            html += '<div class="flex gap-2">';
+            html += '<button onclick="renameChannel(' + i + ')" class="text-sky-400 hover:text-sky-300 text-[9px] underline">Rename</button>';
+            html += '<button onclick="skipChannel(' + i + ')" class="text-amber-400 hover:text-amber-300 text-[9px] underline">Skip</button>';
+            html += '<button onclick="lockChannel(' + i + ')" class="text-red-400 hover:text-red-300 text-[9px] underline">Lock</button>';
+            html += '</div></div>';
+          }
+          list.innerHTML = html;
+          el.style.display = 'flex';
+          el.classList.remove('hidden');
+          closeMenu();
+        }
+
+        function closeChannelManager() {
+          document.getElementById('channelManagerOverlay').style.display = 'none';
+          document.getElementById('channelManagerOverlay').classList.add('hidden');
+        }
+
+        function renameChannel(idx) {
+          var ch = dishChannels[idx];
+          if (!ch) return;
+          var newName = prompt('Rename channel ' + idx + ':', ch.name);
+          if (newName && newName.trim()) {
+            ch.name = newName.trim();
+            openChannelManager();
+            showToast('Channel renamed to ' + newName.trim(), '<i class="fa-solid fa-pen"></i>', 'success');
+          }
+        }
+
+        function skipChannel(idx) {
+          var key = 'samsung_skip_channel_' + idx;
+          var skipped = localStorage.getItem(key) === 'true';
+          localStorage.setItem(key, skipped ? 'false' : 'true');
+          showToast('Channel ' + idx + ': ' + (skipped ? 'Unskipped' : 'Skipped'), '<i class="fa-solid fa-forward"></i>', 'info');
+          openChannelManager();
+        }
+
+        function lockChannel(idx) {
+          var key = 'samsung_lock_channel_' + idx;
+          var locked = localStorage.getItem(key) === 'true';
+          localStorage.setItem(key, locked ? 'false' : 'true');
+          showToast('Channel ' + idx + ': ' + (locked ? 'Unlocked' : 'Locked — PIN required'), '<i class="fa-solid fa-lock"></i>', 'info');
+          openChannelManager();
+        }
+
+        function startAutoTuning() {
+          var el = document.getElementById('autoTuningOverlay');
+          if (!el) return;
+          var bar = document.getElementById('autoTuningBar');
+          var status = document.getElementById('autoTuningStatus');
+          el.style.display = 'flex';
+          el.classList.remove('hidden');
+          closeMenu();
+          var progress = 0;
+          var found = 0;
+          var tuningInterval = setInterval(function() {
+            progress += Math.floor(Math.random() * 8) + 2;
+            if (progress >= 100) {
+              progress = 100;
+              clearInterval(tuningInterval);
+              found = Math.floor(Math.random() * 60) + 30;
+              status.textContent = 'Tuning complete! ' + found + ' channels found.';
+              status.className = 'text-green-400 text-[10px]';
+              setTimeout(function() {
+                el.style.display = 'none';
+                el.classList.add('hidden');
+              }, 2000);
+            } else {
+              found += Math.floor(Math.random() * 2);
+              status.textContent = 'Scanning frequency ' + (Math.floor(Math.random() * 900) + 50) + '.' + (Math.floor(Math.random() * 99)) + ' MHz — ' + found + ' channels found';
+            }
+            bar.style.width = progress + '%';
+          }, 200);
+        }
+
+        function cancelAutoTuning() {
+          document.getElementById('autoTuningOverlay').style.display = 'none';
+          document.getElementById('autoTuningOverlay').classList.add('hidden');
+        }
+
+        function openSignalMeter() {
+          var el = document.getElementById('signalMeterOverlay');
+          if (!el) return;
+          el.style.display = 'flex';
+          el.classList.remove('hidden');
+          closeMenu();
+          updateSignalMeter();
+        }
+
+        var signalMeterInterval = null;
+
+        function updateSignalMeter() {
+          var bar = document.getElementById('signalMeterBar');
+          var pct = document.getElementById('signalMeterPct');
+          var quality = document.getElementById('signalMeterQuality');
+          if (!bar) return;
+          if (signalMeterInterval) clearInterval(signalMeterInterval);
+          signalMeterInterval = setInterval(function() {
+            var val = Math.floor(Math.random() * 30) + 70;
+            bar.style.width = val + '%';
+            pct.textContent = val + '%';
+            if (val >= 90) quality.textContent = 'Excellent';
+            else if (val >= 80) quality.textContent = 'Good';
+            else if (val >= 70) quality.textContent = 'Fair';
+            else quality.textContent = 'Poor';
+          }, 500);
+        }
+
+        function closeSignalMeter() {
+          if (signalMeterInterval) { clearInterval(signalMeterInterval); signalMeterInterval = null; }
+          document.getElementById('signalMeterOverlay').style.display = 'none';
+          document.getElementById('signalMeterOverlay').classList.add('hidden');
+        }
+
+        function openCIInfo() {
+          var el = document.getElementById('ciInfoOverlay');
+          if (!el) return;
+          el.style.display = 'flex';
+          el.classList.remove('hidden');
+          closeMenu();
+        }
+
+        function closeCIInfo() {
+          document.getElementById('ciInfoOverlay').style.display = 'none';
+          document.getElementById('ciInfoOverlay').classList.add('hidden');
+        }
+
+        function openSignalInfo() {
+          var ch = dishChannels[dishChannel];
+          var name = ch ? ch.name.replace(/Channel\s+\d+:\s+/, '') : '—';
+          var freq = (Math.floor(Math.random() * 900) + 50) + '.' + (Math.floor(Math.random() * 99)) + ' MHz';
+          var ssi = Math.floor(Math.random() * 30) + 70;
+          var ber = (Math.random() * 1e-6).toExponential(2);
+          document.getElementById('signalInfoChName').textContent = name;
+          document.getElementById('signalInfoFreq').textContent = freq;
+          document.getElementById('signalInfoSsi').textContent = ssi + '%';
+          document.getElementById('signalInfoBer').textContent = ber;
+          var el = document.getElementById('signalInfoOverlay');
+          if (!el) return;
+          el.style.display = 'flex';
+          el.classList.remove('hidden');
+          closeMenu();
+        }
+
+        function closeSignalInfo() {
+          document.getElementById('signalInfoOverlay').style.display = 'none';
+          document.getElementById('signalInfoOverlay').classList.add('hidden');
+        }
+
+        function showSoftwareVersion() {
+          showToast('Software Version: v' + APP_VERSION + ' / ' + (dishChannels[dishChannel] ? dishChannels[dishChannel].name.replace(/Channel\s+\d+:\s+/, '') : '—'), '<i class="fa-solid fa-code-branch"></i>', 'info');
+        }
+
+        function showWarrantyInfo() {
+          var purchase = new Date();
+          purchase.setFullYear(purchase.getFullYear() - 1);
+          var expiry = new Date(purchase);
+          expiry.setFullYear(expiry.getFullYear() + 2);
+          showToast('Warranty: Valid until ' + expiry.toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' }) + '. Standard 2-year limited warranty.', '<i class="fa-solid fa-file-shield"></i>', 'info');
+        }
+
+        function openProductGuide() {
+          var el = document.getElementById('productGuideOverlay');
+          if (!el) return;
+          el.style.display = 'flex';
+          el.classList.remove('hidden');
+          closeMenu();
+        }
+
+        function closeProductGuide() {
+          document.getElementById('productGuideOverlay').style.display = 'none';
+          document.getElementById('productGuideOverlay').classList.add('hidden');
+        }
+
+        var tvPin = localStorage.getItem('samsung_tv_pin') || '0000';
+
+        function openPinSetup() {
+          var el = document.getElementById('pinSetupOverlay');
+          if (!el) return;
+          document.getElementById('pinSetupInput').value = '';
+          document.getElementById('pinSetupStatus').textContent = 'Enter current PIN (default: 0000)';
+          document.getElementById('pinSetupCurrentPin').value = '';
+          el.style.display = 'flex';
+          el.classList.remove('hidden');
+          closeMenu();
+        }
+
+        function confirmPinSetup() {
+          var current = document.getElementById('pinSetupCurrentPin').value;
+          var newPin = document.getElementById('pinSetupInput').value;
+          if (current !== tvPin) {
+            document.getElementById('pinSetupStatus').textContent = 'Incorrect current PIN!';
+            document.getElementById('pinSetupStatus').className = 'text-red-400 text-[11px] mt-1';
+            return;
+          }
+          if (newPin.length !== 4 || isNaN(parseInt(newPin, 10))) {
+            document.getElementById('pinSetupStatus').textContent = 'New PIN must be 4 digits';
+            document.getElementById('pinSetupStatus').className = 'text-red-400 text-[11px] mt-1';
+            return;
+          }
+          tvPin = newPin;
+          localStorage.setItem('samsung_tv_pin', newPin);
+          document.getElementById('pinSetupOverlay').style.display = 'none';
+          document.getElementById('pinSetupOverlay').classList.add('hidden');
+          showToast('PIN changed successfully', '<i class="fa-solid fa-lock"></i>', 'success');
+        }
+
+        function cancelPinSetup() {
+          document.getElementById('pinSetupOverlay').style.display = 'none';
+          document.getElementById('pinSetupOverlay').classList.add('hidden');
+        }
+
+        var plugPlayStep = 0;
+
+        function openPlugAndPlay() {
+          var el = document.getElementById('plugPlayOverlay');
+          if (!el) return;
+          plugPlayStep = 0;
+          renderPlugPlayStep();
+          el.style.display = 'flex';
+          el.classList.remove('hidden');
+          closeMenu();
+        }
+
+        function renderPlugPlayStep() {
+          var steps = [
+            { title: 'Welcome', text: 'Select your OSD language and press OK to continue.', input: 'select', values: ['English', 'Español', 'Français'], key: 'ppLang', idx: menuConfig[3].options[1].current },
+            { title: 'Country', text: 'Select your country for auto-tuning.', input: 'select', values: ['India', 'Pakistan', 'Nepal', 'Bangladesh', 'Sri Lanka'], key: 'ppCountry', idx: 0 },
+            { title: 'Clock Setting', text: 'Set the current date and time.', input: 'clock', key: 'ppClock' },
+            { title: 'Auto Tuning', text: 'Press OK to start auto-tuning channels.', input: 'tune', key: 'ppTune' },
+            { title: 'Complete', text: 'Plug & Play is complete. Enjoy your Samsung TV!', input: 'done', key: 'ppDone' }
+          ];
+          var step = steps[plugPlayStep];
+          if (!step) return;
+          document.getElementById('plugPlayTitle').textContent = step.title;
+          document.getElementById('plugPlayText').textContent = step.text;
+          var body = document.getElementById('plugPlayBody');
+          body.innerHTML = '';
+          if (step.input === 'select') {
+            var sel = document.createElement('select');
+            sel.id = 'ppSelect';
+            sel.className = 'bg-zinc-800 text-zinc-200 border border-zinc-700 rounded px-2 py-1 text-[11px] font-mono mt-2';
+            step.values.forEach(function(v, i) {
+              var o = document.createElement('option');
+              o.value = i;
+              o.textContent = v;
+              if (i === step.idx) o.selected = true;
+              sel.appendChild(o);
+            });
+            body.appendChild(sel);
+          } else if (step.input === 'clock') {
+            body.innerHTML = '<div class="flex gap-2 mt-2 items-center text-[11px]"><label>HH:</label><input id="ppHour" class="w-10 bg-zinc-800 text-zinc-200 border border-zinc-700 rounded px-1 py-0.5 text-center font-mono" value="12" maxlength="2"><label>MM:</label><input id="ppMin" class="w-10 bg-zinc-800 text-zinc-200 border border-zinc-700 rounded px-1 py-0.5 text-center font-mono" value="00" maxlength="2"></div>';
+          } else if (step.input === 'tune') {
+            body.innerHTML = '<button onclick="startPlugPlayTune()" class="bg-amber-600 hover:bg-amber-500 text-white font-bold px-4 py-1.5 rounded text-[10px] mt-2">Start Tuning</button><div id="ppTuneResult" class="text-[10px] text-zinc-400 mt-2"></div>';
+          } else if (step.input === 'done') {
+            body.innerHTML = '<div class="text-amber-400 text-2xl mt-2">✔</div>';
+          }
+          document.getElementById('plugPlayStep').textContent = (plugPlayStep + 1) + ' / ' + steps.length;
+        }
+
+        function nextPlugPlayStep() {
+          var steps = [
+            { title: 'Welcome', text: 'Select your OSD language and press OK to continue.', input: 'select', values: ['English', 'Español', 'Français'], key: 'ppLang', idx: menuConfig[3].options[1].current },
+            { title: 'Country', text: 'Select your country for auto-tuning.', input: 'select', values: ['India', 'Pakistan', 'Nepal', 'Bangladesh', 'Sri Lanka'], key: 'ppCountry', idx: 0 },
+            { title: 'Clock Setting', text: 'Set the current date and time.', input: 'clock', key: 'ppClock' },
+            { title: 'Auto Tuning', text: 'Press OK to start auto-tuning channels.', input: 'tune', key: 'ppTune' },
+            { title: 'Complete', text: 'Plug & Play is complete. Enjoy your Samsung TV!', input: 'done', key: 'ppDone' }
+          ];
+          var step = steps[plugPlayStep];
+          if (!step) return;
+          if (step.input === 'select') {
+            var sel = document.getElementById('ppSelect');
+            if (sel) {
+              var idx = parseInt(sel.value, 10);
+              menuConfig[3].options[1].current = idx;
+            }
+          }
+          if (step.input === 'clock') {
+            var h = parseInt(document.getElementById('ppHour').value, 10) || 12;
+            var m = parseInt(document.getElementById('ppMin').value, 10) || 0;
+            localStorage.setItem('samsung_manual_hours', h);
+            localStorage.setItem('samsung_manual_minutes', m);
+          }
+          if (step.input === 'tune') {
+            var res = document.getElementById('ppTuneResult');
+            if (res && res.textContent.indexOf('complete') === -1) {
+              res.textContent = 'Please start tuning first!';
+              return;
+            }
+          }
+          plugPlayStep++;
+          if (plugPlayStep >= steps.length) {
+            document.getElementById('plugPlayOverlay').style.display = 'none';
+            document.getElementById('plugPlayOverlay').classList.add('hidden');
+            localStorage.setItem('samsung_plug_play_done', 'true');
+            showToast('Plug & Play complete! TV is ready.', '<i class="fa-solid fa-check-circle"></i>', 'success');
+            return;
+          }
+          renderPlugPlayStep();
+        }
+
+        function startPlugPlayTune() {
+          var res = document.getElementById('ppTuneResult');
+          if (!res) return;
+          res.className = 'text-amber-400 text-[10px] mt-2';
+          var p = 0;
+          var tuneInterval = setInterval(function() {
+            p += Math.floor(Math.random() * 10) + 5;
+            if (p >= 100) {
+              p = 100;
+              clearInterval(tuneInterval);
+              res.textContent = 'Tuning complete! 48 channels found.';
+              res.className = 'text-green-400 text-[10px] mt-2';
+            } else {
+              res.textContent = 'Scanning... ' + p + '%';
+            }
+          }, 300);
+        }
+
+        function prevPlugPlayStep() {
+          if (plugPlayStep > 0) { plugPlayStep--; renderPlugPlayStep(); }
+        }
+
+        function closePlugPlay() {
+          document.getElementById('plugPlayOverlay').style.display = 'none';
+          document.getElementById('plugPlayOverlay').classList.add('hidden');
+        }
+
+        function resetEnergySaving() {
+          // Reset auto power off timer on user activity
+          if (autoPowerOffValue !== 'Off' && typeof resetAutoPowerOffTimer === 'function') {
+            resetAutoPowerOffTimer();
+          }
+        }
+
+        // Auto Power Off: reset timer on user activity
+        function resetAutoPowerOffTimer() {
+          if (autoPowerOffValue === 'Off') return;
+          if (autoPowerOffTimer) { clearTimeout(autoPowerOffTimer); autoPowerOffTimer = null; }
+          applyAutoPowerOff(autoPowerOffValue);
+        }
+
+        // Restore settings on boot
+        function restoreNewFeatures() {
+          var gm = localStorage.getItem('samsung_game_mode');
+          if (gm === 'true') { gameModeOn = true; applyGameMode(true); }
+          var bw = localStorage.getItem('samsung_bd_wise');
+          if (bw === 'true') { bdWiseOn = true; applyBDWise(true); }
+          var apo = localStorage.getItem('samsung_auto_power_off');
+          if (apo && apo !== 'Off') applyAutoPowerOff(apo);
+          var mt = localStorage.getItem('samsung_menu_transparency');
+          if (mt) { var mti = ['Opaque', 'Translucent', 'Transparent'].indexOf(mt); if (mti !== -1) { menuConfig[3].options[2].current = mti; applyMenuTransparency(mt); } }
+        }
+
 
         // --- PICTURE-IN-PICTURE (PiP) ---
         let pipState = 'off';
@@ -6173,6 +6868,8 @@
             startExhaleTimer();
             // Restore energy saving mode
             setupEnergySaving();
+            // Restore new features (Game Mode, BD Wise, Auto Power Off)
+            restoreNewFeatures();
 
             // Phase 6 — Retail Demo Mode auto-start
             if (localStorage.getItem('samsung_demo_mode') === 'true') {
