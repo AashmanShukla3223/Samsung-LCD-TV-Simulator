@@ -5342,6 +5342,15 @@
         function applyPictureMode(modeIndex) {
             var pic = menuConfig[0].options;
             var modeName = pic[0].values[modeIndex].toLowerCase();
+            // Always set Energy Saving to High on any Picture Mode change
+            for (var ei = 0; ei < pic.length; ei++) {
+                if (pic[ei].name === 'Energy Saving') {
+                    pic[ei].current = 3;
+                    break;
+                }
+            }
+            localStorage.setItem('samsung_energy_mode', 'high');
+            applyEnergySaving('high');
             if (modeName === 'custom') {
                 pic[0].current = modeIndex;
                 localStorage.setItem('samsung_picture_mode', modeIndex);
@@ -5481,8 +5490,11 @@
         function setupEnergySaving() {
             var savedMode = localStorage.getItem('samsung_energy_mode');
             var picOpts = menuConfig[0].options;
-            var esOpt = picOpts[picOpts.length - 1];
-            if (esOpt && esOpt.name === 'Energy Saving') {
+            var esOpt = null;
+            for (var ei = 0; ei < picOpts.length; ei++) {
+                if (picOpts[ei].name === 'Energy Saving') { esOpt = picOpts[ei]; break; }
+            }
+            if (esOpt) {
                 if (savedMode) {
                     var idx = esOpt.values.map(function(v) { return v.toLowerCase(); }).indexOf(savedMode);
                     if (idx >= 0) esOpt.current = idx;
