@@ -2934,6 +2934,7 @@
                         var picMode = menuConfig[0].options[0];
                         if (picMode && picMode.values[picMode.current] !== 'Custom') {
                             picMode.current = 4;
+                            localStorage.setItem('samsung_picture_mode', 4);
                         }
                         applyPictureSettings();
                     }
@@ -2998,6 +2999,7 @@
                     var picMode = menuConfig[0].options[0];
                     if (picMode && picMode.values[picMode.current] !== 'Custom') {
                         picMode.current = 4;
+                        localStorage.setItem('samsung_picture_mode', 4);
                     }
                     applyPictureSettings();
                 }
