@@ -1631,7 +1631,7 @@
         const REPUBLIC = 'https://d1rc86nwwc9fag.cloudfront.net/out/v1/vglive-sk-561573/534f6684a9824ef894260909ab46b4f1/main_2.m3u8'
         const MUSIC = 'https://epiconvh.akamaized.net/live/9XM/master.m3u8'
         const KAL = 'https://e77bef9b.wurl.com/master/f36d25e7e52f1ba8d7e56eb859c636563214f541/TEctY2FfU29ueUtBTF9ITFM/playlist.m3u8'
-        let APP_VERSION = '1.0.31';
+        let APP_VERSION = '1.0.32';
         const VERCEL_URL = 'https://samsung-lcd-tv.vercel.app';
 
         // Safari needs same-origin proxy (GitHub release assets lack CORS headers);
@@ -1989,7 +1989,7 @@
                 name: "Picture",
                 icon: "fa-sliders",
                 options: [
-                    { name: "Picture Mode", type: "select", values: ["Dynamic", "Standard", "Natural", "Movie"], current: 1 },
+                    { name: "Picture Mode", type: "select", values: ["Dynamic", "Standard", "Natural", "Movie", "Custom"], current: 1 },
                     { name: "Backlight", type: "range", min: 0, max: 20, current: 0 },
                     { name: "Contrast", type: "range", min: 0, max: 100, current: 95 },
                     { name: "Brightness", type: "range", min: 0, max: 100, current: 100 },
@@ -2931,6 +2931,10 @@
                     opt.current = Math.min(opt.max, opt.current + 1);
                     renderCategoryOptions();
                     if (currentMenuCategory === 0) {
+                        var picMode = menuConfig[0].options[0];
+                        if (picMode && picMode.values[picMode.current] !== 'Custom') {
+                            picMode.current = 4;
+                        }
                         applyPictureSettings();
                     }
                 } else if (opt.type === "action") {
@@ -2991,6 +2995,10 @@
                 opt.current = Math.max(opt.min, opt.current - 1);
                 renderCategoryOptions();
                 if (currentMenuCategory === 0) {
+                    var picMode = menuConfig[0].options[0];
+                    if (picMode && picMode.values[picMode.current] !== 'Custom') {
+                        picMode.current = 4;
+                    }
                     applyPictureSettings();
                 }
             } else {
@@ -5332,6 +5340,12 @@
         function applyPictureMode(modeIndex) {
             var pic = menuConfig[0].options;
             var modeName = pic[0].values[modeIndex].toLowerCase();
+            if (modeName === 'custom') {
+                pic[0].current = modeIndex;
+                localStorage.setItem('samsung_picture_mode', modeIndex);
+                showToast('Picture Mode: Custom', '<i class="fa-solid fa-sliders"></i>', 'info');
+                return;
+            }
             var preset = PICTURE_MODE_PRESETS[modeName];
             if (!preset) return;
             pic[1].current = preset.backlight;
@@ -5359,9 +5373,11 @@
             currentContrastFilter = 0.5 + (contrast / 100);
             currentColorFilter = color / 50;
             applyPictureCombinedFilters();
+            localStorage.setItem('samsung_picture_backlight', backlight);
             localStorage.setItem('samsung_picture_brightness', brightness);
             localStorage.setItem('samsung_picture_contrast', contrast);
             localStorage.setItem('samsung_picture_color', color);
+            localStorage.setItem('samsung_picture_sharpness', pic[5].current);
         }
         function applyPictureCombinedFilters() {
             var userBrightness = currentBrightnessFilter || 1;
@@ -6022,7 +6038,29 @@
           var mt = localStorage.getItem('samsung_menu_transparency');
           if (mt) { var mti = ['Opaque', 'Translucent', 'Transparent'].indexOf(mt); if (mti !== -1) { menuConfig[3].options[2].current = mti; applyMenuTransparency(mt); } }
           var pm = localStorage.getItem('samsung_picture_mode');
-          if (pm !== null) { var pmIdx = parseInt(pm, 10); if (!isNaN(pmIdx) && pmIdx >= 0 && pmIdx < menuConfig[0].options[0].values.length) { menuConfig[0].options[0].current = pmIdx; applyPictureMode(pmIdx); } }
+          if (pm !== null) {
+            var pmIdx = parseInt(pm, 10);
+            if (!isNaN(pmIdx) && pmIdx >= 0 && pmIdx < menuConfig[0].options[0].values.length) {
+              menuConfig[0].options[0].current = pmIdx;
+              if (pmIdx === 4) {
+                // Custom — restore individual slider values from localStorage
+                var pic = menuConfig[0].options;
+                var bl = localStorage.getItem('samsung_picture_backlight');
+                var br = localStorage.getItem('samsung_picture_brightness');
+                var ct = localStorage.getItem('samsung_picture_contrast');
+                var cl = localStorage.getItem('samsung_picture_color');
+                var sh = localStorage.getItem('samsung_picture_sharpness');
+                if (bl !== null) pic[1].current = parseInt(bl, 10);
+                if (ct !== null) pic[2].current = parseInt(ct, 10);
+                if (br !== null) pic[3].current = parseInt(br, 10);
+                if (cl !== null) pic[4].current = parseInt(cl, 10);
+                if (sh !== null) pic[5].current = parseInt(sh, 10);
+                applyPictureSettings();
+              } else {
+                applyPictureMode(pmIdx);
+              }
+            }
+          }
         }
 
 
